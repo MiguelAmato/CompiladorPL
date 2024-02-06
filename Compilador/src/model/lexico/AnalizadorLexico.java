@@ -110,7 +110,7 @@ public class AnalizadorLexico {
 			transita(Estado.REC_ID);
 			return null;
 		}
-		ClaseLexica ret = reservadas.get(lex.toString());
+		ClaseLexica ret = reservadas.get(lex.toString().toLowerCase()); 
 		if (ret != null)
 			return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ret);
 		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.ID,lex.toString());

@@ -1,6 +1,10 @@
 package utils;
 
+import java.io.IOException;
+
+import model.lexico.UnidadLexica;
+
 public interface Function
 {
-    public void apply();
+    public UnidadLexica apply() throws IOException;
 }

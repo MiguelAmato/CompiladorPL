@@ -78,6 +78,7 @@ public class AnalizadorLexico {
     }
     
     private boolean hayChar(char c) {return sigCar == c;}
+    private boolean hayExp() {return sigCar == 'e' || sigCar == 'E';}
     private boolean hayLetra() {return sigCar >= 'a' && sigCar <= 'z' || sigCar >= 'A' && sigCar <= 'z';}
 	private boolean hayDigitoPos() {return sigCar >= '1' && sigCar <= '9';}
 	private boolean hayCero() {return sigCar == '0';}
@@ -106,42 +107,83 @@ public class AnalizadorLexico {
 	}
 	
 	protected UnidadLexica recId() throws IOException {
-		if (hayLetra() || hayDigito() || hayChar('_')) {
-			transita(Estado.REC_ID);
-			return null;
-		}
+		if (hayLetra() || hayDigito() || hayChar('_')) { transita(Estado.REC_ID); return null; }
 		ClaseLexica ret = reservadas.get(lex.toString().toLowerCase()); 
 		if (ret != null)
 			return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ret);
 		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.ID,lex.toString());
 	}
 	
-	protected UnidadLexica reMas() {
+	protected UnidadLexica reMas() throws IOException {
+		if (hayDigito()) { transita(Estado.REC_ENT); return null; }
+		if (hayCero()) { transita(Estado.REC_0); return null; }
+		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.MAS);
+	}
+
+	protected UnidadLexica recMenos() throws IOException {
+		if (hayDigito()) { transita(Estado.REC_ENT); return null; }
+		if (hayCero()) { transita(Estado.REC_0); return null; }
+		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.MENOS);
+	}
+
+	protected UnidadLexica recEnt() throws IOException {
+		if (hayDigito()) { transita(Estado.REC_ENT); return null; }
+		if (hayChar('.')) { transita(Estado.REC_PDEC); return null; }
+		if (hayExp()) { transita(Estado.REC_EXP); return null; }  
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.ENT,lex.toString());
+	}
+
+	protected UnidadLexica rec0() throws IOException {
+		if (hayChar('.')) { transita(Estado.REC_PDEC); return null; }
+		if (hayExp()) { transita(Estado.REC_EXP); return null; }  
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.ENT,lex.toString());
+	}
+
+	protected UnidadLexica recPDEC() throws IOException {
+		if (hayDigito()) { transita(Estado.REC_DEC); }
 		return null;
 	}
 
-	protected UnidadLexica recMenos() {
+	protected UnidadLexica recDEC() throws IOException {
+		if (hayDigitoPos()) { transita(Estado.REC_DEC); return null; }
+		if (hayCero()) { transita(Estado.REC_0DEC); return null; }
+		if (hayExp()) { transita(Estado.REC_EXP); return null; } 
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.REAL,lex.toString());
+	}
+
+	protected UnidadLexica rec0DEC() throws IOException {
+		if (hayDigitoPos()) { transita(Estado.REC_DEC); }
+		else if (hayCero()) { transita(Estado.REC_0DEC); }
+		return null;
+	}
+	
+	protected UnidadLexica recExp() throws IOException {
+		if (hayChar('+')) transita(Estado.REC_EXPPOS); 
+		else if (hayChar('-')) transita(Estado.REC_EXPNEG);
+		else if (hayCero()) transita(Estado.REC_0EXP);
+		else if (hayDigitoPos()) transita(Estado.REC_ENTEXP);
 		return null;
 	}
 
-	protected UnidadLexica recEnt() {
+	protected UnidadLexica recExpPos() throws IOException {
+		if (hayCero()) transita(Estado.REC_0EXP);
+		else if (hayDigitoPos()) transita(Estado.REC_ENTEXP);
 		return null;
 	}
 
-	protected UnidadLexica rec0() {
+	protected UnidadLexica recExpNeg() throws IOException {
+		if (hayCero()) transita(Estado.REC_0EXP);
+		else if (hayDigitoPos()) transita(Estado.REC_ENTEXP);
 		return null;
 	}
 
-	protected UnidadLexica recPDEC() {
-		return null;
+	protected UnidadLexica rec0Exp() {
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.REAL,lex.toString());
 	}
 
-	protected UnidadLexica recDEC() {
-		return null;
-	}
-
-	protected UnidadLexica rec0DEC() {
-		return null;
+	protected UnidadLexica recEntExp() throws IOException {
+		if (hayDigito()) { transita(Estado.REC_ENTEXP); return null; }
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.REAL,lex.toString());
 	}
 
 	protected UnidadLexica recAsig() {
@@ -220,26 +262,6 @@ public class AnalizadorLexico {
 		return null;
 	}
 
-	protected UnidadLexica recExp() {
-		return null;
-	}
-
-	protected UnidadLexica recExpPos() {
-		return null;
-	}
-
-	protected UnidadLexica recExpNeg() {
-		return null;
-	}
-
-	protected UnidadLexica rec0Exp() {
-		return null;
-	}
-
-	protected UnidadLexica recEntExp() {
-		return null;
-	}
-
 	protected UnidadLexica recLlavAp() {
 		return null;
 	}
@@ -281,7 +303,7 @@ public class AnalizadorLexico {
 		reconocedor.put(Estado.REC_EXP, () -> recExp());
 		reconocedor.put(Estado.REC_EXPPOS, () -> recExpPos());
 		reconocedor.put(Estado.REC_EXPNEG, () -> recExpNeg());
-		reconocedor.put(Estado.REC_REC0EXP, () -> rec0Exp());
+		reconocedor.put(Estado.REC_0EXP, () -> rec0Exp());
 		reconocedor.put(Estado.REC_ENTEXP, () -> recEntExp());
 		reconocedor.put(Estado.REC_LLAVAP, () -> recLlavAp());
 		reconocedor.put(Estado.RECLLAVCIE, () -> recLlavCie());

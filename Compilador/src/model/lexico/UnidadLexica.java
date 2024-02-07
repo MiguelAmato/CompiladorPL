@@ -2,7 +2,7 @@ package model.lexico;
 
 public abstract class UnidadLexica {
 	
-	private ClaseLexica clase;
+	protected ClaseLexica clase;
 	private int fila;
 	private int columna;
 	

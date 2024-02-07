@@ -9,6 +9,8 @@ public class UnidadLexicaUnivaluada extends UnidadLexica {
 	public String lexema() { throw new UnsupportedOperationException(); }
 	
 	public String toString() {
+		if (clase.equals(ClaseLexica.ERROR))
+			return "(" + fila() + ',' + columna() + "):Caracter inexperado";
 		return "[clase:" + clase() + ",fila:" + fila() + ",col:" + columna() + "]";
 	}
 }

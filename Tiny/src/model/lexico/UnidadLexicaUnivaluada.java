@@ -13,4 +13,8 @@ public class UnidadLexicaUnivaluada extends UnidadLexica {
 			return "(" + fila() + ',' + columna() + "):Caracter inexperado";
 		return "[clase:" + clase() + ",fila:" + fila() + ",col:" + columna() + "]";
 	}
+	
+	public static UnidadLexica error(int fila, int columna) {
+		return new UnidadLexicaUnivaluada(fila, columna, ClaseLexica.ERROR);
+	}
 }

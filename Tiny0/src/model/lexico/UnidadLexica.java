@@ -20,4 +20,5 @@ public abstract class UnidadLexica {
 	
 	public int columna() { return columna; }
 	
+	
 }

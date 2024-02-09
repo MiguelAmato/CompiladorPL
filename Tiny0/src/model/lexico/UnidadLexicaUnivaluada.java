@@ -13,4 +13,7 @@ public class UnidadLexicaUnivaluada extends UnidadLexica {
 			return "(" + fila() + ',' + columna() + "):Caracter inexperado";
 		return "[clase:" + clase() + ",fila:" + fila() + ",col:" + columna() + "]";
 	}
+	
+
+	
 }

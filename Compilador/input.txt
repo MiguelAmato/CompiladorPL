@@ -1,4 +1,1 @@
-int main () {
-	## Comentario de prueba;
-	return0.0;
-}
+1.$

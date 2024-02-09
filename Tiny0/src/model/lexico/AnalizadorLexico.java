@@ -94,7 +94,6 @@ public class AnalizadorLexico {
     }
 	
 	private UnidadLexica recInicio() throws IOException {
-
         if (hayLetra() || hayChar('_')) transita(Estado.REC_ID);
         else if (hayDigitoPos()) transita(Estado.REC_ENT);
         else if (hayCero()) transita(Estado.REC_0);

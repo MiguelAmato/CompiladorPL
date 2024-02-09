@@ -146,13 +146,13 @@ public class AnalizadorLexico {
 		if (hayDigito()) { transita(Estado.REC_ENT); return null; }
 		if (hayChar('.')) { transita(Estado.REC_PDEC); return null; }
 		if (hayExp()) { transita(Estado.REC_EXP); return null; }  
-		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.ENT,lex.toString());
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.LITENT,lex.toString());
 	}
 
 	protected UnidadLexica rec0() throws IOException {
 		if (hayChar('.')) { transita(Estado.REC_PDEC); return null; }
 		if (hayExp()) { transita(Estado.REC_EXP); return null; }  
-		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.ENT,lex.toString());
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.LITENT,lex.toString());
 	}
 
 	protected UnidadLexica recPDEC() throws IOException {
@@ -160,12 +160,12 @@ public class AnalizadorLexico {
 		else return error();
 		return null;
 	}
-
+	
 	protected UnidadLexica recDEC() throws IOException {
 		if (hayDigitoPos()) { transita(Estado.REC_DEC); return null; }
 		if (hayCero()) { transita(Estado.REC_0DEC); return null; }
 		if (hayExp()) { transita(Estado.REC_EXP); return null; } 
-		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.REAL,lex.toString());
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.LITREAL,lex.toString());
 	}
 
 	protected UnidadLexica rec0DEC() throws IOException {
@@ -199,12 +199,12 @@ public class AnalizadorLexico {
 	}
 
 	protected UnidadLexica rec0Exp() {
-		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.REAL,lex.toString());
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.LITREAL,lex.toString());
 	}
 
 	protected UnidadLexica recEntExp() throws IOException {
 		if (hayDigito()) { transita(Estado.REC_ENTEXP); return null; }
-		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.REAL,lex.toString());
+		return new UnidadLexicaMultivaluada(filaInicio,columnaInicio,ClaseLexica.LITREAL,lex.toString());
 	}
 	
 	protected UnidadLexica recComInt() throws IOException {

@@ -759,7 +759,7 @@ public class AnalizadorLexico {
       else {
         switch (zzAction < 0 ? zzAction : ZZ_ACTION[zzAction]) {
           case 1:
-            { UnidadLexicaUnivaluada.error(getFila(), getColumna());
+            { return UnidadLexicaUnivaluada.error(getFila(), getColumna());
             }
             // fall through
           case 54: break;

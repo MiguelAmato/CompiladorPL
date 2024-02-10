@@ -3,7 +3,7 @@ package model.lexico;
 public enum ClaseLexica {
     MAS("+"),
     MENOS("-"),
-    MUL("*"),
+    MUL("+"),
     DIV("/"),
     MENOR("<"),
     MAYOR(">"),
@@ -15,7 +15,6 @@ public enum ClaseLexica {
     PARAP("("),
     PARCIE(")"),
     PUNYCOMA(";"),
-    COMA(","),
     LLAVAP("{"),
     LLAVCIE("}"),
     CAMBIOSEC("&&"),
@@ -32,7 +31,6 @@ public enum ClaseLexica {
     EOF,
     LITENT,
     LITREAL,
-    PUNTO("."),
     ERROR;
 
     private String image;
@@ -49,4 +47,3 @@ public enum ClaseLexica {
         this.image = image;
     }
 }
-

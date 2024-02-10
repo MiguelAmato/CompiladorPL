@@ -79,7 +79,7 @@ public class AnalizadorLexico {
     
     private boolean hayChar(char c) {return sigCar == c;}
     private boolean hayExp() {return sigCar == 'e' || sigCar == 'E';}
-    private boolean hayLetra() {return sigCar >= 'a' && sigCar <= 'z' || sigCar >= 'A' && sigCar <= 'z';}
+    private boolean hayLetra() {return sigCar >= 'a' && sigCar <= 'z' || sigCar >= 'A' && sigCar <= 'Z';}
 	private boolean hayDigitoPos() {return sigCar >= '1' && sigCar <= '9';}
 	private boolean hayCero() {return sigCar == '0';}
 	private boolean hayDigito() {return hayDigitoPos() || hayCero();}
@@ -108,9 +108,7 @@ public class AnalizadorLexico {
         else if (hayChar('/')) transita(Estado.REC_DIV);
         else if (hayChar('(')) transita(Estado.REC_PAP);
         else if (hayChar(')')) transita(Estado.REC_PCIE);
-        else if (hayChar(',')) transita(Estado.REC_COMA);
         else if (hayChar(';')) transita(Estado.REC_PYCO);
-        else if (hayChar('.')) transita(Estado.REC_PUNTO);
         else if (hayChar('@')) transita(Estado.REC_EVAL);
         else if (hayChar('{')) transita(Estado.REC_LLAVAP);
         else if (hayChar('}')) transita(Estado.REC_LLAVCIE);
@@ -286,17 +284,12 @@ public class AnalizadorLexico {
 		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.PARCIE);
 	}
 
-	protected UnidadLexica recComa() {
-		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.COMA);
-	}
+
 
 	protected UnidadLexica recPYCo() {
 		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.PUNYCOMA);
 	}
 
-	protected UnidadLexica recPunto() {
-		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.PUNTO);
-	}
 
 	protected UnidadLexica recEval() {
 		return new UnidadLexicaUnivaluada(filaInicio,columnaInicio,ClaseLexica.EVAL);
@@ -333,9 +326,7 @@ public class AnalizadorLexico {
 		reconocedor.put(Estado.REC_DIV, () -> recDiv());
 		reconocedor.put(Estado.REC_PAP, () -> recPAp());
 		reconocedor.put(Estado.REC_PCIE, () -> recPCie());
-		reconocedor.put(Estado.REC_COMA, () -> recComa());
 		reconocedor.put(Estado.REC_PYCO, () -> recPYCo());
-		reconocedor.put(Estado.REC_PUNTO, () -> recPunto());
 		reconocedor.put(Estado.REC_CAMBSEC, () -> recCambSec());
 		reconocedor.put(Estado.REC_CAMBSECFIN, () -> recCambSecFin());
 		reconocedor.put(Estado.REC_EVAL, () -> recEval());

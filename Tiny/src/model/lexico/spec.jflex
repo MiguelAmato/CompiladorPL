@@ -4,6 +4,7 @@ package model.lexico;
 %line
 %column
 %class AnalizadorLexico
+%public
 %type UnidadLexica
 %unicode
 
@@ -83,7 +84,7 @@ igualdad = \=\=
 distinto = \!\=
 
 separador = [ ,\t,\r,\b,\n]
-comentario = ##([^\n])*
+comentario = \#\#([^\n])*
 %%
 {int}  { return new UnidadLexicaUnivaluada(getFila(),getColumna(),ClaseLexica.INT); }
 {real}  { return new UnidadLexicaUnivaluada(getFila(),getColumna(),ClaseLexica.REAL); }
@@ -138,4 +139,4 @@ comentario = ##([^\n])*
 {literalCadena}  { return new UnidadLexicaMultivaluada(getFila(),getColumna(),ClaseLexica.LITERAL_CADENA,getLexema()); }
 {separador} {}
 {comentario} {}
-[^] {UnidadLexicaUnivaluada.error(getFila(), getColumna());}
+[^] {return UnidadLexicaUnivaluada.error(getFila(), getColumna());}

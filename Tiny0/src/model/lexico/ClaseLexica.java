@@ -3,7 +3,7 @@ package model.lexico;
 public enum ClaseLexica {
     MAS("+"),
     MENOS("-"),
-    MUL("+"),
+    MUL("*"),
     DIV("/"),
     MENOR("<"),
     MAYOR(">"),

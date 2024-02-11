@@ -25,7 +25,7 @@ public enum ClaseLexica {
     CALL("<call>"),
     SUMA("+"),
     RESTA("-"),
-    MULTIPLICACION("+"),
+    MULTIPLICACION("*"),
     DIVISION("/"),
     MODULO("%"),
     PARENTESIS_APERTURA("("),

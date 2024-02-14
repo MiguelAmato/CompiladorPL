@@ -1,0 +1,10 @@
+{
+## prueba 0: correcto
+real exp1;
+real exp2;
+real res
+&&
+@ exp1 = 2e5 + 3
+@ exp2 = 3e5 + 2
+@ res = exp1 + exp2
+}

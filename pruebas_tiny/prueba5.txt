@@ -1,0 +1,6 @@
+{
+## prueba 5: identificadores
+bOoL reale;  
+&&
+@ reale = fAlSe or TrUe; 
+}

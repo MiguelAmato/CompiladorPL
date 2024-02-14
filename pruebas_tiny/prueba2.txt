@@ -1,0 +1,10 @@
+{
+## prueba 2: exponenciales y reales
+real mal;
+real bien;
+real exp;
+&&
+read bien;
+@ mal = 3.a
+@ exp = 2e-5 + bien 
+}

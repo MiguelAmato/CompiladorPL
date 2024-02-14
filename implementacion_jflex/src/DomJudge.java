@@ -19,8 +19,8 @@ public class DomJudge {
 	}	
 
    public static void main(String[] args) throws FileNotFoundException, IOException {
-     Reader input  = new InputStreamReader(System.in);
-	 //Reader input = new InputStreamReader(new FileInputStream("input.txt"));
+     //Reader input  = new InputStreamReader(System.in);
+	 Reader input = new InputStreamReader(new FileInputStream("input.txt"));
      AnalizadorLexico al = new AnalizadorLexico(input);
      UnidadLexica unidad = null;
      do {

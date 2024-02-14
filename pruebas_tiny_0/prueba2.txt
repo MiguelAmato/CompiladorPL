@@ -1,0 +1,6 @@
+{
+## prueba 2: fallo comentario 
+# esto es un comentario erroneo
+&&
+@ x = 3.5
+}

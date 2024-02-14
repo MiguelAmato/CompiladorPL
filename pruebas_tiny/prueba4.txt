@@ -1,0 +1,11 @@
+{
+## prueba 3: palabras reservadas
+bOoL a;  
+reAl b;
+inT c;
+stRiNg d;
+&&
+@ a = fAlSe oR TrUe; 
+@ a = not TrUe and fAlSe;
+@ d = nUlL
+}

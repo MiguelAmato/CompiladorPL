@@ -1,0 +1,9 @@
+{
+## prueba 3: palabras reservadas
+bOoL a;  
+reAl b;
+inT c;
+&&
+@ a = fAlSe oR TrUe; 
+@ a = not TrUe;
+}

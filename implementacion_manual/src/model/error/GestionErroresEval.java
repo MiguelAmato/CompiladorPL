@@ -7,13 +7,17 @@ import model.lexico.ClaseLexica;
 public class GestionErroresEval {
 	
 	   public static class ErrorLexico extends RuntimeException {
-	       public ErrorLexico(String msg) {
+		private static final long serialVersionUID = 1L;
+
+		public ErrorLexico(String msg) {
 	           super(msg);
 	       }
 	   } 
 	   
 	   public static class ErrorSintactico extends RuntimeException {
-	       public ErrorSintactico(String msg) {
+		private static final long serialVersionUID = 1L;
+
+		public ErrorSintactico(String msg) {
 	           super(msg);
 	       }
 	   } 

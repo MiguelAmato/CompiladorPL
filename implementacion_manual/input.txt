@@ -1,10 +1,15 @@
+## Programa con seccion de declaraciones y 
+## seccion de instrucciones 
 { 
-## Programa simple de ejemplo 
- 
-real peso; 
-bool pesado 
-&& 
-@ peso = (45.0 * 12e-56) / -2.05; 
-@ pesado = (peso > 10.0) or (peso / 2 <= 
-+0.0) 
-}
+  int x; 
+  ReAl y; 
+  Bool z 
+  && 
+  @ x = y = z; 
+  @ x == false < z <= k >= true > 10 != 5; 
+  @ 5 - 6 + 7  + 8 + 9; 
+  @ x and y and z or k; 
+  @ x * y / z * 6e56; 
+  @ not - not - - not x; 
+  @ ((true or false) and (5 - 6) * 7)=a 
+}  

@@ -28,7 +28,7 @@ public enum ClaseLexica {
     AND("<and>"),
     OR("<or>"),
     NOT("<not>"),
-    EOF,
+    EOF("<EOF>"),
     LITENT,
     LITREAL;
 

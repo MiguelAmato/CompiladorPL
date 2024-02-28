@@ -7,11 +7,34 @@ import java.io.Reader;
 
 import model.error.GestionErroresEval;
 import model.error.GestionErroresEval.ErrorLexico;
+import model.error.GestionErroresEval.ErrorSintactico;
 import model.lexico.AnalizadorLexico;
 import model.lexico.ClaseLexica;
 import model.lexico.UnidadLexica;
+import model.sintactico.*;
 
 
+public class DomJudge{
+	   public static void main(String[] args) throws Exception {
+	     try{  
+	      AnalizadorSintacticoEval asint = new AnalizadorSintacticoEvalDJ(new InputStreamReader(System.in));
+	      //AnalizadorSintacticoEval asint = new AnalizadorSintacticoEvalDJ(new InputStreamReader(new FileInputStream("input.txt")));
+	      asint.analiza();
+	     }
+	     catch(ErrorSintactico e) {
+	        System.out.println("ERROR_SINTACTICO"); 
+	     }
+	     catch(ErrorLexico e) {
+	        System.out.println("ERROR_LEXICO"); 
+	     }
+	   }
+	}
+
+/*
+	
+// README: Si se quiere probar solo el analizador lexico se descomenta esta seccion y se comenta la otra
+	
+	
 public class DomJudge {
 	private static void imprime(UnidadLexica unidad) {
 		switch(unidad.clase()) {
@@ -42,3 +65,4 @@ public class DomJudge {
      while (error || unidad.clase() != ClaseLexica.EOF);
     }             
 } 
+*/

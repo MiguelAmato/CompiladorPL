@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import model.error.GestionErroresEval;
+import model.error.GestionErroresEval.ErrorLexico;
 import model.lexico.AnalizadorLexico;
 import model.lexico.ClaseLexica;
 import model.lexico.UnidadLexica;
@@ -22,11 +24,21 @@ public class DomJudge {
      Reader input  = new InputStreamReader(System.in);
 	 //Reader input = new InputStreamReader(new FileInputStream("input.txt"));
      AnalizadorLexico al = new AnalizadorLexico(input);
+     GestionErroresEval errores = new GestionErroresEval();
+     al.fijaGestionErrores(errores);
      UnidadLexica unidad = null;
+     boolean error;
      do {
+       error = false;  
+       try {  
          unidad = al.sigToken();
-         imprime(unidad);
+	     imprime(unidad);
+       }
+       catch(ErrorLexico e) {
+              System.out.println("ERROR");
+              error = true;
+       }
      }
-     while (unidad.clase() != ClaseLexica.EOF);
-    }        
+     while (error || unidad.clase() != ClaseLexica.EOF);
+    }             
 } 

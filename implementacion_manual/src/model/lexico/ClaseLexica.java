@@ -30,8 +30,7 @@ public enum ClaseLexica {
     NOT("<not>"),
     EOF,
     LITENT,
-    LITREAL,
-    ERROR;
+    LITREAL;
 
     private String image;
 

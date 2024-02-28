@@ -5,6 +5,7 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
+import model.error.GestionErroresEval;
 import utils.Function;
 
 public class AnalizadorLexico {
@@ -18,6 +19,8 @@ public class AnalizadorLexico {
 	 private int columnaActual;
 	 private Estado estado;
 	 private static String NL = System.getProperty("line.separator");
+	 
+	 GestionErroresEval errores;
 	 
 	 private Map<Estado, Function> reconocedor;
 	 private Map<String, ClaseLexica> reservadas;
@@ -86,11 +89,12 @@ public class AnalizadorLexico {
 	private boolean haySep() {return sigCar == ' ' || sigCar == '\t' || sigCar=='\n' || sigCar == '\r'|| sigCar == '\b';}
 	private boolean hayEOF() {return sigCar == -1;}
     
-    private UnidadLexica error() throws IOException {
+    private void error() throws IOException {
     	transitaIgnorando(Estado.INICIO);
 		lex.delete(0,lex.length());
         //System.err.println("(" + filaActual + ',' + columnaActual + "):Caracter inexperado"); 
-        return new UnidadLexicaUnivaluada(filaActual, columnaActual, ClaseLexica.ERROR);
+        //return new UnidadLexicaUnivaluada(filaActual, columnaActual, ClaseLexica.ERROR);
+		errores.errorLexico(filaActual, columnaActual, (char)sigCar);
     }
 	
 	private UnidadLexica recInicio() throws IOException {
@@ -115,7 +119,7 @@ public class AnalizadorLexico {
         else if (hayChar('#')) transitaIgnorando(Estado.REC_COMINT);
         else if (haySep()) transitaIgnorando(Estado.INICIO);
         else if (hayEOF()) transita(Estado.REC_EOF);
-        else return error();
+        else error();
 		return null;
 	}
 	
@@ -154,7 +158,7 @@ public class AnalizadorLexico {
 
 	protected UnidadLexica recPDEC() throws IOException {
 		if (hayDigito()) { transita(Estado.REC_DEC); }
-		else return error();
+		else error();
 		return null;
 	}
 	
@@ -168,7 +172,7 @@ public class AnalizadorLexico {
 	protected UnidadLexica rec0DEC() throws IOException {
 		if (hayDigitoPos()) { transita(Estado.REC_DEC); }
 		else if (hayCero()) { transita(Estado.REC_0DEC); }
-		else return error();
+		else error();
 		return null;
 	}
 	
@@ -177,21 +181,21 @@ public class AnalizadorLexico {
 		else if (hayChar('-')) transita(Estado.REC_EXPNEG);
 		else if (hayCero()) transita(Estado.REC_0EXP);
 		else if (hayDigitoPos()) transita(Estado.REC_ENTEXP);
-		else return error();
+		else error();
 		return null;
 	}
 
 	protected UnidadLexica recExpPos() throws IOException {
 		if (hayCero()) transita(Estado.REC_0EXP);
 		else if (hayDigitoPos()) transita(Estado.REC_ENTEXP);
-		else return error();
+		else error();
 		return null;
 	}
 
 	protected UnidadLexica recExpNeg() throws IOException {
 		if (hayCero()) transita(Estado.REC_0EXP);
 		else if (hayDigitoPos()) transita(Estado.REC_ENTEXP);
-		else return error();
+		else error();
 		return null;
 	}
 
@@ -206,7 +210,7 @@ public class AnalizadorLexico {
 	
 	protected UnidadLexica recComInt() throws IOException {
 		if (hayChar('#')) transitaIgnorando(Estado.REC_COM);
-		else return error();
+		else error();
 		return null;
 	}
 	
@@ -232,7 +236,7 @@ public class AnalizadorLexico {
 
 	protected UnidadLexica recDist() throws IOException {
 		if (hayChar('=')) { transita(Estado.REC_DISTFIN); }
-		else return error();
+		else error();
 		return null;
 	}
 
@@ -260,7 +264,7 @@ public class AnalizadorLexico {
 	
 	protected UnidadLexica recCambSec() throws IOException {
 		if (hayChar('&')) transita(Estado.REC_CAMBSECFIN);
-		else return error();
+		else error();
 		return null;
 	}
 	
@@ -354,6 +358,10 @@ public class AnalizadorLexico {
 			put("or", ClaseLexica.OR);
 			put("not", ClaseLexica.NOT);
 		}};
+	}
+
+	public void fijaGestionErrores(GestionErroresEval errores) {
+		this.errores = errores;
 	}
 	
 	

@@ -1,0 +1,126 @@
+options  {
+  STATIC=false;
+  DEBUG_PARSER=true;
+}  
+PARSER_BEGIN(AnalizadorSintacticoTiny)
+package asint;
+
+public class AnalizadorSintacticoTiny {
+    protected void newToken(Token t) {}
+}
+
+PARSER_END(AnalizadorSintacticoTiny)
+	TOKEN:{<#letra:["a"-"z","A"-"Z","_"]>}
+	TOKEN:{<#digitoPositivo:["1"-"9"]>}
+	TOKEN:{<#digito:<digitoPositivo>|"0">}
+	TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">}
+	TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
+	TOKEN:{<#decimal: "."<parteDecimal>>}
+	TOKEN:{<#exponencial: ("e"|"E")(["+","-"])?<parteEntera>>}
+	TOKEN:{<and:("a"|"A")("n"|"N")("d"|"D")>}
+	TOKEN:{<or:("o"|"O")("r"|"R")>}
+	TOKEN:{<not:("n"|"N")("o"|"O")("t"|"T")>}
+	TOKEN:{<ent:("i"|"I")("n"|"N")("t"|"T")>}
+	TOKEN:{<real:("r"|"R")("e"|"E")("a"|"A")("l"|"L")>}
+	TOKEN:{<bool:("b"|"B")("o"|"O")("o"|"O")("l"|"L")>}
+	TOKEN:{<string:("s"|"S")("t"|"T")("r"|"R")("i"|"I")("n"|"N")("g"|"G")>}
+	TOKEN:{<nulo:("n"|"N")("u"|"U")("l"|"L")("l"|"L")>}
+	TOKEN:{<falso:("f"|"F")("a"|"A")("l"|"L")("s"|"S")("e"|"E")>}
+	TOKEN:{<verdadero:("t"|"T")("r"|"R")("u"|"U")("e"|"E")>}
+	TOKEN:{<proc:("p"|"P")("r"|"R")("o"|"O")("c"|"C")>}
+	TOKEN:{<If:("i"|"I")("f"|"F")>}
+	TOKEN:{<Else:("e"|"E")("l"|"L")("s"|"S")("e"|"E")>}
+	TOKEN:{<While:("w"|"W")("h"|"H")("i"|"I")("l"|"L")("e"|"E")>}
+	TOKEN:{<struct:("s"|"S")("t"|"T")("r"|"R")("u"|"U")("c"|"C")("t"|"T")>}
+	TOKEN:{<New:("n"|"N")("e"|"E")("w"|"W")>}
+	TOKEN:{<Delete:("d"|"D")("e"|"E")("l"|"L")("e"|"E")("t"|"T")("e"|"E")>}
+	TOKEN:{<read:("r"|"R")("e"|"E")("a"|"A")("d"|"D")>}
+	TOKEN:{<write:("w"|"W")("r"|"R")("i"|"I")("t"|"T")("e"|"E")>}
+	TOKEN:{<nl:("n"|"N")("l"|"L")>}
+	TOKEN:{<type:("t"|"T")("y"|"Y")("p"|"P")("e"|"E")>}
+	TOKEN:{<call:("c"|"C")("a"|"A")("l"|"L")("l"|"L")>}
+	TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
+	TOKEN:{<literal_entero:(["+","-"])?<parteEntera>>}
+	TOKEN:{<literal_cadena:"\""(~["\""])*"\"">}
+	TOKEN:{<literal_real:(<literal_entero><decimal>)|(<literal_entero><exponencial>)|(<literal_entero><decimal><exponencial>)>}
+    TOKEN:{<menorIgual:"<=">}
+    TOKEN:{<mayorIgual:">=">}
+    TOKEN:{<igualdad:"==">}
+    TOKEN:{<distinto:"!=">}
+    TOKEN:{<cambioSec:"&&">}
+	SKIP:{<["\t"," ","\r","\b","\n"]>}
+	SKIP:{<"##"((~["\n"]) | "\'")*>}
+
+	void analiza() : {} {programa() <EOF> }
+	void programa() : {} {bloque()}
+	void bloque() : {} {"{" declaraciones_opt() instrucciones_opt() "}"}
+
+	void declaraciones_opt() : {} {seccion_declaraciones() | {}}
+	void seccion_declaraciones() : {} {lista_declaraciones() <cambioSec>}
+
+	void lista_declaraciones() : {} {declaracion() lista_declaraciones_re()}
+	void lista_declaraciones_re() : {} {";" declaracion() lista_declaraciones_re() | {}}
+	
+	void declaracion() : {} {declaracion_variable() | declaracion_tipo() | declaracion_proc()}
+	void declaracion_variable() : {} {tipo() <identificador>}
+	void declaracion_tipo() : {} {<type> tipo() <identificador>}
+	void declaracion_proc() : {} {cabecera_proc() bloque()}
+	void cabecera_proc() : {} {<proc> <identificador> "(" parametros_formales() ")"}
+	void parametros_formales() : {} {lista_parametros() | {}}
+	void lista_parametros() : {} {parametro() lista_parametros_re()}
+	void lista_parametros_re() : {} {"," parametro() lista_parametros_re() | {}}
+	void parametro() : {} {tipo() parametro_re()}
+	void parametro_re() : {} {<identificador> | "&" <identificador>}
+
+	void tipo() : {} {tipo1() tipo_re()}
+	void tipo_re() : {} {("["<literal_entero>"]") tipo_re() | {}}
+	void tipo1() : {} {"^" tipo1() | tipo2() }
+	void tipo2() : {} {<ent> | <real> | <bool> | <string> | <identificador> | tipo_struct()}
+	void tipo_struct() : {} {<struct> "{" lista_struct() "}"}
+	void lista_struct() : {} {campo() lista_struct_re()}
+	void lista_struct_re() : {} {"," campo() lista_struct_re() | {}}
+	void campo() : {} {tipo() <identificador>}
+
+	void instrucciones_opt() : {} {lista_instrucciones() | {}}
+	void lista_instrucciones() : {} {instruccion() lista_instrucciones_re()}
+	void lista_instrucciones_re() : {} {";" instruccion() lista_instrucciones_re() | {}}
+	void instruccion() : {} {instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_reserva() | instruccion_libera() | instruccion_call() | instruccion_compuesta()}
+	void instruccion_eval() : {} {"@" E0()}
+	void instruccion_if() : {} {<If> E0() bloque() instruccion_if_re()}
+	void instruccion_if_re() : {} {<Else> bloque() | {}}
+	void instruccion_while() : {} {<While> E0() bloque()}
+	void instruccion_read() : {} {<read> E0()}
+	void instruccion_write() : {} {<write> E0()}
+	void instruccion_nl() : {} {<nl>}
+	void instruccion_reserva() : {} {<New> E0()}
+	void instruccion_libera() : {} {<Delete> E0()}
+	void instruccion_call() : {} {<call> <identificador> "(" parametros_reales() ")"}
+	void parametros_reales() : {} {lista_parametros_reales() | {}}
+	void lista_parametros_reales() : {} {E0() lista_parametros_reales_re()}
+	void lista_parametros_reales_re() : {} {"," E0() lista_parametros_reales_re() | {}}
+	void instruccion_compuesta() : {} {bloque()}
+
+	void E0() : {} {E1() E0RE()}
+	void E0RE() : {} {"=" E0() | {}}
+	void E1() : {} {E2() E1RE()}
+	void E1RE() : {} {op_relacional() E2() E1RE() | {}}
+	void E2() : {} {E3() E2RE() E2RE1()}
+	void E2RE1() : {} {"+" E3() E2RE1() | {}}
+	void E2RE() : {} {"-" E3() | {}}
+	void E3() : {} {E4() E3RE()}
+	void E3RE() : {} {<and> E3() | <or> E4() | {}}
+	void E4() : {} {E5() E4RE()}
+	void E4RE() : {} {op_nivel4() E5() E4RE() | {}}
+	void E5() : {} {op_nivel5() E5() | E6()}
+	void E6() : {} {E7() E6RE()}
+	void E6RE() : {} {op_nivel6() E6RE() | {}}
+	void E7() : {} {"(" E0() ")" | op_basico()}
+	void op_relacional() : {} {">" | <mayorIgual> | "<" | <menorIgual> | <igualdad> | <distinto>}
+	void op_nivel4() : {} {"*" | "/" | "%"}
+	void op_nivel5() : {} {"-" | <not>}
+	void op_nivel6() : {} {op_indexacion() | op_registro() | op_indireccion()}
+	void op_indexacion() : {} {"[" E0() "]"}
+	void op_registro() : {} {"." <identificador>}
+	void op_indireccion() : {} {"^" op_indireccion_re()}
+	void op_indireccion_re() : {} {op_indireccion() | {}}
+	void op_basico() : {} {<literal_entero> | <literal_real> | <verdadero> | <falso> | <literal_cadena> | <identificador> | <nulo>}

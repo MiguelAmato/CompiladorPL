@@ -23,7 +23,7 @@ public class AnalizadorSintacticoEval {
 		 sigToken();
 	}
 	
-	 public void analiza() {
+	public void analiza() {
 		 programa();
 		 empareja(ClaseLexica.EOF);
 	}

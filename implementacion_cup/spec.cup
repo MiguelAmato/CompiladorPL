@@ -1,6 +1,0 @@
-package asint;
-
-import java_cup.runtime.*;
-import alex.AnalizadorLexico;
-import alex.UnidadLexica;
-import errors.GestionErroresEval;

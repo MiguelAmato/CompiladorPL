@@ -1,0 +1,185 @@
+package asint;
+
+import java_cup.runtime.*;
+import alex.AnalizadorLexico;
+import alex.UnidadLexica;
+import errors.GestionErroresEval;
+
+scan with {: 
+  return getScanner().next_token(); 
+:};
+parser code {: 
+   private GestionErroresEval errores;
+   public void syntax_error(Symbol unidadLexica) {
+     errores.errorSintactico((UnidadLexica)unidadLexica);
+   }
+:};
+init with {: 
+   errores = new GestionErroresEval();
+   AnalizadorLexico alex = (AnalizadorLexico)getScanner();
+   alex.fijaGestionErrores(errores);
+:};
+
+
+terminal      INT, REAL, BOOL, STRING, AND, OR, NOT, NULL, TRUE, FALSE, PROC, IF, ELSE, WHILE, STRUCT, NEW, DELETE, 
+              READ, WRITE, NL, TYPE, CALL, SUMA, RESTA, MULTIPLICACION, DIVISION, MODULO, PARENTESIS_APERTURA, 
+              PARENTESIS_CIERRE, ASIG, COMA, PUNTO_Y_COMA, CORCHETE_APERTURA, CORCHETE_CIERRE, PUNTO, PUNTERO, 
+              LLAVE_APERTURA, LLAVE_CIERRE, REFERENCIA, CAMBIO_DE_SECUENCIA, EVAL, MENOR, MAYOR, MENOR_O_IGUAL, 
+              MAYOR_O_IGUAL, IGUALDAD, DISTINTO, IDENTIFICADOR, LITERAL_ENTERO, LITERAL_REAL, LITERAL_CADENA;
+
+non terminal  programa, _bloque, declaraciones_opt, seccion_declaraciones, lista_declaraciones, lista_declaraciones_re, 
+              declaracion, declaracion_variable, declaracion_tipo, declaracion_proc, cabecera_proc, parametros_formales, 
+              lista_parametros, lista_parametros_re, parametro, parametrore, tipo, tipore, tipo1, tipo_struct, lista_struct, 
+              lista_struct_re, campo, instrucciones_opt, lista_instrucciones, lista_instrucciones_re, instruccion, 
+              instruccion_eval, instruccion_if, instruccion_if_re, instruccion_while, instruccion_read, instruccion_write, 
+              instruccion_nl, instruccion_reserva, instruccion_libera, instruccion_call, instruccion_compuesta, E0, E0RE, 
+              E1, E1RE, E2, E2RE1, E2RE, E3, E3RE, E4, E4RE, E5, E6, E6RE, E7, op_relacional, op_nivel4, op_nivel5, op_nivel6, 
+              op_indexacion, op_registro, op_indireccion, op_basico, tipo2, parametros_reales, lista_parametros_reales,
+              lista_parametros_reales_re;
+
+programa	::= _bloque;
+_bloque		::= LLAVE_APERTURA declaraciones_opt instrucciones_opt LLAVE_CIERRE;
+
+declaraciones_opt	::= seccion_declaraciones;
+declaraciones_opt	::= ;
+
+seccion_declaraciones	::= lista_declaraciones CAMBIO_DE_SECUENCIA;
+lista_declaraciones		::= declaracion lista_declaraciones_re;
+lista_declaraciones_re	::= PUNTO_Y_COMA declaracion  lista_declaraciones_re;
+lista_declaraciones_re	::= ;
+
+declaracion ::= declaracion_variable;
+declaracion ::= declaracion_tipo;
+declaracion ::= declaracion_proc;
+
+declaracion_variable	::= tipo IDENTIFICADOR;
+
+declaracion_tipo	::= TYPE tipo IDENTIFICADOR;
+
+
+declaracion_proc	::= cabecera_proc _bloque;
+  
+cabecera_proc 	::= PROC IDENTIFICADOR PARENTESIS_APERTURA parametros_formales PARENTESIS_CIERRE;
+  
+parametros_formales ::= lista_parametros;
+parametros_formales ::= ;
+
+lista_parametros ::= parametro lista_parametros_re;
+lista_parametros_re ::= COMA parametro lista_parametros_re;
+lista_parametros_re ::=  ;
+
+parametro ::= tipo parametrore;
+parametrore::= IDENTIFICADOR;
+parametrore::= REFERENCIA IDENTIFICADOR;
+
+tipo	::= tipo1 tipore;
+tipore	::= CORCHETE_APERTURA LITERAL_ENTERO CORCHETE_CIERRE;
+tipore	::= ;
+tipo1	::= PUNTERO tipo1;
+tipo1 ::= tipo2;
+tipo2	::= INT;
+tipo2	::= REAL;
+tipo2	::= BOOL;
+tipo2	::= STRING;
+tipo2	::= IDENTIFICADOR;
+tipo2	::= tipo_struct;
+
+tipo_struct	::= STRUCT LLAVE_APERTURA lista_struct LLAVE_CIERRE;
+lista_struct 	::= campo lista_struct_re;
+lista_struct_re ::= COMA campo lista_struct_re;
+lista_struct_re ::= ;
+campo	::= tipo IDENTIFICADOR;
+
+instrucciones_opt	::= lista_instrucciones;
+instrucciones_opt	::= ;
+
+lista_instrucciones	::= instruccion lista_instrucciones_re;
+lista_instrucciones_re ::= PUNTO_Y_COMA instruccion lista_instrucciones_re;
+lista_instrucciones_re ::= ;
+
+instruccion	::= instruccion_eval;
+instruccion	::= instruccion_if;
+instruccion	::= instruccion_while;
+instruccion	::= instruccion_read;
+instruccion	::= instruccion_write;
+instruccion	::= instruccion_nl;
+instruccion	::= instruccion_reserva;
+instruccion	::= instruccion_libera;
+instruccion	::= instruccion_call;
+instruccion	::= instruccion_compuesta ;
+
+instruccion_eval	::= EVAL E0;
+instruccion_if		::= IF E0 _bloque instruccion_if_re;
+instruccion_if_re	::= ELSE _bloque;
+instruccion_if_re	::= ;
+instruccion_while	::= WHILE E0 _bloque;
+instruccion_read	::= READ E0 ;
+instruccion_write	::= WRITE E0 ;
+instruccion_nl	::= NL;
+instruccion_reserva	::= NEW E0 ;
+instruccion_libera	::= DELETE E0 ;
+instruccion_call		::= CALL IDENTIFICADOR PARENTESIS_APERTURA parametros_reales PARENTESIS_CIERRE;
+parametros_reales		::= lista_parametros_reales;
+parametros_reales		::= ;
+lista_parametros_reales	::= E0 lista_parametros_reales_re;
+lista_parametros_reales_re ::= COMA E0 lista_parametros_reales_re;
+lista_parametros_reales_re ::= ;
+instruccion_compuesta 	::= _bloque;
+
+E0 ::= E1 E0RE;
+E0RE::= ASIG E0;
+E0RE::= ;
+E1 ::= E2 E1RE;
+E1RE ::= op_relacional E2 E1RE;
+E1RE ::= ;
+E2 ::= E3 E2RE E2RE1;
+E2RE1::= SUMA E3 E2RE1;
+E2RE1::= ;
+E2RE::= RESTA E3;
+E2RE::= ;
+E3 ::= E4 E3RE;
+E3RE::= AND E3;
+E3RE::= OR E4;
+E3RE::= ;
+E4 ::= E5 E4RE;
+E4RE ::= op_nivel4 E5 E4RE;
+E4RE ::= ;
+E5 ::= op_nivel5 E5;
+E5 ::= E6;
+E6 ::= E7 E6RE;
+E6RE::= op_nivel6 E6RE;
+E6RE ::= ;
+E7 ::= PARENTESIS_APERTURA E0 PARENTESIS_CIERRE;
+E7 ::= op_basico;
+
+op_relacional ::= MAYOR;
+op_relacional ::= MAYOR_O_IGUAL;
+op_relacional ::= MENOR;
+op_relacional ::= MENOR_O_IGUAL;
+op_relacional ::= IGUALDAD;
+op_relacional ::= DISTINTO;
+
+op_nivel4 ::= MULTIPLICACION;
+op_nivel4 ::= DIVISION;
+op_nivel4 ::= MODULO;
+
+op_nivel5 ::= RESTA;
+op_nivel5 ::= NOT;
+
+op_nivel6 ::= op_indexacion;
+op_nivel6 ::= op_registro;
+op_nivel6 ::= op_indireccion;
+
+op_indexacion ::= CORCHETE_APERTURA E0 CORCHETE_CIERRE;
+
+op_registro ::= PUNTO IDENTIFICADOR;
+
+op_indireccion ::= PUNTERO;
+
+op_basico ::= LITERAL_ENTERO;
+op_basico ::= LITERAL_REAL;
+op_basico ::= TRUE;
+op_basico ::= FALSE;
+op_basico ::= LITERAL_CADENA;
+op_basico ::= IDENTIFICADOR;
+op_basico ::= NULL;

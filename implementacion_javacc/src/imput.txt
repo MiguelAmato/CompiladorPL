@@ -33,13 +33,13 @@ proc lee_nombres(tListaNombres & nombres) {
         @ i = i + 1 
       } 
  };  ## fin del procedimiento lee_nombres  
-  ## Hace un uso global de las variables 'nombres'''' y arbol declaradas en 
+  ## Hace un uso global de las variables 'nombres''''  y arbol declaradas en 
   ## el programa principal 
 proc construye_arbol() { 
   int i; ## para iterar sobre la lista de nombres 
  
      ## Inserta el nombre actual en el árbol de búsqueda que recibe como parámetro. 
-     ## Hace un uso global de la variable 'nombres' declarado en el programa principal, 
+     ## Hace un uso global de la variable 'nombres declarado en el programa principal, 
      ## y en del contador 'i' declarado en el subprograma contenedor 'construye_arbol' 
   proc inserta_nombre(tArbol & arbol) {  
     if arbol == null {  
@@ -116,7 +116,7 @@ proc construye_arbol() {
   } ## del procedimiento escribe_nombres 
  &&          
       ## Programa principal 
- 
+   
     call lee_nombres(nombres); 
     call construye_arbol(); 
     write "Listado de nombres ordenado"; nl; 

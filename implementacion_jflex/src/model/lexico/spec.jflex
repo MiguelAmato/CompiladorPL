@@ -1,5 +1,7 @@
 package model.lexico;
 
+import model.errors.GestionErroresEval;
+
 %%
 %line
 %column
@@ -9,9 +11,11 @@ package model.lexico;
 %unicode
 
 %{
+	private GestionErroresEval errores;
 	public String getLexema() {return yytext();}
 	public int getFila() {return yyline+1;}
 	public int getColumna() {return yycolumn+1;}	
+	public void fijaGestionErrores(GestionErroresEval errores) { this.errores = errores; }
 %}
 
 %eofval{
@@ -139,4 +143,4 @@ comentario = \#\#([^\n])*
 {literalCadena}  { return new UnidadLexicaMultivaluada(getFila(),getColumna(),ClaseLexica.LITERAL_CADENA,getLexema()); }
 {separador} {}
 {comentario} {}
-[^] {return UnidadLexicaUnivaluada.error(getFila(), getColumna());}
+[^] {errores.errorLexico(getFila(), getColumna(), '0');}

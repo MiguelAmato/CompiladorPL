@@ -9,6 +9,7 @@ public class AnalizadorSintacticoEvalDJ extends AnalizadorSintacticoEval {
     public AnalizadorSintacticoEvalDJ(Reader input) throws IOException {
        super(input); 
     }
+
   protected final void traza_emparejamiento(UnidadLexica unidad) {
       switch(unidad.clase()) {
 		   case ID: case LITENT: case LITREAL: System.out.println(unidad.lexema()); break;

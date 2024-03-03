@@ -13,14 +13,17 @@ public class AnalizadorSintacticoEval {
 	private AnalizadorLexico alex; // analizador léxico
 	private GestionErroresEval errores; // gestor de errores
 	private Set<ClaseLexica> esperados; // clases léxicas esperadas
+
+	protected boolean deshabilitar_trazas;
 	 
 	public AnalizadorSintacticoEval(Reader input) throws IOException {
-		 errores = new GestionErroresEval();
-		 alex = new AnalizadorLexico(input);
-		 alex.fijaGestionErrores(errores);
-		 esperados = EnumSet.noneOf(ClaseLexica.class);
-		 // Se lee el primer token adelantado
-		 sigToken();
+		deshabilitar_trazas = false;
+		errores = new GestionErroresEval();
+		alex = new AnalizadorLexico(input);
+		alex.fijaGestionErrores(errores);
+		esperados = EnumSet.noneOf(ClaseLexica.class);
+		// Se lee el primer token adelantado
+		sigToken();
 	}
 	
 	public void analiza() {
@@ -390,6 +393,7 @@ public class AnalizadorSintacticoEval {
 	
 	private void empareja(ClaseLexica claseEsperada) {
 	      if (anticipo.clase() == claseEsperada) {
+			if (!deshabilitar_trazas)
 	          traza_emparejamiento(anticipo);
 	          sigToken();
 	      }    
@@ -412,6 +416,8 @@ public class AnalizadorSintacticoEval {
     private void error() {
         errores.errorSintactico(anticipo.fila(), anticipo.columna(), anticipo.clase(), esperados);
     }
+
+	public void deshabilitar_trazas() { deshabilitar_trazas = true; }
     
     protected void traza_emparejamiento(UnidadLexica anticipo) {} 
 }

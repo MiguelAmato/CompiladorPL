@@ -17,9 +17,21 @@ import model.sintactico.*;
 public class DomJudge{
 	   public static void main(String[] args) throws Exception {
 	     try{  
-	      AnalizadorSintacticoEval asint = new AnalizadorSintacticoEvalDJ(new InputStreamReader(System.in));
-	      //AnalizadorSintacticoEval asint = new AnalizadorSintacticoEvalDJ(new InputStreamReader(new FileInputStream("input.txt")));
-	      asint.analiza();
+			AnalizadorSintacticoEval asint;
+
+			if (args.length == 0)
+				asint = new AnalizadorSintacticoEvalDJ(new InputStreamReader(System.in));
+			else if (args.length == 1) {
+				asint = new AnalizadorSintacticoEvalDJ(new InputStreamReader(new FileInputStream(args[0])));
+				asint.deshabilitar_trazas(); 
+			}
+			else
+				throw new Exception("Numero de argumentos incorrecto");
+			
+			asint.analiza();
+			
+			if (args.length != 0)
+				System.out.println("OK");
 	     }
 	     catch(ErrorSintactico e) {
 	        System.out.println("ERROR_SINTACTICO"); 
@@ -27,13 +39,13 @@ public class DomJudge{
 	     catch(ErrorLexico e) {
 	        System.out.println("ERROR_LEXICO"); 
 	     }
+		 
 	   }
-	}
+}
 
 /*
-	
-// README: Si se quiere probar solo el analizador lexico se descomenta esta seccion y se comenta la otra
-	
+
+// README: Si se quiere probar solo el analizador lexico se descomenta este main y se comentan los anteriores
 	
 public class DomJudge {
 	private static void imprime(UnidadLexica unidad) {
@@ -64,5 +76,6 @@ public class DomJudge {
      }
      while (error || unidad.clase() != ClaseLexica.EOF);
     }             
-} 
+}
+
 */

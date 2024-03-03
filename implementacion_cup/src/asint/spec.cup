@@ -27,26 +27,22 @@ terminal      INT, REAL, BOOL, STRING, AND, OR, NOT, NULL, TRUE, FALSE, PROC, IF
               LLAVE_APERTURA, LLAVE_CIERRE, REFERENCIA, CAMBIO_DE_SECUENCIA, EVAL, MENOR, MAYOR, MENOR_O_IGUAL, 
               MAYOR_O_IGUAL, IGUALDAD, DISTINTO, IDENTIFICADOR, LITERAL_ENTERO, LITERAL_REAL, LITERAL_CADENA;
 
-non terminal  programa, _bloque, declaraciones_opt, seccion_declaraciones, lista_declaraciones, lista_declaraciones_re, 
+non terminal  programa, bloque, declaraciones_opt, lista_declaraciones, 
               declaracion, declaracion_variable, declaracion_tipo, declaracion_proc, cabecera_proc, parametros_formales, 
-              lista_parametros, lista_parametros_re, parametro, parametrore, tipo, tipore, tipo1, tipo_struct, lista_struct, 
-              lista_struct_re, campo, instrucciones_opt, lista_instrucciones, lista_instrucciones_re, instruccion, 
-              instruccion_eval, instruccion_if, instruccion_if_re, instruccion_while, instruccion_read, instruccion_write, 
-              instruccion_nl, instruccion_reserva, instruccion_libera, instruccion_call, instruccion_compuesta, E0, E0RE, 
-              E1, E1RE, E2, E2RE1, E2RE, E3, E3RE, E4, E4RE, E5, E6, E6RE, E7, op_relacional, op_nivel4, op_nivel5, op_nivel6, 
-              op_indexacion, op_registro, op_indireccion, op_basico, tipo2, parametros_reales, lista_parametros_reales,
-              lista_parametros_reales_re;
+              lista_parametros, parametro, tipo, tipo1, tipo_struct, lista_struct, campo, instrucciones_opt, lista_instrucciones, instruccion, 
+              instruccion_eval, instruccion_if, instruccion_while, instruccion_read, instruccion_write, 
+              instruccion_nl, instruccion_reserva, instruccion_libera, instruccion_call, instruccion_compuesta, E0, 
+              E1, E2, E3, E4, E5, E6, E7, op_relacional, op_nivel4, op_nivel5, op_nivel6, 
+              op_indexacion, op_registro, op_indireccion, op_basico, tipo2, parametros_reales, lista_parametros_reales;
 
-programa	::= _bloque;
-_bloque		::= LLAVE_APERTURA declaraciones_opt instrucciones_opt LLAVE_CIERRE;
+programa ::= bloque;
+bloque ::= LLAVE_APERTURA declaraciones_opt instrucciones_opt LLAVE_CIERRE;
 
-declaraciones_opt	::= seccion_declaraciones;
+declaraciones_opt	::= lista_declaraciones CAMBIO_DE_SECUENCIA;
 declaraciones_opt	::= ;
 
-seccion_declaraciones	::= lista_declaraciones CAMBIO_DE_SECUENCIA;
-lista_declaraciones		::= declaracion lista_declaraciones_re;
-lista_declaraciones_re	::= PUNTO_Y_COMA declaracion  lista_declaraciones_re;
-lista_declaraciones_re	::= ;
+lista_declaraciones	::= lista_declaraciones PUNTO_Y_COMA declaracion;
+lista_declaraciones	::= declaracion ;
 
 declaracion ::= declaracion_variable;
 declaracion ::= declaracion_tipo;
@@ -56,46 +52,42 @@ declaracion_variable	::= tipo IDENTIFICADOR;
 
 declaracion_tipo	::= TYPE tipo IDENTIFICADOR;
 
+declaracion_proc	::= cabecera_proc bloque;
 
-declaracion_proc	::= cabecera_proc _bloque;
-  
+
 cabecera_proc 	::= PROC IDENTIFICADOR PARENTESIS_APERTURA parametros_formales PARENTESIS_CIERRE;
-  
-parametros_formales ::= lista_parametros;
+
+parametros_formales	::= lista_parametros;
 parametros_formales ::= ;
 
-lista_parametros ::= parametro lista_parametros_re;
-lista_parametros_re ::= COMA parametro lista_parametros_re;
-lista_parametros_re ::=  ;
+lista_parametros ::= lista_parametros COMA parametro;
+lista_parametros ::= parametro;
 
-parametro ::= tipo parametrore;
-parametrore::= IDENTIFICADOR;
-parametrore::= REFERENCIA IDENTIFICADOR;
+parametro ::= tipo IDENTIFICADOR;
+parametro ::= tipo REFERENCIA IDENTIFICADOR;
 
-tipo	::= tipo1 tipore;
-tipore	::= CORCHETE_APERTURA LITERAL_ENTERO CORCHETE_CIERRE;
-tipore	::= ;
+tipo	::= tipo CORCHETE_APERTURA LITERAL_ENTERO CORCHETE_CIERRE;
+tipo 	::= tipo1;
+tipo1	::= tipo2;
 tipo1	::= PUNTERO tipo1;
-tipo1 ::= tipo2;
-tipo2	::= INT;
-tipo2	::= REAL;
-tipo2	::= BOOL;
-tipo2	::= STRING;
-tipo2	::= IDENTIFICADOR;
-tipo2	::= tipo_struct;
+tipo1	::= INT;
+tipo1	::= REAL;
+tipo1	::= BOOL;
+tipo1	::= STRING;
+tipo1	::= IDENTIFICADOR;
+tipo1	::= tipo_struct;
+
 
 tipo_struct	::= STRUCT LLAVE_APERTURA lista_struct LLAVE_CIERRE;
-lista_struct 	::= campo lista_struct_re;
-lista_struct_re ::= COMA campo lista_struct_re;
-lista_struct_re ::= ;
+lista_struct 	::= lista_struct COMA campo;
+lista_struct 	::= campo;
 campo	::= tipo IDENTIFICADOR;
 
 instrucciones_opt	::= lista_instrucciones;
 instrucciones_opt	::= ;
 
-lista_instrucciones	::= instruccion lista_instrucciones_re;
-lista_instrucciones_re ::= PUNTO_Y_COMA instruccion lista_instrucciones_re;
-lista_instrucciones_re ::= ;
+lista_instrucciones	::= lista_instrucciones PUNTO_Y_COMA instruccion;
+lista_instrucciones	::= instruccion;
 
 instruccion	::= instruccion_eval;
 instruccion	::= instruccion_if;
@@ -109,46 +101,39 @@ instruccion	::= instruccion_call;
 instruccion	::= instruccion_compuesta ;
 
 instruccion_eval	::= EVAL E0;
-instruccion_if		::= IF E0 _bloque instruccion_if_re;
-instruccion_if_re	::= ELSE _bloque;
-instruccion_if_re	::= ;
-instruccion_while	::= WHILE E0 _bloque;
-instruccion_read	::= READ E0 ;
-instruccion_write	::= WRITE E0 ;
+instruccion_if	::= IF E0 bloque;
+instruccion_if	::= IF E0 bloque ELSE bloque;
+instruccion_while	::= WHILE E0 bloque;
+instruccion_read	::= READ E0;
+instruccion_write	::= WRITE E0;
 instruccion_nl	::= NL;
-instruccion_reserva	::= NEW E0 ;
-instruccion_libera	::= DELETE E0 ;
+instruccion_reserva	::= NEW E0;
+instruccion_libera	::= DELETE E0;
 instruccion_call		::= CALL IDENTIFICADOR PARENTESIS_APERTURA parametros_reales PARENTESIS_CIERRE;
 parametros_reales		::= lista_parametros_reales;
-parametros_reales		::= ;
-lista_parametros_reales	::= E0 lista_parametros_reales_re;
-lista_parametros_reales_re ::= COMA E0 lista_parametros_reales_re;
-lista_parametros_reales_re ::= ;
-instruccion_compuesta 	::= _bloque;
+parametros_reales		::=  ;
+lista_parametros_reales	::= lista_parametros_reales COMA E0;
+lista_parametros_reales	::= E0;
 
-E0 ::= E1 E0RE;
-E0RE::= ASIG E0;
-E0RE::= ;
-E1 ::= E2 E1RE;
-E1RE ::= op_relacional E2 E1RE;
-E1RE ::= ;
-E2 ::= E3 E2RE E2RE1;
-E2RE1::= SUMA E3 E2RE1;
-E2RE1::= ;
-E2RE::= RESTA E3;
-E2RE::= ;
-E3 ::= E4 E3RE;
-E3RE::= AND E3;
-E3RE::= OR E4;
-E3RE::= ;
-E4 ::= E5 E4RE;
-E4RE ::= op_nivel4 E5 E4RE;
-E4RE ::= ;
+instruccion_compuesta 	::= bloque;
+
+
+E0 ::= E1 ASIG E0;
+E0 ::= E1;
+E1 ::= E1 op_relacional E2;
+E1 ::= E2;
+E2 ::= E2 SUMA E3;
+E2 ::= E3 RESTA E3;
+E2 ::= E3;
+E3 ::= E4 AND E3;
+E3 ::= E4 OR E4;
+E3 ::= E4;
+E4 ::= E4 op_nivel4 E5;
+E4 ::= E5;
 E5 ::= op_nivel5 E5;
 E5 ::= E6;
-E6 ::= E7 E6RE;
-E6RE::= op_nivel6 E6RE;
-E6RE ::= ;
+E6 ::= E6 op_nivel6 ;
+E6 ::= E7;
 E7 ::= PARENTESIS_APERTURA E0 PARENTESIS_CIERRE;
 E7 ::= op_basico;
 

@@ -59,7 +59,7 @@ decimal = \.{parteDecimal}
 exponencial = (e|E)[\+,\-]?{parteEntera}
 
 identificador = {letra}({letra}|{digito})*
-literalEntero = [\+,\-]?{parteEntera}
+literalEntero = [\+\-]?{parteEntera}
 literalReal = ({literalEntero}{decimal})|({literalEntero}{exponencial})|({literalEntero}{decimal}{exponencial})
 literalCadena = \"[^\"]*\"
 

@@ -10,8 +10,8 @@ import java.io.InputStreamReader;
 public class DomJudge{
    public static void main(String[] args) throws Exception {
      try{  
-      //AnalizadorSintacticoTiny asint = new AnalizadorSintacticoTinyDJ(new InputStreamReader(System.in));
-      AnalizadorSintacticoTiny asint = new AnalizadorSintacticoTinyDJ(new InputStreamReader(new FileInputStream("src/imput.txt")));
+      AnalizadorSintacticoTiny asint = new AnalizadorSintacticoTinyDJ(new InputStreamReader(System.in));
+      //AnalizadorSintacticoTiny asint = new AnalizadorSintacticoTinyDJ(new InputStreamReader(new FileInputStream("src/imput.txt")));
       asint.analiza();
      }
      catch(ParseException e) {

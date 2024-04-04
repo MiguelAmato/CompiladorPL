@@ -20,12 +20,12 @@ init with {:
    alex.fijaGestionErrores(errores);
 :};
 
-
 terminal      INT, REAL, BOOL, STRING, AND, OR, NOT, NULL, TRUE, FALSE, PROC, IF, ELSE, WHILE, STRUCT, NEW, DELETE, 
               READ, WRITE, NL, TYPE, CALL, SUMA, RESTA, MULTIPLICACION, DIVISION, MODULO, PARENTESIS_APERTURA, 
               PARENTESIS_CIERRE, ASIG, COMA, PUNTO_Y_COMA, CORCHETE_APERTURA, CORCHETE_CIERRE, PUNTO, PUNTERO, 
               LLAVE_APERTURA, LLAVE_CIERRE, REFERENCIA, CAMBIO_DE_SECUENCIA, EVAL, MENOR, MAYOR, MENOR_O_IGUAL, 
-              MAYOR_O_IGUAL, IGUALDAD, DISTINTO, IDENTIFICADOR, LITERAL_ENTERO, LITERAL_REAL, LITERAL_CADENA;
+              MAYOR_O_IGUAL, IGUALDAD, DISTINTO;
+terminal      IDENTIFICADOR, LITERAL_ENTERO, LITERAL_REAL, LITERAL_CADENA;
 
 non terminal  programa, bloque, declaraciones_opt, lista_declaraciones, 
               declaracion, declaracion_variable, declaracion_tipo, declaracion_proc, cabecera_proc, parametros_formales, 

@@ -1,5 +1,6 @@
 ## Programa con seccion de declaraciones y 
 ## seccion de instrucciones 
+$
 { 
   int x; 
   ReAl y; 

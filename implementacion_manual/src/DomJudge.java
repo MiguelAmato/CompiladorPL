@@ -25,19 +25,24 @@ public class DomJudge{
 				asint = new AnalizadorSintacticoEvalDJ(new InputStreamReader(new FileInputStream(args[0])));
 				asint.deshabilitar_trazas(); 
 			}
-			else
-				throw new Exception("Numero de argumentos incorrecto");
-			
+			else 
+				throw new IllegalArgumentException("Numero de argumentos incorrecto");
+
 			asint.analiza();
 			
 			if (args.length != 0)
 				System.out.println("OK");
 	     }
 	     catch(ErrorSintactico e) {
-	        System.out.println("ERROR_SINTACTICO"); 
+	    	//System.out.println(e.getMessage()); // Salida como indica la entrega del CV
+	        System.out.println("ERROR_SINTACTICO"); // Salida esperada por el juez
 	     }
 	     catch(ErrorLexico e) {
-	        System.out.println("ERROR_LEXICO"); 
+	    	//System.out.println(e.getMessage()); // Salida como indica la entrega del CV
+	        System.out.println("ERROR_LEXICO"); // Salida esperada por el juez
+	     }
+	     catch(IllegalArgumentException e) {
+	    	 System.out.println(e.getMessage());
 	     }
 		 
 	   }

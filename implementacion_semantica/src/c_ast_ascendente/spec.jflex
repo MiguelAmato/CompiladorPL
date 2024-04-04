@@ -1,7 +1,4 @@
-package alex;
-
-import errors.GestionErroresEval;
-import asint.ClaseLexica;
+package c_ast_ascendente;
 
 %%
 %line

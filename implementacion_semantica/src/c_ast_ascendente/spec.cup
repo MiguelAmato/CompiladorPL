@@ -1,0 +1,233 @@
+package c_ast_ascendente;
+
+import java_cup.runtime.*;
+import asint.ClaseSemanticaEval;
+import c_ast_ascendente.UnidadLexica.StringLocalizado;
+import asint.SintaxisAbstractaEval.*;
+
+scan with {: 
+  return getScanner().next_token(); 
+:};
+parser code {: 
+   private GestionErroresEval errores;
+   public void syntax_error(Symbol unidadLexica) {
+     errores.errorSintactico((UnidadLexica)unidadLexica);
+   }
+:};
+init with {: 
+   errores = new GestionErroresEval();
+   AnalizadorLexico alex = (AnalizadorLexico)getScanner();
+   alex.fijaGestionErrores(errores);
+:};
+action code {:
+  ClaseSemanticaEval sem = new ClaseSemanticaEval();
+:}
+
+terminal      INT, REAL, BOOL, STRING, AND, OR, NOT, NULL, TRUE, FALSE, PROC, IF, ELSE, WHILE, STRUCT, NEW, DELETE, 
+              READ, WRITE, NL, TYPE, CALL, SUMA, RESTA, MULTIPLICACION, DIVISION, MODULO, PARENTESIS_APERTURA, 
+              PARENTESIS_CIERRE, ASIG, COMA, PUNTO_Y_COMA, CORCHETE_APERTURA, CORCHETE_CIERRE, PUNTO, PUNTERO, 
+              LLAVE_APERTURA, LLAVE_CIERRE, REFERENCIA, CAMBIO_DE_SECUENCIA, EVAL, MENOR, MAYOR, MENOR_O_IGUAL, 
+              MAYOR_O_IGUAL, IGUALDAD, DISTINTO;
+terminal      StringLocalizado IDENTIFICADOR, LITERAL_ENTERO, LITERAL_REAL, LITERAL_CADENA;
+
+non terminal Prog programa;
+non terminal Decs declaraciones_opt;
+non terminal LDecs lista_declaraciones;
+non terminal Dec declaracion, declaracion_variable, declaracion_tipo, declaracion_proc;
+non terminal ParamF parametros_formales;
+non terminal LParam lista_parametros;
+non terminal Param parametro;
+non terminal Tipo tipo, tipo1, tipo2, tipo_struct;
+non terminal LStruct lista_struct;
+non terminal Campo campo;
+non terminal InstrOpt instrucciones_opt;
+non terminal LInstr lista_instrucciones;
+non terminal Instr instruccion, instruccion_eval, instruccion_if, instruccion_while, instruccion_read, instruccion_write, instruccion_nl, instruccion_reserva, instruccion_libera, instruccion_call, instruccion_compuesta;
+non terminal ParamR parametros_reales;
+non terminal LParamR lista_parametros_reales;
+non terminal Exp E0, E1, E2, E3, E4, E5, E6, E7;
+non terminal String op_relacional, op_nivel4, op_nivel5;
+
+programa ::= LLAVE_APERTURA declaraciones_opt: decs instrucciones_opt:instrOpt LLAVE_CIERRE
+    {: RESULT = sem.prog(decs, instrOpt); :};
+
+declaraciones_opt	::= lista_declaraciones: lDecs CAMBIO_DE_SECUENCIA
+    {: RESULT = sem.si_decs(lDecs); :};
+declaraciones_opt	::=
+    {: RESULT = sem.no_decs(); :};
+
+lista_declaraciones	::= lista_declaraciones: lDecs PUNTO_Y_COMA declaracion: dec
+    {: RESULT = sem.muchas_decs(lDecs, dec); :};
+lista_declaraciones	::= declaracion: dec
+    {: RESULT = sem.una_dec(dec); :};
+
+declaracion ::= declaracion_variable;
+declaracion ::= declaracion_tipo;
+declaracion ::= declaracion_proc;
+
+declaracion_variable	::= tipo: tipo IDENTIFICADOR: id
+    {: RESULT = (Dec) sem.dec_id(tipo, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+
+declaracion_tipo	::= TYPE tipo: tipo IDENTIFICADOR: id
+    {: RESULT = (Dec) sem.dec_type(tipo, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+
+declaracion_proc	::= PROC IDENTIFICADOR: id PARENTESIS_APERTURA parametros_formales: paramF PARENTESIS_CIERRE programa: prog
+    {: RESULT = (Dec) sem.dec_proc(id.str(), paramF, prog).ponFila(id.fila()).ponCol(id.col()); :};
+
+parametros_formales	::= lista_parametros: lParam
+    {: RESULT = sem.si_parF(lParam); :};
+parametros_formales ::= 
+    {: RESULT = sem.no_parF(); :};
+
+lista_parametros ::= lista_parametros: lParam COMA parametro: param
+    {: RESULT = sem.muchos_param(lParam, param); :};
+lista_parametros ::= parametro: param
+    {: RESULT = sem.un_param(param); :};
+
+parametro ::= tipo: tipo IDENTIFICADOR: id
+    {: RESULT = (Param) sem.param_cop(tipo, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+parametro ::= tipo: tipo REFERENCIA IDENTIFICADOR: id
+    {: RESULT = (Param) sem.param_ref(tipo, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+
+tipo	::= tipo: tipo CORCHETE_APERTURA LITERAL_ENTERO: id CORCHETE_CIERRE
+    {: RESULT = (Tipo) sem.tipo_array(tipo, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+tipo 	::= tipo1;
+tipo1	::= tipo2;
+tipo1	::= PUNTERO tipo1: tipo
+    {: RESULT = sem.tipo_punt(tipo); :};
+tipo1	::= INT
+    {: RESULT = sem.tipo_int(); :};
+tipo1	::= REAL
+    {: RESULT = sem.tipo_real(); :};
+tipo1	::= BOOL
+    {: RESULT = sem.tipo_bool(); :};
+tipo1	::= STRING
+    {: RESULT = sem.tipo_string(); :};
+tipo1	::= IDENTIFICADOR: id
+    {: RESULT = (Tipo) sem.tipo_id(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+tipo1	::= tipo_struct;
+
+
+tipo_struct	::= STRUCT LLAVE_APERTURA lista_struct: LStruct LLAVE_CIERRE
+    {: RESULT = sem.tipo_struct(LStruct); :};
+lista_struct 	::= lista_struct: LStruct COMA campo: campo
+    {: RESULT = sem.lista_struct(LStruct, campo); :};
+lista_struct 	::= campo: campo
+    {: RESULT = sem.info_struct(campo); :};
+campo	::= tipo: tipo IDENTIFICADOR: id
+    {: RESULT = (Campo) sem.campo(tipo, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+
+instrucciones_opt	::= lista_instrucciones: lInstr
+    {: RESULT = sem.si_inst(lInstr); :};
+instrucciones_opt	::= 
+    {: RESULT = sem.no_inst(); :};
+
+lista_instrucciones	::= lista_instrucciones: lInstr PUNTO_Y_COMA instruccion: instr
+    {: RESULT = sem.muchas_instr(lInstr, instr); :};
+lista_instrucciones	::= instruccion: instr
+    {: RESULT = sem.una_instr(instr); :};
+
+instruccion	::= instruccion_eval;
+instruccion	::= instruccion_if;
+instruccion	::= instruccion_while;
+instruccion	::= instruccion_read;
+instruccion	::= instruccion_write;
+instruccion	::= instruccion_nl;
+instruccion	::= instruccion_reserva;
+instruccion	::= instruccion_libera;
+instruccion	::= instruccion_call;
+instruccion	::= instruccion_compuesta ;
+
+instruccion_eval	::= EVAL E0: exp
+    {: RESULT = sem.instr_eval(exp); :};
+instruccion_if	::= IF E0: exp programa: prog
+    {: RESULT = sem.instr_if(exp, prog); :};
+instruccion_if	::= IF E0: exp programa: prog1 ELSE programa: prog2
+    {: RESULT = sem.instr_else(exp, prog1, prog2); :};
+instruccion_while	::= WHILE E0: exp programa: prog
+    {: RESULT = sem.instr_wh(exp, prog); :};
+instruccion_read	::= READ E0: exp
+    {: RESULT = sem.instr_rd(exp); :};
+instruccion_write	::= WRITE E0: exp
+    {: RESULT = sem.instr_wr(exp); :};
+instruccion_nl	::= NL
+    {: RESULT = sem.instr_nl(); :};
+instruccion_reserva	::= NEW E0: exp
+    {: RESULT = sem.instr_new(exp); :};
+instruccion_libera	::= DELETE E0: exp
+    {: RESULT = sem.instr_del(exp); :};
+instruccion_call		::= CALL IDENTIFICADOR: id PARENTESIS_APERTURA parametros_reales: paramR PARENTESIS_CIERRE
+    {: RESULT = (Instr) sem.instr_call(id.str(), paramR).ponFila(id.fila()).ponCol(id.col()); :};
+parametros_reales		::= lista_parametros_reales: lParamR
+    {: RESULT = sem.si_param_re(lParamR); :};
+parametros_reales		::=  
+    {: RESULT = sem.no_param_re(); :};
+lista_parametros_reales	::= lista_parametros_reales: lParamR COMA E0: exp
+    {: RESULT = sem.muchos_param_re(lParamR, exp); :};
+lista_parametros_reales	::= E0: exp
+    {: RESULT = sem.un_param_re(exp); :};
+
+instruccion_compuesta 	::= programa: prog
+    {: RESULT = sem.instr_comp(prog); :};
+
+
+E0 ::= E1: exp1 ASIG E0: exp2
+    {: RESULT = sem.asig(exp1, exp2); :};
+E0 ::= E1;
+E1 ::= E1: exp1 op_relacional: op E2: exp2
+    {: RESULT = sem.op_rel(op, exp1, exp2); :};
+E1 ::= E2;
+E2 ::= E2: exp1 SUMA E3: exp2
+    {: RESULT = sem.suma(exp1, exp2); :};
+E2 ::= E3: exp1 RESTA E3: exp2
+    {: RESULT = sem.resta(exp1, exp2); :};
+E2 ::= E3;
+E3 ::= E4: exp1 AND E3: exp2
+    {: RESULT = sem.and(exp1, exp2); :};
+E3 ::= E4: exp1 OR E4: exp2
+    {: RESULT = sem.or(exp1, exp2); :};
+E3 ::= E4;
+E4 ::= E4: exp1 op_nivel4: op E5: exp2
+    {: RESULT = sem.op_mul(op, exp1, exp2); :};
+E4 ::= E5;
+E5 ::= op_nivel5: op E5: exp
+    {: RESULT = sem.op_inv(op, exp); :};
+E5 ::= E6;
+E6 ::= E6: exp1 CORCHETE_APERTURA E0: exp2 CORCHETE_CIERRE
+  {: RESULT = sem.index(exp1, exp2); :};
+E6 ::= E6: exp PUNTO IDENTIFICADOR: id
+  {: RESULT = (Exp) sem.reg(exp, id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+E6 ::= E6: exp PUNTERO
+  {: RESULT = sem.indir(exp); :};
+E6 ::= E7;
+E7 ::= PARENTESIS_APERTURA E0 PARENTESIS_CIERRE;
+
+
+op_relacional ::= MAYOR;
+op_relacional ::= MAYOR_O_IGUAL;
+op_relacional ::= MENOR;
+op_relacional ::= MENOR_O_IGUAL;
+op_relacional ::= IGUALDAD;
+op_relacional ::= DISTINTO;
+
+op_nivel4 ::= MULTIPLICACION;
+op_nivel4 ::= DIVISION;
+op_nivel4 ::= MODULO;
+
+op_nivel5 ::= RESTA;
+op_nivel5 ::= NOT;
+
+E7 ::= LITERAL_ENTERO: num
+  {: RESULT = (Exp) sem.literal_ent(num.str()).ponFila(num.fila()).ponCol(num.col()); :}; 
+E7 ::= LITERAL_REAL: num
+  {: RESULT = (Exp) sem.literal_real(num.str()).ponFila(num.fila()).ponCol(num.col()); :};
+E7 ::= TRUE
+  {: RESULT = sem.true_(); :};
+E7 ::= FALSE
+  {: RESULT = sem.false_(); :};
+E7 ::= LITERAL_CADENA: id
+    {: RESULT = (Exp) sem.literal_cadena(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+E7 ::= IDENTIFICADOR: id
+    {: RESULT = (Exp) sem.id(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
+E7 ::= NULL
+    {: RESULT = sem.nulo(); :};

@@ -51,76 +51,293 @@ PARSER_END(AnalizadorSintacticoTiny)
 	SKIP:{<["\t"," ","\r","\b","\n"]>}
 	SKIP:{<"##"((~["\n"]) | "\'")*>}
 
-	void analiza() : {} {programa() <EOF> }
-	void programa() : {} {bloque()}
-	void bloque() : {} {"{" declaraciones_opt() instrucciones_opt() "}"}
+	Prog analiza() : 
+		{ Prog prog; } 
+		{ 
+			prog = programa() <EOF> 
+			{return prog;}
+		}
+	Prog programa() : 
+		{ Decs decOpt; InstrOpt instrOpt; } 
+		{
+			"{" decOpt = declaraciones_opt() instrOpt = instrucciones_opt() "}"
+			{return sem.prog(decOpt, instrOpt);}
+		}
+	Decs declaraciones_opt() : 
+		{ LDecs ldecs } 
+		{
+			ldecs = lista_declaraciones() <cambioSec> 
+			{return sem.si_decs(ldecs);}
+			| 
+			{return sem.no_decs();}
+		}
+	LDecs lista_declaraciones() : 
+		{ Dec dec; LDecs ldecs } 
+		{
+			dec = declaracion() ldecs = lista_declaraciones_re(sem.una_dec(dec))
+			{ return ldecs; }
+		}
+	LDecs lista_declaraciones_re(LDecs ldech) : 
+		{ Dec dec; LDecs ldecs } 
+		{
+			";" dec = declaracion() ldecs = lista_declaraciones_re(sem.muchas_decs(ldech,dec))
+			{return ldecs;} 
+			| 
+			{return ldech;}
+		}
+	Dec declaracion() : 
+		{ Dec dec; } 
+		{
+			dec = declaracion_variable()
+			{return dec;}
+			| 
+			dec = declaracion_tipo() 
+			{return dec;}
+			| 
+			dec = declaracion_proc()
+			{return dec;}
+		}
+	Dec declaracion_variable() : 
+		{Tipo tipo; Token id;} 
+		{
+			tipo = tipo() id = <identificador>
+			{ return (Dec)sem.dec_id(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); } 	
+		}
+	Dec declaracion_tipo() : 
+		{Tipo tipo; Token id;} 
+		{
+			<type> tipo = tipo() id = <identificador>
+			{return (Dec)sem.dec_type(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+	Dec declaracion_proc() : 
+		{Token id; ParamF paramf; Prog prog;} 
+		{
+			<proc> id = <identificador> "(" paramf = parametros_formales() ")" prog = programa()
+			{return (Dec) sem.dec_proc(id.image, paramf, prog).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+	ParamF parametros_formales() : 
+		{LParam lparam} 
+		{
+			lparam = lista_parametros() 
+			{return sem.si_parF(lparam);}
+			| 
+			{return sem.no_parF();}
+		}
+	LParam lista_parametros() : 
+		{Param param; LParam lparam;} 
+		{
+			param = parametro() lparam = lista_parametros_re(sem.un_param(param))
+			{ return lparam; }
+		}
+	LParam lista_parametros_re(LParam lparamh) : 
+		{ Param param; LParam lparam; } 
+		{
+			"," param = parametro() lparam = lista_parametros_re(sem.muchos_param(lparamh, param))
+			{return lparam;}
+			| 
+			{return lparamh;}
+		}
+	Param parametro() : 
+		{Tipo tipo; Param param;} 
+		{
+			tipo = tipo() param = parametro_re(tipo)
+			{return param;}
+		}
+	Param parametro_re(Tipo tipoh) : 
+		{Token id;} 
+		{
+			id = <identificador>
+			{return sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+			| 
+			"&" id = <identificador>
+			{return sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
 
-	void declaraciones_opt() : {} {seccion_declaraciones() | {}}
-	void seccion_declaraciones() : {} {lista_declaraciones() <cambioSec>}
+	Tipo tipo() : 
+		{Tipo tipo1; Tipo tipore;} 
+		{
+			tipo1 = tipo1() tipore = tipo_re(tipo1)
+			{return tipo_re}
+		}
+	Tipo tipo_re(Tipo tipoh) : 
+		{Token ent; } 
+		{
+			("[" ent = <literal_entero> "]") 
+			{return (Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
+			| 
+			{return tipoh;}
+		}
+	Tipo tipo1() : 
+		{ Tipo tipo2; } 
+		{ 
+			tipo2 =  tipo2()
+			{return tipo2;}
+		}
+	Tipo tipo2() : 
+		{Tipo tip, Token id} 
+		{
+			"^" tip = tipo1() 
+			{return sem.tipo_punt(tip);}
+			| 
+			<ent>
+			{return tipo_int();} 
+			| 
+			<real> 
+			{return tipo_real();} 
+			| 
+			<bool> 
+			{return tipo_bool();} 
+			| 
+			<string> 
+			{return tipo_string();} 
+			| 
+			id = <identificador> 
+			{return tipo_int(id.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);} 
+			| 
+			tip = tipo_struct()
+			{return tip;}
 
-	void lista_declaraciones() : {} {declaracion() lista_declaraciones_re()}
-	void lista_declaraciones_re() : {} {";" declaracion() lista_declaraciones_re() | {}}
-	
-	void declaracion() : {} {declaracion_variable() | declaracion_tipo() | declaracion_proc()}
-	void declaracion_variable() : {} {tipo() <identificador>}
-	void declaracion_tipo() : {} {<type> tipo() <identificador>}
-	void declaracion_proc() : {} {cabecera_proc() bloque()}
-	void cabecera_proc() : {} {<proc> <identificador> "(" parametros_formales() ")"}
-	void parametros_formales() : {} {lista_parametros() | {}}
-	void lista_parametros() : {} {parametro() lista_parametros_re()}
-	void lista_parametros_re() : {} {"," parametro() lista_parametros_re() | {}}
-	void parametro() : {} {tipo() parametro_re()}
-	void parametro_re() : {} {<identificador> | "&" <identificador>}
+		}
+	Tipo tipo_struct() : 
+		{LStruct lstruct} 
+		{
+			<struct> "{" lstruct = lista_struct() "}"
+			{return sem.tipo_struct(lstruct);}
+		}
+	void lista_struct() : 
+		{} 
+		{campo() lista_struct_re()}
+	void lista_struct_re() : 
+		{} 
+		{"," campo() lista_struct_re() | {}}
+	void campo() : 
+		{} 
+		{tipo() <identificador>}
 
-	void tipo() : {} {tipo1() tipo_re()}
-	void tipo_re() : {} {("["<literal_entero>"]") tipo_re() | {}}
-	void tipo1() : {} {"^" tipo1() | tipo2() }
-	void tipo2() : {} {<ent> | <real> | <bool> | <string> | <identificador> | tipo_struct()}
-	void tipo_struct() : {} {<struct> "{" lista_struct() "}"}
-	void lista_struct() : {} {campo() lista_struct_re()}
-	void lista_struct_re() : {} {"," campo() lista_struct_re() | {}}
-	void campo() : {} {tipo() <identificador>}
+	void instrucciones_opt() : 
+		{} 
+		{lista_instrucciones() | {}}
+	void lista_instrucciones() : 
+		{} 
+		{instruccion() lista_instrucciones_re()}
+	void lista_instrucciones_re() : 
+		{} 
+		{";" instruccion() lista_instrucciones_re() | {}}
+	void instruccion() : 
+		{} 
+		{instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_reserva() | instruccion_libera() | instruccion_call() | instruccion_compuesta()}
+	void instruccion_eval() : 
+		{} 
+		{"@" E0()}
+	void instruccion_if() : 
+		{} 
+		{<If> E0() programa() instruccion_if_re()}
+	void instruccion_if_re() : 
+		{} 
+		{<Else> programa() | {}}
+	void instruccion_while() : 
+		{} 
+		{<While> E0() programa()}
+	void instruccion_read() : 
+		{} 
+		{<read> E0()}
+	void instruccion_write() : 
+		{} 
+		{<write> E0()}
+	void instruccion_nl() : 
+		{} 
+		{<nl>}
+	void instruccion_reserva() : 
+		{} 
+		{<New> E0()}
+	void instruccion_libera() : 
+		{} 
+		{<Delete> E0()}
+	void instruccion_call() : 
+		{} 
+		{<call> <identificador> "(" parametros_reales() ")"}
+	void parametros_reales() : 
+		{} 
+		{lista_parametros_reales() | {}}
+	void lista_parametros_reales() : 
+		{} 
+		{E0() lista_parametros_reales_re()}
+	void lista_parametros_reales_re() : 
+		{} 
+		{"," E0() lista_parametros_reales_re() | {}}
+	void instruccion_compuesta() : 
+		{} 
+		{programa()}
 
-	void instrucciones_opt() : {} {lista_instrucciones() | {}}
-	void lista_instrucciones() : {} {instruccion() lista_instrucciones_re()}
-	void lista_instrucciones_re() : {} {";" instruccion() lista_instrucciones_re() | {}}
-	void instruccion() : {} {instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_reserva() | instruccion_libera() | instruccion_call() | instruccion_compuesta()}
-	void instruccion_eval() : {} {"@" E0()}
-	void instruccion_if() : {} {<If> E0() bloque() instruccion_if_re()}
-	void instruccion_if_re() : {} {<Else> bloque() | {}}
-	void instruccion_while() : {} {<While> E0() bloque()}
-	void instruccion_read() : {} {<read> E0()}
-	void instruccion_write() : {} {<write> E0()}
-	void instruccion_nl() : {} {<nl>}
-	void instruccion_reserva() : {} {<New> E0()}
-	void instruccion_libera() : {} {<Delete> E0()}
-	void instruccion_call() : {} {<call> <identificador> "(" parametros_reales() ")"}
-	void parametros_reales() : {} {lista_parametros_reales() | {}}
-	void lista_parametros_reales() : {} {E0() lista_parametros_reales_re()}
-	void lista_parametros_reales_re() : {} {"," E0() lista_parametros_reales_re() | {}}
-	void instruccion_compuesta() : {} {bloque()}
-
-	void E0() : {} {E1() E0RE()}
-	void E0RE() : {} {"=" E0() | {}}
-	void E1() : {} {E2() E1RE()}
-	void E1RE() : {} {op_relacional() E2() E1RE() | {}}
-	void E2() : {} {E3() E2RE() E2RE1()}
-	void E2RE1() : {} {"+" E3() E2RE1() | {}}
-	void E2RE() : {} {"-" E3() | {}}
-	void E3() : {} {E4() E3RE()}
-	void E3RE() : {} {<and> E3() | <or> E4() | {}}
-	void E4() : {} {E5() E4RE()}
-	void E4RE() : {} {op_nivel4() E5() E4RE() | {}}
-	void E5() : {} {op_nivel5() E5() | E6()}
-	void E6() : {} {E7() E6RE()}
-	void E6RE() : {} {op_nivel6() E6RE() | {}}
-	void E7() : {} {"(" E0() ")" | op_basico()}
-	void op_relacional() : {} {">" | <mayorIgual> | "<" | <menorIgual> | <igualdad> | <distinto>}
-	void op_nivel4() : {} {"*" | "/" | "%"}
-	void op_nivel5() : {} {"-" | <not>}
-	void op_nivel6() : {} {op_indexacion() | op_registro() | op_indireccion()}
-	void op_indexacion() : {} {"[" E0() "]"}
-	void op_registro() : {} {"." <identificador>}
-	void op_indireccion() : {} {"^" op_indireccion_re()}
-	void op_indireccion_re() : {} {op_indireccion() | {}}
-	void op_basico() : {} {<literal_entero> | <literal_real> | <verdadero> | <falso> | <literal_cadena> | <identificador> | <nulo>}
+	void E0() : 
+		{} 
+		{E1() E0RE()}
+	void E0RE() : 
+		{} 
+		{"=" E0() | {}}
+	void E1() : 
+		{} 
+		{E2() E1RE()}
+	void E1RE() : 
+		{} 
+		{op_relacional() E2() E1RE() | {}}
+	void E2() : 
+		{} 
+		{E3() E2RE() E2RE1()}
+	void E2RE1() : 
+		{} 
+		{"+" E3() E2RE1() | {}}
+	void E2RE() : 
+		{} 
+		{"-" E3() | {}}
+	void E3() : 
+		{} 
+		{E4() E3RE()}
+	void E3RE() : 
+		{} 
+		{<and> E3() | <or> E4() | {}}
+	void E4() : 
+		{} 
+		{E5() E4RE()}
+	void E4RE() : 
+		{} 
+		{op_nivel4() E5() E4RE() | {}}
+	void E5() : 
+		{} 
+		{op_nivel5() E5() | E6()}
+	void E6() : 
+		{} 
+		{E7() E6RE()}
+	void E6RE() : 
+		{} 
+		{op_nivel6() E6RE() | {}}
+	void E7() : 
+		{} 
+		{"(" E0() ")" | op_basico()}
+	void op_relacional() : 
+		{} 
+		{">" | <mayorIgual> | "<" | <menorIgual> | <igualdad> | <distinto>}
+	void op_nivel4() : 
+		{} 
+		{"*" | "/" | "%"}
+	void op_nivel5() : 
+		{} 
+		{"-" | <not>}
+	void op_nivel6() : 
+		{} 
+		{op_indexacion() | op_registro() | op_indireccion()}
+	void op_indexacion() : 
+		{} 
+		{"[" E0() "]"}
+	void op_registro() : 
+		{} 
+		{"." <identificador>}
+	void op_indireccion() : 
+		{} 
+		{"^" op_indireccion_re()}
+	void op_indireccion_re() : 
+		{} 
+		{op_indireccion() | {}}
+	void op_basico() : 
+		{} 
+		{<literal_entero> | <literal_real> | <verdadero> | <falso> | <literal_cadena> | <identificador> | <nulo>}

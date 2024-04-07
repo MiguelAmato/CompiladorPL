@@ -51,6 +51,8 @@ PARSER_END(AnalizadorSintacticoTiny)
 	SKIP:{<["\t"," ","\r","\b","\n"]>}
 	SKIP:{<"##"((~["\n"]) | "\'")*>}
 
+
+
 	Prog analiza() : 
 		{ Prog prog; } 
 		{ 
@@ -204,56 +206,116 @@ PARSER_END(AnalizadorSintacticoTiny)
 			<struct> "{" lstruct = lista_struct() "}"
 			{return sem.tipo_struct(lstruct);}
 		}
-	void lista_struct() : 
-		{} 
-		{campo() lista_struct_re()}
-	void lista_struct_re() : 
-		{} 
-		{"," campo() lista_struct_re() | {}}
-	void campo() : 
-		{} 
-		{tipo() <identificador>}
+	LStruct lista_struct() : 
+		{Campo campo; LStruct lstruct} 
+		{
+			campo = campo() lstruct = lista_struct_re(sem.info_struct(campo))
+			{return lstruct;}
+		}
+	LStruct lista_struct_re(LStruct lstructh) : 
+		{Campo campo; LStruct lstruct;} 
+		{
+			"," campo = campo() lstruct = lista_struct_re(sem.lista_struct(lstructh, campo)) 
+			{return lstruct;}
+			| 
+			{return lstructh;}
+		}
+	Campo campo() : 
+		{Tipo tipo; Token id;} 
+		{
+			tipo = tipo() id = <identificador>
+			{return sem.campo(tipo, id.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
+		}
 
-	void instrucciones_opt() : 
-		{} 
-		{lista_instrucciones() | {}}
-	void lista_instrucciones() : 
-		{} 
-		{instruccion() lista_instrucciones_re()}
-	void lista_instrucciones_re() : 
-		{} 
-		{";" instruccion() lista_instrucciones_re() | {}}
-	void instruccion() : 
-		{} 
-		{instruccion_eval() | instruccion_if() | instruccion_while() | instruccion_read() | instruccion_write() | instruccion_nl() | instruccion_reserva() | instruccion_libera() | instruccion_call() | instruccion_compuesta()}
-	void instruccion_eval() : 
-		{} 
-		{"@" E0()}
-	void instruccion_if() : 
-		{} 
-		{<If> E0() programa() instruccion_if_re()}
-	void instruccion_if_re() : 
+	InstrOpt instrucciones_opt() : 
+		{LInstr linstr} 
+		{
+			linstr = lista_instrucciones() 
+			{return sem.si_inst(linstr);} 
+			| 
+			{return sem.no_inst();}
+			}
+	LInstr lista_instrucciones() : 
+		{Instr inst; LInstr linstr;} 
+		{
+			inst = instruccion() linstr = lista_instrucciones_re(sem.una_instr(inst))
+			{return linstr;}
+		}
+	LInstr lista_instrucciones_re(LInstr linstrh) : 
+		{Instr inst; LInstr linstr;} 
+		{
+			";" inst = instruccion() linstr = lista_instrucciones_re(sem.muchas_instr(linstrh, inst)) 
+			{return linstr;}
+			| 
+			{return linstrh;}
+		}
+	Instr instruccion() : 
+		{ Instr intr } 
+		{
+			instr = instruccion_eval
+			{return intr;} 
+			| 
+			instr = instruccion_if
+			{return intr;} 
+			| 
+			instr = instruccion_while
+			{return intr;} 
+			| 
+			instr = instruccion_read
+			{return intr;} 
+			| 
+			instr = instruccion_write
+			{return intr;}
+			| 
+			instr = instruccion_nl
+			{return intr;} 
+			| 
+			instr = instruccion_reserva
+			{return intr;} 
+			| 
+			instr = instruccion_libera
+			{return intr;} 
+			| 
+			instr = instruccion_call
+			{return intr;} 
+			| 
+			instr = instruccion_compuesta
+			{return intr;}
+		}
+	Instr instruccion_eval() : 
+		{Exp exp;} 
+		{
+			"@" exp = E0()
+			{ return sem.instr_eval(exp); }
+		}
+	Instr instruccion_if() : 
+		{ Exp exp; Prog prog; } 
+		{
+			<If> E0() programa() instruccion_if_re()
+			{ return sem.instr_if() }
+		}
+	Instr instruccion_if_re() : 
 		{} 
 		{<Else> programa() | {}}
-	void instruccion_while() : 
+	Instr instruccion_while() : 
 		{} 
 		{<While> E0() programa()}
-	void instruccion_read() : 
+	Instr instruccion_read() : 
 		{} 
 		{<read> E0()}
-	void instruccion_write() : 
+	Instr instruccion_write() : 
 		{} 
 		{<write> E0()}
-	void instruccion_nl() : 
+	Instr instruccion_nl() : 
 		{} 
 		{<nl>}
-	void instruccion_reserva() : 
+	Instr instruccion_reserva() : 
 		{} 
 		{<New> E0()}
-	void instruccion_libera() : 
+	Instr instruccion_libera() : 
 		{} 
 		{<Delete> E0()}
-	void instruccion_call() : 
+	Instr instruccion_call() : 
 		{} 
 		{<call> <identificador> "(" parametros_reales() ")"}
 	void parametros_reales() : 

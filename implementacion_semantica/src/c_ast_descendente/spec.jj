@@ -52,7 +52,6 @@ PARSER_END(AnalizadorSintacticoTiny)
 	SKIP:{<"##"((~["\n"]) | "\'")*>}
 
 
-
 	Prog analiza() : 
 		{ Prog prog; } 
 		{ 
@@ -291,7 +290,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 	Instr instruccion_if() : 
 		{ Exp exp; Prog prog; } 
 		{
-			<If> E0() programa() instruccion_if_re()
+			<If> exp = E0() prog = programa() instruccion_if_re()
 			{ return sem.instr_if() }
 		}
 	Instr instruccion_if_re() : 

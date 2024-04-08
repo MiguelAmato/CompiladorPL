@@ -1,0 +1,404 @@
+options  {
+  STATIC=false;
+  DEBUG_PARSER=true;
+}  
+PARSER_BEGIN(AnalizadorSintacticoTiny)
+package asint;
+
+public class AnalizadorSintacticoTiny {
+    protected void newToken(Token t) {}
+}
+
+PARSER_END(AnalizadorSintacticoTiny)
+	TOKEN:{<#letra:["a"-"z","A"-"Z","_"]>}
+	TOKEN:{<#digitoPositivo:["1"-"9"]>}
+	TOKEN:{<#digito:<digitoPositivo>|"0">}
+	TOKEN:{<#parteEntera:<digitoPositivo> (<digito>)* |"0">}
+	TOKEN:{<#parteDecimal: (<digito>)* <digitoPositivo> | "0">}
+	TOKEN:{<#decimal: "."<parteDecimal>>}
+	TOKEN:{<#exponencial: ("e"|"E")(["+","-"])?<parteEntera>>}
+	TOKEN:{<and:("a"|"A")("n"|"N")("d"|"D")>}
+	TOKEN:{<or:("o"|"O")("r"|"R")>}
+	TOKEN:{<not:("n"|"N")("o"|"O")("t"|"T")>}
+	TOKEN:{<ent:("i"|"I")("n"|"N")("t"|"T")>}
+	TOKEN:{<real:("r"|"R")("e"|"E")("a"|"A")("l"|"L")>}
+	TOKEN:{<bool:("b"|"B")("o"|"O")("o"|"O")("l"|"L")>}
+	TOKEN:{<string:("s"|"S")("t"|"T")("r"|"R")("i"|"I")("n"|"N")("g"|"G")>}
+	TOKEN:{<nulo:("n"|"N")("u"|"U")("l"|"L")("l"|"L")>}
+	TOKEN:{<falso:("f"|"F")("a"|"A")("l"|"L")("s"|"S")("e"|"E")>}
+	TOKEN:{<verdadero:("t"|"T")("r"|"R")("u"|"U")("e"|"E")>}
+	TOKEN:{<proc:("p"|"P")("r"|"R")("o"|"O")("c"|"C")>}
+	TOKEN:{<If:("i"|"I")("f"|"F")>}
+	TOKEN:{<Else:("e"|"E")("l"|"L")("s"|"S")("e"|"E")>}
+	TOKEN:{<While:("w"|"W")("h"|"H")("i"|"I")("l"|"L")("e"|"E")>}
+	TOKEN:{<struct:("s"|"S")("t"|"T")("r"|"R")("u"|"U")("c"|"C")("t"|"T")>}
+	TOKEN:{<New:("n"|"N")("e"|"E")("w"|"W")>}
+	TOKEN:{<Delete:("d"|"D")("e"|"E")("l"|"L")("e"|"E")("t"|"T")("e"|"E")>}
+	TOKEN:{<read:("r"|"R")("e"|"E")("a"|"A")("d"|"D")>}
+	TOKEN:{<write:("w"|"W")("r"|"R")("i"|"I")("t"|"T")("e"|"E")>}
+	TOKEN:{<nl:("n"|"N")("l"|"L")>}
+	TOKEN:{<type:("t"|"T")("y"|"Y")("p"|"P")("e"|"E")>}
+	TOKEN:{<call:("c"|"C")("a"|"A")("l"|"L")("l"|"L")>}
+	TOKEN:{<identificador:<letra>(<letra>|<digito>)*>}
+	TOKEN:{<literal_entero:(["+","-"])?<parteEntera>>}
+	TOKEN:{<literal_cadena:"\""(~["\""])*"\"">}
+	TOKEN:{<literal_real:(<literal_entero><decimal>)|(<literal_entero><exponencial>)|(<literal_entero><decimal><exponencial>)>}
+    TOKEN:{<menorIgual:"<=">}
+    TOKEN:{<mayorIgual:">=">}
+    TOKEN:{<igualdad:"==">}
+    TOKEN:{<distinto:"!=">}
+    TOKEN:{<cambioSec:"&&">}
+	SKIP:{<["\t"," ","\r","\b","\n"]>}
+	SKIP:{<"##"((~["\n"]) | "\'")*>}
+
+
+	Prog analiza() : 
+		{ Prog prog; } 
+		{ 
+			prog = programa() <EOF> 
+			{return prog;}
+		}
+	Prog programa() : 
+		{ Decs decOpt; InstrOpt instrOpt; } 
+		{
+			"{" decOpt = declaraciones_opt() instrOpt = instrucciones_opt() "}"
+			{return sem.prog(decOpt, instrOpt);}
+		}
+	Decs declaraciones_opt() : 
+		{ LDecs ldecs } 
+		{
+			ldecs = lista_declaraciones() <cambioSec> 
+			{return sem.si_decs(ldecs);}
+			| 
+			{return sem.no_decs();}
+		}
+	LDecs lista_declaraciones() : 
+		{ Dec dec; LDecs ldecs } 
+		{
+			dec = declaracion() ldecs = lista_declaraciones_re(sem.una_dec(dec))
+			{ return ldecs; }
+		}
+	LDecs lista_declaraciones_re(LDecs ldech) : 
+		{ Dec dec; LDecs ldecs } 
+		{
+			";" dec = declaracion() ldecs = lista_declaraciones_re(sem.muchas_decs(ldech,dec))
+			{return ldecs;} 
+			| 
+			{return ldech;}
+		}
+	Dec declaracion() : 
+		{ Dec dec; } 
+		{
+			dec = declaracion_variable()
+			{return dec;}
+			| 
+			dec = declaracion_tipo() 
+			{return dec;}
+			| 
+			dec = declaracion_proc()
+			{return dec;}
+		}
+	Dec declaracion_variable() : 
+		{Tipo tipo; Token id;} 
+		{
+			tipo = tipo() id = <identificador>
+			{ return (Dec)sem.dec_id(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn); } 	
+		}
+	Dec declaracion_tipo() : 
+		{Tipo tipo; Token id;} 
+		{
+			<type> tipo = tipo() id = <identificador>
+			{return (Dec)sem.dec_type(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+	Dec declaracion_proc() : 
+		{Token id; ParamF paramf; Prog prog;} 
+		{
+			<proc> id = <identificador> "(" paramf = parametros_formales() ")" prog = programa()
+			{return (Dec) sem.dec_proc(id.image, paramf, prog).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+	ParamF parametros_formales() : 
+		{LParam lparam} 
+		{
+			lparam = lista_parametros() 
+			{return sem.si_parF(lparam);}
+			| 
+			{return sem.no_parF();}
+		}
+	LParam lista_parametros() : 
+		{Param param; LParam lparam;} 
+		{
+			param = parametro() lparam = lista_parametros_re(sem.un_param(param))
+			{ return lparam; }
+		}
+	LParam lista_parametros_re(LParam lparamh) : 
+		{ Param param; LParam lparam; } 
+		{
+			"," param = parametro() lparam = lista_parametros_re(sem.muchos_param(lparamh, param))
+			{return lparam;}
+			| 
+			{return lparamh;}
+		}
+	Param parametro() : 
+		{Tipo tipo; Param param;} 
+		{
+			tipo = tipo() param = parametro_re(tipo)
+			{return param;}
+		}
+	Param parametro_re(Tipo tipoh) : 
+		{Token id;} 
+		{
+			id = <identificador>
+			{return sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+			| 
+			"&" id = <identificador>
+			{return sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+
+	Tipo tipo() : 
+		{Tipo tipo1; Tipo tipore;} 
+		{
+			tipo1 = tipo1() tipore = tipo_re(tipo1)
+			{return tipo_re}
+		}
+	Tipo tipo_re(Tipo tipoh) : 
+		{Token ent; } 
+		{
+			("[" ent = <literal_entero> "]") 
+			{return (Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
+			| 
+			{return tipoh;}
+		}
+	Tipo tipo1() : 
+		{ Tipo tipo2; } 
+		{ 
+			tipo2 =  tipo2()
+			{return tipo2;}
+		}
+	Tipo tipo2() : 
+		{Tipo tip, Token id} 
+		{
+			"^" tip = tipo1() 
+			{return sem.tipo_punt(tip);}
+			| 
+			<ent>
+			{return tipo_int();} 
+			| 
+			<real> 
+			{return tipo_real();} 
+			| 
+			<bool> 
+			{return tipo_bool();} 
+			| 
+			<string> 
+			{return tipo_string();} 
+			| 
+			id = <identificador> 
+			{return tipo_int(id.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);} 
+			| 
+			tip = tipo_struct()
+			{return tip;}
+
+		}
+	Tipo tipo_struct() : 
+		{LStruct lstruct} 
+		{
+			<struct> "{" lstruct = lista_struct() "}"
+			{return sem.tipo_struct(lstruct);}
+		}
+	LStruct lista_struct() : 
+		{Campo campo; LStruct lstruct} 
+		{
+			campo = campo() lstruct = lista_struct_re(sem.info_struct(campo))
+			{return lstruct;}
+		}
+	LStruct lista_struct_re(LStruct lstructh) : 
+		{Campo campo; LStruct lstruct;} 
+		{
+			"," campo = campo() lstruct = lista_struct_re(sem.lista_struct(lstructh, campo)) 
+			{return lstruct;}
+			| 
+			{return lstructh;}
+		}
+	Campo campo() : 
+		{Tipo tipo; Token id;} 
+		{
+			tipo = tipo() id = <identificador>
+			{return sem.campo(tipo, id.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
+		}
+
+	InstrOpt instrucciones_opt() : 
+		{LInstr linstr} 
+		{
+			linstr = lista_instrucciones() 
+			{return sem.si_inst(linstr);} 
+			| 
+			{return sem.no_inst();}
+			}
+	LInstr lista_instrucciones() : 
+		{Instr inst; LInstr linstr;} 
+		{
+			inst = instruccion() linstr = lista_instrucciones_re(sem.una_instr(inst))
+			{return linstr;}
+		}
+	LInstr lista_instrucciones_re(LInstr linstrh) : 
+		{Instr inst; LInstr linstr;} 
+		{
+			";" inst = instruccion() linstr = lista_instrucciones_re(sem.muchas_instr(linstrh, inst)) 
+			{return linstr;}
+			| 
+			{return linstrh;}
+		}
+	Instr instruccion() : 
+		{ Instr intr } 
+		{
+			instr = instruccion_eval
+			{return intr;} 
+			| 
+			instr = instruccion_if
+			{return intr;} 
+			| 
+			instr = instruccion_while
+			{return intr;} 
+			| 
+			instr = instruccion_read
+			{return intr;} 
+			| 
+			instr = instruccion_write
+			{return intr;}
+			| 
+			instr = instruccion_nl
+			{return intr;} 
+			| 
+			instr = instruccion_reserva
+			{return intr;} 
+			| 
+			instr = instruccion_libera
+			{return intr;} 
+			| 
+			instr = instruccion_call
+			{return intr;} 
+			| 
+			instr = instruccion_compuesta
+			{return intr;}
+		}
+	Instr instruccion_eval() : 
+		{Exp exp;} 
+		{
+			"@" exp = E0()
+			{ return sem.instr_eval(exp); }
+		}
+	Instr instruccion_if() : 
+		{ Exp exp; Prog prog; } 
+		{
+			<If> exp = E0() prog = programa() instruccion_if_re()
+			{ return sem.instr_if() }
+		}
+	Instr instruccion_if_re() : 
+		{} 
+		{<Else> programa() | {}}
+	Instr instruccion_while() : 
+		{} 
+		{<While> E0() programa()}
+	Instr instruccion_read() : 
+		{} 
+		{<read> E0()}
+	Instr instruccion_write() : 
+		{} 
+		{<write> E0()}
+	Instr instruccion_nl() : 
+		{} 
+		{<nl>}
+	Instr instruccion_reserva() : 
+		{} 
+		{<New> E0()}
+	Instr instruccion_libera() : 
+		{} 
+		{<Delete> E0()}
+	Instr instruccion_call() : 
+		{} 
+		{<call> <identificador> "(" parametros_reales() ")"}
+	void parametros_reales() : 
+		{} 
+		{lista_parametros_reales() | {}}
+	void lista_parametros_reales() : 
+		{} 
+		{E0() lista_parametros_reales_re()}
+	void lista_parametros_reales_re() : 
+		{} 
+		{"," E0() lista_parametros_reales_re() | {}}
+	void instruccion_compuesta() : 
+		{} 
+		{programa()}
+
+	void E0() : 
+		{} 
+		{E1() E0RE()}
+	void E0RE() : 
+		{} 
+		{"=" E0() | {}}
+	void E1() : 
+		{} 
+		{E2() E1RE()}
+	void E1RE() : 
+		{} 
+		{op_relacional() E2() E1RE() | {}}
+	void E2() : 
+		{} 
+		{E3() E2RE() E2RE1()}
+	void E2RE1() : 
+		{} 
+		{"+" E3() E2RE1() | {}}
+	void E2RE() : 
+		{} 
+		{"-" E3() | {}}
+	void E3() : 
+		{} 
+		{E4() E3RE()}
+	void E3RE() : 
+		{} 
+		{<and> E3() | <or> E4() | {}}
+	void E4() : 
+		{} 
+		{E5() E4RE()}
+	void E4RE() : 
+		{} 
+		{op_nivel4() E5() E4RE() | {}}
+	void E5() : 
+		{} 
+		{op_nivel5() E5() | E6()}
+	void E6() : 
+		{} 
+		{E7() E6RE()}
+	void E6RE() : 
+		{} 
+		{op_nivel6() E6RE() | {}}
+	void E7() : 
+		{} 
+		{"(" E0() ")" | op_basico()}
+	void op_relacional() : 
+		{} 
+		{">" | <mayorIgual> | "<" | <menorIgual> | <igualdad> | <distinto>}
+	void op_nivel4() : 
+		{} 
+		{"*" | "/" | "%"}
+	void op_nivel5() : 
+		{} 
+		{"-" | <not>}
+	void op_nivel6() : 
+		{} 
+		{op_indexacion() | op_registro() | op_indireccion()}
+	void op_indexacion() : 
+		{} 
+		{"[" E0() "]"}
+	void op_registro() : 
+		{} 
+		{"." <identificador>}
+	void op_indireccion() : 
+		{} 
+		{"^" op_indireccion_re()}
+	void op_indireccion_re() : 
+		{} 
+		{op_indireccion() | {}}
+	void op_basico() : 
+		{} 
+		{<literal_entero> | <literal_real> | <verdadero> | <falso> | <literal_cadena> | <identificador> | <nulo>}

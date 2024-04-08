@@ -39,8 +39,8 @@ public class Main {
 
 					Prog prog = (Prog)asint.parse().value;
 
-					// new ProcRecursivo().imprime(prog);
-					System.out.println(asint.parse().value);
+					 new ProcRecursivo().imprime(prog);
+					//System.out.println(asint.parse().value);
 				}
 		}
 		else if(args[2].equals("int")){

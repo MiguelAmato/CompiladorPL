@@ -3,7 +3,6 @@ package c_ast_descendente;
 
 import asint.SintaxisAbstractaEval.*;
 import asint.ClaseSemanticaEval;
-import c_ast_ascendente.UnidadLexica.StringLocalizado;
 
 public class Asts implements AstsConstants {
     private ClaseSemanticaEval sem = new ClaseSemanticaEval();
@@ -289,13 +288,14 @@ public class Asts implements AstsConstants {
   final public Tipo tipo_re(Tipo tipoh) throws ParseException {
     trace_call("tipo_re");
     try {
-                 Token ent;
+                 Token ent; Tipo tipo_re;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 48:
         jj_consume_token(48);
         ent = jj_consume_token(literal_entero);
         jj_consume_token(49);
-                         {if (true) return (Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
+        tipo_re = tipo_re((Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn));
+                         {if (true) return tipo_re;}
         break;
       default:
         jj_la1[6] = jj_gen;
@@ -311,8 +311,26 @@ public class Asts implements AstsConstants {
     trace_call("tipo1");
     try {
                   Tipo tipo2;
-      tipo2 = tipo2();
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 50:
+        jj_consume_token(50);
+        tipo2 = tipo1();
+                         {if (true) return sem.tipo_punt(tipo2);}
+        break;
+      case ent:
+      case real:
+      case bool:
+      case string:
+      case struct:
+      case identificador:
+        tipo2 = tipo2();
                          {if (true) return tipo2;}
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("tipo1");
@@ -324,11 +342,6 @@ public class Asts implements AstsConstants {
     try {
                  Tipo tip; Token id;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 50:
-        jj_consume_token(50);
-        tip = tipo1();
-                         {if (true) return sem.tipo_punt(tip);}
-        break;
       case ent:
         jj_consume_token(ent);
                          {if (true) return sem.tipo_int();}
@@ -354,7 +367,7 @@ public class Asts implements AstsConstants {
                          {if (true) return tip;}
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[8] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -382,7 +395,7 @@ public class Asts implements AstsConstants {
   final public LStruct lista_struct() throws ParseException {
     trace_call("lista_struct");
     try {
-                 Campo campo; LStruct lstruct;
+                 LStruct lstruct; Campo campo;
       campo = campo();
       lstruct = lista_struct_re(sem.info_struct(campo));
                          {if (true) return lstruct;}
@@ -395,7 +408,7 @@ public class Asts implements AstsConstants {
   final public LStruct lista_struct_re(LStruct lstructh) throws ParseException {
     trace_call("lista_struct_re");
     try {
-                 Campo campo; LStruct lstruct;
+                 LStruct lstruct; Campo campo;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case 46:
         jj_consume_token(46);
@@ -404,7 +417,7 @@ public class Asts implements AstsConstants {
                          {if (true) return lstruct;}
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[9] = jj_gen;
                          {if (true) return lstructh;}
       }
     throw new Error("Missing return statement in function");
@@ -445,7 +458,7 @@ public class Asts implements AstsConstants {
                          {if (true) return sem.si_inst(linstr);}
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[10] = jj_gen;
                          {if (true) return sem.no_inst();}
       }
     throw new Error("Missing return statement in function");
@@ -479,7 +492,7 @@ public class Asts implements AstsConstants {
                          {if (true) return linstr;}
         break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[11] = jj_gen;
                          {if (true) return linstrh;}
       }
     throw new Error("Missing return statement in function");
@@ -534,7 +547,7 @@ public class Asts implements AstsConstants {
                          {if (true) return instr;}
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -583,7 +596,7 @@ public class Asts implements AstsConstants {
                           {if (true) return sem.instr_else(exp, prog, prog2);}
         break;
       default:
-        jj_la1[12] = jj_gen;
+        jj_la1[13] = jj_gen;
                           {if (true) return sem.instr_if(exp, prog);}
       }
     throw new Error("Missing return statement in function");
@@ -716,7 +729,7 @@ public class Asts implements AstsConstants {
                          {if (true) return sem.si_param_re(params);}
         break;
       default:
-        jj_la1[13] = jj_gen;
+        jj_la1[14] = jj_gen;
                          {if (true) return sem.no_param_re();}
       }
     throw new Error("Missing return statement in function");
@@ -750,7 +763,7 @@ public class Asts implements AstsConstants {
                          {if (true) return params;}
         break;
       default:
-        jj_la1[14] = jj_gen;
+        jj_la1[15] = jj_gen;
                          {if (true) return paramsh;}
       }
     throw new Error("Missing return statement in function");
@@ -783,7 +796,7 @@ public class Asts implements AstsConstants {
                          {if (true) return (Exp)sem.asig(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn);}
         break;
       default:
-        jj_la1[15] = jj_gen;
+        jj_la1[16] = jj_gen;
                          {if (true) return exph;}
       }
     throw new Error("Missing return statement in function");
@@ -822,7 +835,7 @@ public class Asts implements AstsConstants {
                          {if (true) return exp_re;}
         break;
       default:
-        jj_la1[16] = jj_gen;
+        jj_la1[17] = jj_gen;
                          {if (true) return exph;}
       }
     throw new Error("Missing return statement in function");
@@ -857,7 +870,7 @@ public class Asts implements AstsConstants {
                          {if (true) return exp_re;}
         break;
       default:
-        jj_la1[17] = jj_gen;
+        jj_la1[18] = jj_gen;
                          {if (true) return exph;}
       }
     throw new Error("Missing return statement in function");
@@ -877,7 +890,7 @@ public class Asts implements AstsConstants {
                          {if (true) return (Exp)sem.resta(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn);}
         break;
       default:
-        jj_la1[18] = jj_gen;
+        jj_la1[19] = jj_gen;
                          {if (true) return exph;}
       }
     throw new Error("Missing return statement in function");
@@ -915,7 +928,7 @@ public class Asts implements AstsConstants {
                          {if (true) return (Exp)sem.or(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn);}
         break;
       default:
-        jj_la1[19] = jj_gen;
+        jj_la1[20] = jj_gen;
                          {if (true) return exph;}
       }
     throw new Error("Missing return statement in function");
@@ -951,7 +964,7 @@ public class Asts implements AstsConstants {
                          {if (true) return exp_re;}
         break;
       default:
-        jj_la1[20] = jj_gen;
+        jj_la1[21] = jj_gen;
                          {if (true) return exph;}
       }
     throw new Error("Missing return statement in function");
@@ -983,7 +996,7 @@ public class Asts implements AstsConstants {
                          {if (true) return exp;}
         break;
       default:
-        jj_la1[21] = jj_gen;
+        jj_la1[22] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1030,7 +1043,7 @@ public class Asts implements AstsConstants {
                          {if (true) return exp_re;}
         break;
       default:
-        jj_la1[22] = jj_gen;
+        jj_la1[23] = jj_gen;
                          {if (true) return exph;}
       }
     throw new Error("Missing return statement in function");
@@ -1061,7 +1074,7 @@ public class Asts implements AstsConstants {
                          {if (true) return exp;}
         break;
       default:
-        jj_la1[23] = jj_gen;
+        jj_la1[24] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1101,7 +1114,7 @@ public class Asts implements AstsConstants {
                          {if (true) return op;}
         break;
       default:
-        jj_la1[24] = jj_gen;
+        jj_la1[25] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1129,7 +1142,7 @@ public class Asts implements AstsConstants {
                          {if (true) return op;}
         break;
       default:
-        jj_la1[25] = jj_gen;
+        jj_la1[26] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1153,7 +1166,7 @@ public class Asts implements AstsConstants {
                          {if (true) return op;}
         break;
       default:
-        jj_la1[26] = jj_gen;
+        jj_la1[27] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1197,7 +1210,7 @@ public class Asts implements AstsConstants {
                          {if (true) return (Exp)sem.nulo().ponFila(op.beginLine).ponCol(op.beginColumn);}
         break;
       default:
-        jj_la1[27] = jj_gen;
+        jj_la1[28] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -1216,7 +1229,7 @@ public class Asts implements AstsConstants {
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[28];
+  final private int[] jj_la1 = new int[29];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1224,10 +1237,10 @@ public class Asts implements AstsConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x50447800,0x0,0x50447800,0x40407800,0x0,0x40000000,0x0,0x40407800,0x0,0x2fa80000,0x0,0x2fa80000,0x100000,0xc0038400,0x0,0x0,0x0,0x0,0x0,0x300,0x0,0xc0038400,0x0,0xc0038000,0x0,0x0,0x400,0xc0038000,};
+      jj_la1_0 = new int[] {0x50447800,0x0,0x50447800,0x40407800,0x0,0x40000000,0x0,0x40407800,0x40407800,0x0,0x2fa80000,0x0,0x2fa80000,0x100000,0xc0038400,0x0,0x0,0x0,0x0,0x0,0x300,0x0,0xc0038400,0x0,0xc0038000,0x0,0x0,0x400,0xc0038000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x40000,0x800,0x40000,0x40000,0x4000,0x8000,0x10000,0x40000,0x4000,0x80200,0x800,0x80200,0x0,0x401003,0x4000,0x100000,0x300003c,0x200000,0x400000,0x0,0x1c000000,0x401003,0x850000,0x1003,0x300003c,0x1c000000,0x400000,0x3,};
+      jj_la1_1 = new int[] {0x40000,0x800,0x40000,0x40000,0x4000,0x8000,0x10000,0x40000,0x0,0x4000,0x80200,0x800,0x80200,0x0,0x401003,0x4000,0x100000,0x300003c,0x200000,0x400000,0x0,0x1c000000,0x401003,0x850000,0x1003,0x300003c,0x1c000000,0x400000,0x3,};
    }
 
   /** Constructor with InputStream. */
@@ -1241,7 +1254,7 @@ public class Asts implements AstsConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1255,7 +1268,7 @@ public class Asts implements AstsConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1265,7 +1278,7 @@ public class Asts implements AstsConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1275,7 +1288,7 @@ public class Asts implements AstsConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1284,7 +1297,7 @@ public class Asts implements AstsConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1293,7 +1306,7 @@ public class Asts implements AstsConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 28; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 29; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -1351,7 +1364,7 @@ public class Asts implements AstsConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 28; i++) {
+    for (int i = 0; i < 29; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

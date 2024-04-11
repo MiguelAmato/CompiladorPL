@@ -7,7 +7,6 @@ package c_ast_descendente;
 
 import asint.SintaxisAbstractaEval.*;
 import asint.ClaseSemanticaEval;
-import c_ast_ascendente.UnidadLexica.StringLocalizado;
 
 public class Asts {
     private ClaseSemanticaEval sem = new ClaseSemanticaEval();
@@ -165,25 +164,25 @@ PARSER_END(Asts)
 			{return tipore;}
 		}
 	Tipo tipo_re(Tipo tipoh) : 
-		{Token ent;} 
+		{Token ent; Tipo tipo_re;} 
 		{
-			("[" ent = <literal_entero> "]") 
-			{return (Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
+			"[" ent = <literal_entero> "]" tipo_re = tipo_re((Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn))
+			{return tipo_re;}
 			| 
 			{return tipoh;}
 		}
 	Tipo tipo1() : 
 		{ Tipo tipo2; } 
 		{ 
-			tipo2 =  tipo2()
+			"^" tipo2 =  tipo1()
+			{return sem.tipo_punt(tipo2);}
+			|
+			tipo2 = tipo2()
 			{return tipo2;}
 		}
 	Tipo tipo2() : 
 		{Tipo tip; Token id;} 
 		{
-			"^" tip = tipo1() 
-			{return sem.tipo_punt(tip);}
-			| 
 			<ent>
 			{return sem.tipo_int();} 
 			| 
@@ -209,13 +208,13 @@ PARSER_END(Asts)
 			{return sem.tipo_struct(lstruct);}
 		}
 	LStruct lista_struct() : 
-		{Campo campo; LStruct lstruct;} 
+		{LStruct lstruct; Campo campo;} 
 		{
 			campo = campo() lstruct = lista_struct_re(sem.info_struct(campo))
 			{return lstruct;}
 		}
 	LStruct lista_struct_re(LStruct lstructh) : 
-		{Campo campo; LStruct lstruct;} 
+		{LStruct lstruct; Campo campo;} 
 		{
 			"," campo = campo() lstruct = lista_struct_re(sem.lista_struct(lstructh, campo)) 
 			{return lstruct;}

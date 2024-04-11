@@ -2,7 +2,6 @@
 package c_ast_descendente;
 import asint.SintaxisAbstractaEval.*;
 import asint.ClaseSemanticaEval;
-import c_ast_ascendente.UnidadLexica.StringLocalizado;
 
 /** Token Manager. */
 public class AstsTokenManager implements AstsConstants

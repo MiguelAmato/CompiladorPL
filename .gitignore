@@ -29,3 +29,4 @@ replay_pid*
 .vscode
 
 implementacion_semantica/src/c_ast_descendente/message.txt
+implementacion_semantica/src/c_ast_ascendente/message.cup

@@ -7,7 +7,7 @@ import java.io.Reader;
 public class Main {
    public static void main(String[] args) throws Exception {
 
-	Reader input = new InputStreamReader(new FileInputStream("implementacion_semantica/src/c_ast_ascendente/input.txt"));
+	Reader input = new InputStreamReader(new FileInputStream("implementacion_semantica/src/input.txt"));
 	AnalizadorLexico alex = new AnalizadorLexico(input);
  	Asts asint = new Asts(alex);
 	//asint.setScanner(alex);

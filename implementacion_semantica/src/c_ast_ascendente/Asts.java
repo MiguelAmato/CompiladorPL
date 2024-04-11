@@ -1287,7 +1287,8 @@ class CUP$Asts$actions {
           case 79: // E7 ::= PARENTESIS_APERTURA E0 PARENTESIS_CIERRE 
             {
               Exp RESULT =null;
-
+		Exp exp = (Exp)((java_cup.runtime.Symbol) CUP$Asts$stack.elementAt(CUP$Asts$top-1)).value;
+		 RESULT = exp; 
               CUP$Asts$result = parser.getSymbolFactory().newSymbol("E7",38, RESULT);
             }
           return CUP$Asts$result;

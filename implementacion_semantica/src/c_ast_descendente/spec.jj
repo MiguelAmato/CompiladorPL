@@ -2,14 +2,18 @@ options  {
   STATIC=false;
   DEBUG_PARSER=true;
 }  
-PARSER_BEGIN(AnalizadorSintacticoTiny)
-package asint;
+PARSER_BEGIN(Asts)
+package c_ast_descendente;
 
-public class AnalizadorSintacticoTiny {
-    protected void newToken(Token t) {}
+import asint.SintaxisAbstractaEval.*;
+import asint.ClaseSemanticaEval;
+import c_ast_ascendente.UnidadLexica.StringLocalizado;
+
+public class Asts {
+    private ClaseSemanticaEval sem = new ClaseSemanticaEval();
 }
 
-PARSER_END(AnalizadorSintacticoTiny)
+PARSER_END(Asts)
 	TOKEN:{<#letra:["a"-"z","A"-"Z","_"]>}
 	TOKEN:{<#digitoPositivo:["1"-"9"]>}
 	TOKEN:{<#digito:<digitoPositivo>|"0">}
@@ -65,7 +69,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			{return sem.prog(decOpt, instrOpt);}
 		}
 	Decs declaraciones_opt() : 
-		{ LDecs ldecs } 
+		{ LDecs ldecs; } 
 		{
 			ldecs = lista_declaraciones() <cambioSec> 
 			{return sem.si_decs(ldecs);}
@@ -73,13 +77,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			{return sem.no_decs();}
 		}
 	LDecs lista_declaraciones() : 
-		{ Dec dec; LDecs ldecs } 
+		{ Dec dec; LDecs ldecs; } 
 		{
 			dec = declaracion() ldecs = lista_declaraciones_re(sem.una_dec(dec))
 			{ return ldecs; }
 		}
 	LDecs lista_declaraciones_re(LDecs ldech) : 
-		{ Dec dec; LDecs ldecs } 
+		{ Dec dec; LDecs ldecs; } 
 		{
 			";" dec = declaracion() ldecs = lista_declaraciones_re(sem.muchas_decs(ldech,dec))
 			{return ldecs;} 
@@ -117,7 +121,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			{return (Dec) sem.dec_proc(id.image, paramf, prog).ponFila(id.beginLine).ponCol(id.beginColumn);}
 		}
 	ParamF parametros_formales() : 
-		{LParam lparam} 
+		{LParam lparam;} 
 		{
 			lparam = lista_parametros() 
 			{return sem.si_parF(lparam);}
@@ -148,20 +152,20 @@ PARSER_END(AnalizadorSintacticoTiny)
 		{Token id;} 
 		{
 			id = <identificador>
-			{return sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+			{return (Param)sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
 			| 
 			"&" id = <identificador>
-			{return sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+			{return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
 		}
 
 	Tipo tipo() : 
-		{Tipo tipo1; Tipo tipore;} 
+		{Tipo tipo1, tipore;} 
 		{
 			tipo1 = tipo1() tipore = tipo_re(tipo1)
-			{return tipo_re}
+			{return tipore;}
 		}
 	Tipo tipo_re(Tipo tipoh) : 
-		{Token ent; } 
+		{Token ent;} 
 		{
 			("[" ent = <literal_entero> "]") 
 			{return (Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
@@ -175,38 +179,37 @@ PARSER_END(AnalizadorSintacticoTiny)
 			{return tipo2;}
 		}
 	Tipo tipo2() : 
-		{Tipo tip, Token id} 
+		{Tipo tip; Token id;} 
 		{
 			"^" tip = tipo1() 
 			{return sem.tipo_punt(tip);}
 			| 
 			<ent>
-			{return tipo_int();} 
+			{return sem.tipo_int();} 
 			| 
 			<real> 
-			{return tipo_real();} 
+			{return sem.tipo_real();} 
 			| 
 			<bool> 
-			{return tipo_bool();} 
+			{return sem.tipo_bool();} 
 			| 
 			<string> 
-			{return tipo_string();} 
+			{return sem.tipo_string();} 
 			| 
 			id = <identificador> 
-			{return tipo_int(id.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);} 
+			{return (Tipo)sem.tipo_id(id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
 			| 
 			tip = tipo_struct()
 			{return tip;}
-
 		}
 	Tipo tipo_struct() : 
-		{LStruct lstruct} 
+		{LStruct lstruct;} 
 		{
 			<struct> "{" lstruct = lista_struct() "}"
 			{return sem.tipo_struct(lstruct);}
 		}
 	LStruct lista_struct() : 
-		{Campo campo; LStruct lstruct} 
+		{Campo campo; LStruct lstruct;} 
 		{
 			campo = campo() lstruct = lista_struct_re(sem.info_struct(campo))
 			{return lstruct;}
@@ -223,11 +226,11 @@ PARSER_END(AnalizadorSintacticoTiny)
 		{Tipo tipo; Token id;} 
 		{
 			tipo = tipo() id = <identificador>
-			{return sem.campo(tipo, id.image).ponFila(ent.beginLine).ponCol(ent.beginColumn);}
+			{return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
 		}
 
 	InstrOpt instrucciones_opt() : 
-		{LInstr linstr} 
+		{LInstr linstr;} 
 		{
 			linstr = lista_instrucciones() 
 			{return sem.si_inst(linstr);} 
@@ -249,37 +252,37 @@ PARSER_END(AnalizadorSintacticoTiny)
 			{return linstrh;}
 		}
 	Instr instruccion() : 
-		{ Instr intr } 
+		{ Instr instr; } 
 		{
 			instr = instruccion_eval()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_if()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_while()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_read()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_write()
-			{return intr;}
+			{return instr;}
 			| 
 			instr = instruccion_nl()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_reserva()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_libera()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_call()
-			{return intr;} 
+			{return instr;} 
 			| 
 			instr = instruccion_compuesta()
-			{return intr;}
+			{return instr;}
 		}
 	Instr instruccion_eval() : 
 		{Exp exp;} 
@@ -357,13 +360,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			| 
 			{return sem.no_param_re();}
 		}
-	void lista_parametros_reales() : 
+	LParamR lista_parametros_reales() : 
 		{LParamR params; Exp exp;} 
 		{
 			exp = E0() params = lista_parametros_reales_re(sem.un_param_re(exp))
 			{return params;}
 		}
-	void lista_parametros_reales_re(LParamR paramsh) : 
+	LParamR lista_parametros_reales_re(LParamR paramsh) : 
 		{Exp exp; LParamR params;} 
 		{
 			"," exp = E0() params = lista_parametros_reales_re(sem.muchos_param_re(paramsh, exp))
@@ -372,13 +375,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			{return paramsh;}
 		}
 
-	void E0() : 
+	Exp E0() : 
 		{Exp exp; Exp exp_re;} 
 		{
 			exp = E1() exp_re = E0RE(exp)
 			{return exp_re;}
 		}
-	void E0RE(Exp exph) : 
+	Exp E0RE(Exp exph) : 
 		{Token op; Exp exp;} 
 		{
 			op = "=" exp = E0()
@@ -386,13 +389,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			| 
 			{return exph;}
 		}
-	void E1() : 
+	Exp E1() : 
 		{Exp exp; Exp exp_re;} 
 		{
 			exp = E2() exp_re = E1RE(exp)
 			{return exp_re;}
 		}
-	void E1RE(Exp exph) : 
+	Exp E1RE(Exp exph) : 
 		{Token op; Exp exp, exp_re;} 
 		{
 			op = op_relacional() exp = E2() exp_re = E1RE((Exp)sem.op_rel(op.image, exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn))
@@ -400,13 +403,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			| 
 			{return exph;}
 		}
-	void E2() : 
+	Exp E2() : 
 		{Exp exp, exp_re1, exp_re2;} 
 		{
 			exp = E3() exp_re2 = E2RE(exp) exp_re1 = E2RE1(exp_re2)
 			{return exp_re1;}
 		}
-	void E2RE1(Exp exph) : 
+	Exp E2RE1(Exp exph) : 
 		{Token op; Exp exp, exp_re;} 
 		{
 			op = "+" exp = E3() exp_re = E2RE1((Exp)sem.suma(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn))
@@ -414,8 +417,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			| 
 			{return exph;}
 		}
-		{"+" E3() E2RE1() | {}}
-	void E2RE(Exp exph) : 
+	Exp E2RE(Exp exph) : 
 		{Token op; Exp exp;} 
 		{
 			op = "-" exp = E3()
@@ -423,13 +425,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			| 
 			{return exph;}
 		}
-	void E3() : 
+	Exp E3() : 
 		{Exp exp, exp_re;} 
 		{
-			exp = E4() exp_re = E3RE()
+			exp = E4() exp_re = E3RE(exp)
 			{return exp_re;}
 		} 
-	void E3RE(Exp exph) : 
+	Exp E3RE(Exp exph) : 
 		{Token op; Exp exp;} 
 		{
 			op = <and> exp = E3()
@@ -440,13 +442,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			| 
 			{return exph;}
 		}
-	void E4() : 
+	Exp E4() : 
 		{Exp exp, exp_re;} 
 		{
-			exp = E5() exp_re = E4RE()
+			exp = E5() exp_re = E4RE(exp)
 			{return exp_re;}
 		}
-	void E4RE(Exp exph) : 
+	Exp E4RE(Exp exph) : 
 		{Token op; Exp exp, exp_re;} 
 		{
 			op = op_nivel4() exp = E5() exp_re = E4RE((Exp)sem.op_mul(op.image, exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn))
@@ -454,7 +456,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			| 
 			{return exph;}
 		}
-	void E5() : 
+	Exp E5() : 
 		{Token op; Exp exp;} 
 		{
 			op = op_nivel5() exp = E5() 
@@ -463,13 +465,13 @@ PARSER_END(AnalizadorSintacticoTiny)
 			exp = E6()
 			{return exp;}
 		}
-	void E6() : 
+	Exp E6() : 
 		{Exp exp, exp_re;} 
 		{
 			exp = E7() exp_re = E6RE(exp)
 			{return exp_re;}
 		}
-	void E6RE(Exp exph) : 
+	Exp E6RE(Exp exph) : 
 		{Token corAp, iden, reg; Exp exp, exp_re;} 
 		{
 			corAp = "[" exp = E0() "]" exp_re = E6RE((Exp)sem.index(exph, exp).ponFila(corAp.beginLine).ponCol(corAp.beginColumn))
@@ -483,7 +485,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			|
 			{return exph;}
 		}
-	void E7() : 
+	Exp E7() : 
 		{Exp exp;} 
 		{
 			"(" exp = E0() ")" 
@@ -492,7 +494,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			exp = op_basico()
 			{return exp;}
 		}
-	void op_relacional() : 
+	Token op_relacional() : 
 		{Token op;} 
 		{
 			op = ">"
@@ -513,7 +515,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			op = <distinto>
 			{return op;}
 		}
-	void op_nivel4() : 
+	Token op_nivel4() : 
 		{Token op;} 
 		{
 			op = "*" 
@@ -525,7 +527,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			op = "%" 
 			{return op;}
 		}
-	void op_nivel5() : 
+	Token op_nivel5() : 
 		{Token op;} 
 		{
 			op = "-"
@@ -534,7 +536,7 @@ PARSER_END(AnalizadorSintacticoTiny)
 			op = <not>
 			{return op;}
 		}
-	void op_basico() : 
+	Exp op_basico() : 
 		{Token op;} 
 		{
 			op = <literal_entero> 

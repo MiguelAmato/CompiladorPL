@@ -1,6 +1,0 @@
-{
-	"java.project.referencedLibraries": [
-		"lib/**/*.jar",
-		"implementacion_semantica/lib/java-cup-11b-runtime.jar"
-	]
-}

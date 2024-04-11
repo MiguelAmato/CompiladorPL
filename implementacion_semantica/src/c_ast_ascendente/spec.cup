@@ -31,7 +31,6 @@ terminal      StringLocalizado IDENTIFICADOR, LITERAL_ENTERO, LITERAL_REAL, LITE
               CORCHETE_APERTURA, PUNTERO, SUMA, RESTA, MULTIPLICACION, DIVISION, MODULO, AND, OR, NOT,MENOR,
               MAYOR, MENOR_O_IGUAL, MAYOR_O_IGUAL, IGUALDAD, DISTINTO, ASIG;
 
-non terminal Bloq bloque
 non terminal Prog programa;
 non terminal Decs declaraciones_opt;
 non terminal LDecs lista_declaraciones;
@@ -47,7 +46,7 @@ non terminal LInstr lista_instrucciones;
 non terminal Instr instruccion, instruccion_eval, instruccion_if, instruccion_while, instruccion_read, instruccion_write, instruccion_nl, instruccion_reserva, instruccion_libera, instruccion_call, instruccion_compuesta;
 non terminal ParamR parametros_reales;
 non terminal LParamR lista_parametros_reales;
-non terminal Exp E0, E1, E2, E3, E4, E5, E6, E7;
+non terminal Exp E0, E1, E2, E3, E4, E5, E6, E7, opnd;
 non terminal StringLocalizado op_relacional, op_nivel4, op_nivel5;
 
 programa ::= LLAVE_APERTURA declaraciones_opt: decs instrucciones_opt:instrOpt LLAVE_CIERRE
@@ -112,7 +111,8 @@ tipo1	::= STRING
     {: RESULT = sem.tipo_string(); :};
 tipo1	::= IDENTIFICADOR: id
     {: RESULT = (Tipo) sem.tipo_id(id.str()).ponFila(id.fila()).ponCol(id.col()); :};
-tipo1	::= tipo_struct;
+tipo1	::= tipo_struct: tipo
+    {: RESULT = tipo; :};
 
 
 tipo_struct	::= STRUCT LLAVE_APERTURA lista_struct: LStruct LLAVE_CIERRE
@@ -226,7 +226,7 @@ E6 ::= E7: exp
  {: RESULT = exp; :};
 E7 ::= PARENTESIS_APERTURA E0 PARENTESIS_CIERRE;
 E7 ::= opnd: op
-    {: RESULT = op :};
+    {: RESULT = op; :};
 
 
 op_relacional ::= MAYOR: op

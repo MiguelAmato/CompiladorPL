@@ -579,8 +579,8 @@ public class Asts implements AstsConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case Else:
         jj_consume_token(Else);
-        prog = programa();
-                          {if (true) return sem.instr_if_else(exp, prog, prog2);}
+        prog2 = programa();
+                          {if (true) return sem.instr_else(exp, prog, prog2);}
         break;
       default:
         jj_la1[12] = jj_gen;

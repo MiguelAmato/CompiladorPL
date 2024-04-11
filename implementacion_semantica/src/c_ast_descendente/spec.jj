@@ -299,8 +299,8 @@ PARSER_END(Asts)
 	Instr instruccion_if_re(Exp exp, Prog prog) : 
 		{ Prog prog2; } 
 		{
-			<Else> prog = programa()
-			{ return sem.instr_if_else(exp, prog, prog2);}
+			<Else> prog2 = programa()
+			{ return sem.instr_else(exp, prog, prog2);}
 			|
 			{ return sem.instr_if(exp, prog);}
 		}

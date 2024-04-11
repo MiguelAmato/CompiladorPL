@@ -251,34 +251,34 @@ PARSER_END(AnalizadorSintacticoTiny)
 	Instr instruccion() : 
 		{ Instr intr } 
 		{
-			instr = instruccion_eval
+			instr = instruccion_eval()
 			{return intr;} 
 			| 
-			instr = instruccion_if
+			instr = instruccion_if()
 			{return intr;} 
 			| 
-			instr = instruccion_while
+			instr = instruccion_while()
 			{return intr;} 
 			| 
-			instr = instruccion_read
+			instr = instruccion_read()
 			{return intr;} 
 			| 
-			instr = instruccion_write
+			instr = instruccion_write()
 			{return intr;}
 			| 
-			instr = instruccion_nl
+			instr = instruccion_nl()
 			{return intr;} 
 			| 
-			instr = instruccion_reserva
+			instr = instruccion_reserva()
 			{return intr;} 
 			| 
-			instr = instruccion_libera
+			instr = instruccion_libera()
 			{return intr;} 
 			| 
-			instr = instruccion_call
+			instr = instruccion_call()
 			{return intr;} 
 			| 
-			instr = instruccion_compuesta
+			instr = instruccion_compuesta()
 			{return intr;}
 		}
 	Instr instruccion_eval() : 
@@ -288,117 +288,272 @@ PARSER_END(AnalizadorSintacticoTiny)
 			{ return sem.instr_eval(exp); }
 		}
 	Instr instruccion_if() : 
-		{ Exp exp; Prog prog; } 
+		{ Exp exp; Prog prog; Instr instr_re; } 
 		{
-			<If> exp = E0() prog = programa() instruccion_if_re()
-			{ return sem.instr_if() }
+			<If> exp = E0() prog = programa() instr_re = instruccion_if_re(exp, prog)
+			{ return instr_re; }
 		}
-	Instr instruccion_if_re() : 
-		{} 
-		{<Else> programa() | {}}
+	Instr instruccion_if_re(Exp exp, Prog prog) : 
+		{ Prog prog2; } 
+		{
+			<Else> prog = programa()
+			{ return sem.instr_if_else(exp, prog, prog2);}
+			|
+			{ return sem.instr_if(exp, prog);}
+		}
 	Instr instruccion_while() : 
-		{} 
-		{<While> E0() programa()}
+		{Exp exp; Prog prog;} 
+		{
+			<While> exp = E0() prog = programa()
+			{ return sem.instr_wh(exp, prog);}
+		}
 	Instr instruccion_read() : 
-		{} 
-		{<read> E0()}
+		{Exp exp;} 
+		{
+			<read> exp = E0()
+			{ return sem.instr_rd(exp);}
+		}
 	Instr instruccion_write() : 
-		{} 
-		{<write> E0()}
+		{Exp exp;} 
+		{
+			<write> exp = E0()
+			{ return sem.instr_wr(exp);}
+		}
 	Instr instruccion_nl() : 
 		{} 
-		{<nl>}
+		{
+			<nl>
+			{ return sem.instr_nl();}
+		}
 	Instr instruccion_reserva() : 
-		{} 
-		{<New> E0()}
+		{Exp exp;} 
+		{
+			<New> exp = E0()
+			{ return sem.instr_new(exp);}
+		}
 	Instr instruccion_libera() : 
-		{} 
-		{<Delete> E0()}
+		{Exp exp;} 
+		{
+			<Delete> exp = E0()
+			{ return sem.instr_del(exp);}
+		}
 	Instr instruccion_call() : 
-		{} 
-		{<call> <identificador> "(" parametros_reales() ")"}
-	void parametros_reales() : 
-		{} 
-		{lista_parametros_reales() | {}}
+		{Token id; ParamR param;} 
+		{
+			<call> id = <identificador> "(" param = parametros_reales() ")"
+			{ return (Instr)sem.instr_call(id.image, param).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+	Instr instruccion_compuesta() :
+		{Prog prog;} 
+		{
+			prog = programa()
+			{ return sem.instr_comp(prog);}
+		}
+	ParamR parametros_reales() : 
+		{LParamR params;} 
+		{
+			params = lista_parametros_reales()
+			{return sem.si_param_re(params);}
+			| 
+			{return sem.no_param_re();}
+		}
 	void lista_parametros_reales() : 
-		{} 
-		{E0() lista_parametros_reales_re()}
-	void lista_parametros_reales_re() : 
-		{} 
-		{"," E0() lista_parametros_reales_re() | {}}
-	void instruccion_compuesta() : 
-		{} 
-		{programa()}
+		{LParamR params; Exp exp;} 
+		{
+			exp = E0() params = lista_parametros_reales_re(sem.un_param_re(exp))
+			{return params;}
+		}
+	void lista_parametros_reales_re(LParamR paramsh) : 
+		{Exp exp; LParamR params;} 
+		{
+			"," exp = E0() params = lista_parametros_reales_re(sem.muchos_param_re(paramsh, exp))
+			{return params;}
+			| 
+			{return paramsh;}
+		}
 
 	void E0() : 
-		{} 
-		{E1() E0RE()}
-	void E0RE() : 
-		{} 
-		{"=" E0() | {}}
+		{Exp exp; Exp exp_re;} 
+		{
+			exp = E1() exp_re = E0RE(exp)
+			{return exp_re;}
+		}
+	void E0RE(Exp exph) : 
+		{Token op; Exp exp;} 
+		{
+			op = "=" exp = E0()
+			{return (Exp)sem.asig(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| 
+			{return exph;}
+		}
 	void E1() : 
-		{} 
-		{E2() E1RE()}
-	void E1RE() : 
-		{} 
-		{op_relacional() E2() E1RE() | {}}
+		{Exp exp; Exp exp_re;} 
+		{
+			exp = E2() exp_re = E1RE(exp)
+			{return exp_re;}
+		}
+	void E1RE(Exp exph) : 
+		{Token op; Exp exp, exp_re;} 
+		{
+			op = op_relacional() exp = E2() exp_re = E1RE((Exp)sem.op_rel(op.image, exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn))
+			{return exp_re;}
+			| 
+			{return exph;}
+		}
 	void E2() : 
-		{} 
-		{E3() E2RE() E2RE1()}
-	void E2RE1() : 
-		{} 
+		{Exp exp, exp_re1, exp_re2;} 
+		{
+			exp = E3() exp_re2 = E2RE(exp) exp_re1 = E2RE1(exp_re2)
+			{return exp_re1;}
+		}
+	void E2RE1(Exp exph) : 
+		{Token op; Exp exp, exp_re;} 
+		{
+			op = "+" exp = E3() exp_re = E2RE1((Exp)sem.suma(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn))
+			{return exp_re;}
+			| 
+			{return exph;}
+		}
 		{"+" E3() E2RE1() | {}}
-	void E2RE() : 
-		{} 
-		{"-" E3() | {}}
+	void E2RE(Exp exph) : 
+		{Token op; Exp exp;} 
+		{
+			op = "-" exp = E3()
+			{return (Exp)sem.resta(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| 
+			{return exph;}
+		}
 	void E3() : 
-		{} 
-		{E4() E3RE()}
-	void E3RE() : 
-		{} 
-		{<and> E3() | <or> E4() | {}}
+		{Exp exp, exp_re;} 
+		{
+			exp = E4() exp_re = E3RE()
+			{return exp_re;}
+		} 
+	void E3RE(Exp exph) : 
+		{Token op; Exp exp;} 
+		{
+			op = <and> exp = E3()
+			{return (Exp)sem.and(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn);} 
+			| 
+			op = <or> exp = E4()
+			{return (Exp)sem.or(exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn);} 
+			| 
+			{return exph;}
+		}
 	void E4() : 
-		{} 
-		{E5() E4RE()}
-	void E4RE() : 
-		{} 
-		{op_nivel4() E5() E4RE() | {}}
+		{Exp exp, exp_re;} 
+		{
+			exp = E5() exp_re = E4RE()
+			{return exp_re;}
+		}
+	void E4RE(Exp exph) : 
+		{Token op; Exp exp, exp_re;} 
+		{
+			op = op_nivel4() exp = E5() exp_re = E4RE((Exp)sem.op_mul(op.image, exph, exp).ponFila(op.beginLine).ponCol(op.beginColumn))
+			{return exp_re;}
+			| 
+			{return exph;}
+		}
 	void E5() : 
-		{} 
-		{op_nivel5() E5() | E6()}
+		{Token op; Exp exp;} 
+		{
+			op = op_nivel5() exp = E5() 
+			{return (Exp)sem.op_inv(op.image, exp).ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| 
+			exp = E6()
+			{return exp;}
+		}
 	void E6() : 
-		{} 
-		{E7() E6RE()}
-	void E6RE() : 
-		{} 
-		{op_nivel6() E6RE() | {}}
+		{Exp exp, exp_re;} 
+		{
+			exp = E7() exp_re = E6RE(exp)
+			{return exp_re;}
+		}
+	void E6RE(Exp exph) : 
+		{Token corAp, iden, reg; Exp exp, exp_re;} 
+		{
+			corAp = "[" exp = E0() "]" exp_re = E6RE((Exp)sem.index(exph, exp).ponFila(corAp.beginLine).ponCol(corAp.beginColumn))
+			{return exp_re;}
+			| 
+			"." iden = <identificador> exp_re = E6RE((Exp)sem.reg(exph, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn))
+			{return exp_re;}
+			|
+			reg = "^" exp_re = E6RE((Exp)sem.indir(exph).ponFila(reg.beginLine).ponCol(reg.beginColumn))
+			{return exp_re;}
+			|
+			{return exph;}
+		}
 	void E7() : 
-		{} 
-		{"(" E0() ")" | op_basico()}
+		{Exp exp;} 
+		{
+			"(" exp = E0() ")" 
+			{return exp;}
+			| 
+			exp = op_basico()
+			{return exp;}
+		}
 	void op_relacional() : 
-		{} 
-		{">" | <mayorIgual> | "<" | <menorIgual> | <igualdad> | <distinto>}
+		{Token op;} 
+		{
+			op = ">"
+			{return op;}
+			|
+			op = <mayorIgual> 
+			{return op;}
+			|
+			op = "<"
+			{return op;}
+			|
+			op = <menorIgual>
+			{return op;}
+			|
+			op = <igualdad>
+			{return op;}
+			|
+			op = <distinto>
+			{return op;}
+		}
 	void op_nivel4() : 
-		{} 
-		{"*" | "/" | "%"}
+		{Token op;} 
+		{
+			op = "*" 
+			{return op;}
+			|
+			op = "/" 
+			{return op;}
+			|
+			op = "%" 
+			{return op;}
+		}
 	void op_nivel5() : 
-		{} 
-		{"-" | <not>}
-	void op_nivel6() : 
-		{} 
-		{op_indexacion() | op_registro() | op_indireccion()}
-	void op_indexacion() : 
-		{} 
-		{"[" E0() "]"}
-	void op_registro() : 
-		{} 
-		{"." <identificador>}
-	void op_indireccion() : 
-		{} 
-		{"^" op_indireccion_re()}
-	void op_indireccion_re() : 
-		{} 
-		{op_indireccion() | {}}
+		{Token op;} 
+		{
+			op = "-"
+			{return op;} 
+			| 
+			op = <not>
+			{return op;}
+		}
 	void op_basico() : 
-		{} 
-		{<literal_entero> | <literal_real> | <verdadero> | <falso> | <literal_cadena> | <identificador> | <nulo>}
+		{Token op;} 
+		{
+			op = <literal_entero> 
+			{return (Exp)sem.literal_ent(op.image).ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| 
+			op = <literal_real> 
+			{return (Exp)sem.literal_real(op.image).ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| 
+			op = <verdadero> 
+			{return (Exp)sem.true_().ponFila(op.beginLine).ponCol(op.beginColumn);}
+			|
+			op = <falso> 
+			{return (Exp)sem.false_().ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| 
+			op = <literal_cadena> 
+			{return (Exp)sem.literal_cadena(op.image).ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| 
+			op = <identificador> 
+			{return (Exp)sem.id(op.image).ponFila(op.beginLine).ponCol(op.beginColumn);}
+			| op = <nulo>
+			{return (Exp)sem.nulo().ponFila(op.beginLine).ponCol(op.beginColumn);}  
+		}

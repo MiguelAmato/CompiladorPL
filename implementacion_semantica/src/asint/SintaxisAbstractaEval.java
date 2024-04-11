@@ -1,6 +1,30 @@
 package asint;
 
 public class SintaxisAbstractaEval {
+
+	private static void imprimeOpnd(Exp opnd, int np) {
+
+			if(opnd.prioridad() < np) {
+				System.out.print("(");
+			};
+			opnd.imprime();
+			if(opnd.prioridad() < np) {
+				System.out.print(")");
+			};
+		}
+
+		private static void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1) {
+			imprimeOpnd(opnd0,np0);
+			System.out.print(" "+op+" ");
+			imprimeOpnd(opnd1,np1);
+		}
+
+		private static void imprimeExpPre(Exp opnd, String op, int np) {
+			System.out.print(op);
+			imprimeOpnd(opnd,np);
+		}
+		
+
 	public static abstract class Nodo {
 		public Nodo() {
 			fila = col = -1;
@@ -14,6 +38,8 @@ public class SintaxisAbstractaEval {
 			return this;
 		}
 
+		public abstract void imprime();
+
 		public Nodo ponCol(int col) {
 			this.col = col;
 			return this;
@@ -26,6 +52,9 @@ public class SintaxisAbstractaEval {
 		public int leeCol() {
 			return col;
 		}
+
+		// public abstract void procesa(Procesamiento p);
+		// public abstract void imprime();
 	}
 
 	public static class Literal_ent extends Exp {
@@ -34,6 +63,18 @@ public class SintaxisAbstractaEval {
 		public Literal_ent(String num) {
 			super();
 			this.num = num;
+		}
+
+		public String num() {
+			return num;
+		}
+
+		public void imprime() {
+			System.out.println(num);
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -49,6 +90,18 @@ public class SintaxisAbstractaEval {
 			this.num = num;
 		}
 
+		public String num() {
+			return num;
+		}
+
+		public void imprime() {
+			System.out.println(num);
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "literal_real(" + num + "[" + leeFila() + "," + leeCol() + "])";
 		}
@@ -62,6 +115,18 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public String id() {
+			return id;
+		}
+
+		public void imprime() {
+			System.out.println(id);
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "literal_cadena(" + id + "[" + leeFila() + "," + leeCol() + "])";
 		}
@@ -72,6 +137,14 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 
+		public void imprime() {
+			System.out.println("<true>");
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "true[" + leeFila() + "," + leeCol() + "]";
 		}
@@ -80,6 +153,14 @@ public class SintaxisAbstractaEval {
 	public static class False extends Exp {
 		public False() {
 			super();
+		}
+
+		public void imprime() {
+			System.out.println("<false>");
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -95,6 +176,18 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public String id() {
+			return id;
+		}
+
+		public void imprime() {
+			System.out.println(id);
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "id(" + id + "[" + leeFila() + "," + leeCol() + "])";
 		}
@@ -104,6 +197,14 @@ public class SintaxisAbstractaEval {
 
 		public Null() {
 			super();
+		}
+
+		public void imprime() {
+			System.out.println("<null>");
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -120,6 +221,26 @@ public class SintaxisAbstractaEval {
 			this.exp2 = exp2;
 		}
 
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, "=", exp2, 1, 0);
+		}
+
+		public int prioridad() {
+			return 0;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "asig(" + exp1 + "," + exp2 + ")";
 		}
@@ -132,6 +253,26 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, ">", exp2, 1, 2);
+		}
+
+		public int prioridad() {
+			return 1;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -148,6 +289,26 @@ public class SintaxisAbstractaEval {
 			this.exp2 = exp2;
 		}
 
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, "<", exp2, 1, 2);
+		}
+
+		public int prioridad() {
+			return 1;
+		}
+
 		public String toString() {
 			return "menor(" + exp1 + "," + exp2 + ")";
 		}
@@ -160,6 +321,26 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}	
+		
+		public void imprime() {
+			imprimeExpBin(exp1, ">=", exp2, 1, 2);
+		}
+
+		public int prioridad() {
+			return 1;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -176,6 +357,26 @@ public class SintaxisAbstractaEval {
 			this.exp2 = exp2;
 		}
 
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, "<=", exp2, 1, 2);
+		}
+
+		public int prioridad() {
+			return 1;
+		}
+
 		public String toString() {
 			return "menor_igual(" + exp1 + "," + exp2 + ")";
 		}
@@ -188,6 +389,26 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, "==", exp2, 1, 2);
+		}
+
+		public int prioridad() {
+			return 1;
 		}
 
 		public String toString() {
@@ -204,6 +425,26 @@ public class SintaxisAbstractaEval {
 			this.exp2 = exp2;
 		}
 
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+
+		public void imprime() {
+			imprimeExpBin(exp1, "!=", exp2, 1, 2);
+		}
+
+		public int prioridad() {
+			return 1;
+		}
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "distinto(" + exp1 + "," + exp2 + ")";
 		}
@@ -216,6 +457,27 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+
+		public void imprime() {
+			imprimeExpBin(exp1, "+", exp2, 2, 3);
+		}
+
+		public int prioridad() {
+			return 2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -232,6 +494,26 @@ public class SintaxisAbstractaEval {
 			this.exp2 = exp2;
 		}
 
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, "-", exp2, 3, 3);
+		}
+
+		public int prioridad() {
+			return 2;
+		}
+
 		public String toString() {
 			return "resta(" + exp1 + "," + exp2 + ")";
 		}
@@ -244,6 +526,26 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, "*", exp2, 4, 5);
+		}
+
+		public int prioridad() {
+			return 4;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -260,6 +562,29 @@ public class SintaxisAbstractaEval {
 			this.exp2 = exp2;
 		}
 
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+
+		public void imprime() {
+			imprimeExpBin(exp1, "/", exp2, 4, 5);
+		}
+
+		
+		public int prioridad() {
+			return 4;
+		}
+
+
 		public String toString() {
 			return "div(" + exp1 + "," + exp2 + ")";
 		}
@@ -272,6 +597,27 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+
+		public void imprime() {
+			imprimeExpBin(exp1, "%", exp2, 4, 5);
+		}
+
+		public int prioridad() {
+			return 4;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -288,6 +634,28 @@ public class SintaxisAbstractaEval {
 			this.exp2 = exp2;
 		}
 
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+
+		public void imprime() {
+			imprimeExpBin(exp1, "and", exp2, 4, 3);
+		}
+
+		
+		public int prioridad() {
+			return 3;
+		}
+
 		public String toString() {
 			return "and(" + exp1 + "," + exp2 + ")";
 		}
@@ -300,6 +668,27 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			imprimeExpBin(exp1, "or", exp2, 4, 4);
+		}
+
+
+		public int prioridad() {
+			return 3;
 		}
 
 		public String toString() {
@@ -315,6 +704,24 @@ public class SintaxisAbstractaEval {
 			this.exp = exp;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+				imprimeExpPre(exp, "not", 5);
+		}
+
+
+		public int prioridad() {
+			return 5;
+		}
+
+
 		public String toString() {
 			return "not(" + exp + ")";
 		}
@@ -328,6 +735,25 @@ public class SintaxisAbstractaEval {
 			this.exp = exp;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			imprimeExpPre(exp, "-", 5);
+		}
+
+		
+		public int prioridad() {
+			return 5;
+		}
+
+
+
 		public String toString() {
 			return "menos(" + exp + ")";
 		}
@@ -340,6 +766,31 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp1 = exp1;
 			this.exp2 = exp2;
+		}
+
+		public Exp exp1() {
+			return exp1;
+		}
+
+		public Exp exp2() {
+			return exp2;
+		}
+
+		public void imprime() {
+			imprimeOpnd(exp1, 6);
+			System.out.print("[");
+			imprimeOpnd(exp2, 6);
+			System.out.print("]");
+		}
+
+		
+		public int prioridad() {
+			return 6;
+		}
+
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -357,6 +808,30 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			imprimeOpnd(exp, 6);
+			System.out.print(".");
+			System.out.print(id);
+		}
+
+
+		public int prioridad() {
+			return 6;
+		}
+
+
 		public String toString() {
 			return "reg(" + exp + "," + id + ")";
 		}
@@ -370,6 +845,25 @@ public class SintaxisAbstractaEval {
 			this.exp = exp;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("^");
+			System.out.println(exp);
+		}
+
+		
+		public int prioridad() {
+			return 6;
+		}
+
+
 		public String toString() {
 			return "indir(" + exp + ")";
 		}
@@ -378,6 +872,12 @@ public class SintaxisAbstractaEval {
 	public static abstract class Exp extends Nodo {
 		public Exp() {
 			super();
+		}
+
+		public void procesa(Procesamiento p){		}
+
+		public int prioridad() {
+			return 0;
 		}
 	}
 
@@ -389,6 +889,24 @@ public class SintaxisAbstractaEval {
 			super();
 			this.lParamR = lParamR;
 			this.exp = exp;
+		}
+
+		public Exp exp() {
+			return exp;
+		}
+
+		public LParamR lParamR() {
+			return lParamR;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			lParamR.imprime();
+			System.out.println(",");
+			exp.imprime();
 		}
 
 		public String toString() {
@@ -404,15 +922,32 @@ public class SintaxisAbstractaEval {
 			this.exp = exp;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		
+		public void imprime() {
+			exp.imprime();
+		}
+
+
 		public String toString() {
 			return "un_param_re(" + exp + ")";
 		}
 	}
 
-	public static class LParamR extends Nodo {
+	public abstract static class LParamR extends Nodo {
 		public LParamR() {
 			super();
 		}
+		public void procesa(Procesamiento p){}
+
+		
 	}
 
 	public static class Si_param_re extends ParamR {
@@ -423,6 +958,18 @@ public class SintaxisAbstractaEval {
 			this.lParamR = lParamR;
 		}
 
+		public LParamR lParamR() {
+			return lParamR;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			lParamR.imprime();
+		}	
+
 		public String toString() {
 			return "si_param_re(" + lParamR + ")";
 		}
@@ -432,12 +979,20 @@ public class SintaxisAbstractaEval {
 		public No_param_re() {
 			super();
 		}
+		public void imprime() {
+			System.out.println("");
+		}
 	}
 
-	public static class ParamR extends Nodo {
+	public abstract static class ParamR extends Nodo {
 		public ParamR() {
 			super();
 		}
+
+		public void procesa(Procesamiento p){}
+
+
+		
 	}
 
 	public static class Instr_eval extends Instr {
@@ -446,6 +1001,19 @@ public class SintaxisAbstractaEval {
 		public Instr_eval(Exp exp) {
 			super();
 			this.exp = exp;
+		}
+
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("@");
+			exp.imprime();
 		}
 
 		public String toString() {
@@ -461,6 +1029,24 @@ public class SintaxisAbstractaEval {
 			super();
 			this.exp = exp;
 			this.prog = prog;
+		}
+
+		public Exp exp() {
+			return exp;
+		}
+
+		public Prog prog() {
+			return prog;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<if>");
+			exp.imprime();
+			prog.imprime();
 		}
 
 		public String toString() {
@@ -479,6 +1065,30 @@ public class SintaxisAbstractaEval {
 			this.prog2 = prog2;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public Prog prog1() {
+			return prog1;
+		}
+
+		public Prog prog2() {
+			return prog2;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<if>");
+			exp.imprime();
+			prog1.imprime();
+			System.out.println("<else>");
+			prog2.imprime();
+		}
+
 		public String toString() {
 			return "instr_else(" + exp + "," + prog1 + "," + prog2 + ")";
 		}
@@ -494,6 +1104,24 @@ public class SintaxisAbstractaEval {
 			this.prog = prog;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public Prog prog() {
+			return prog;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<while>");
+			exp.imprime();
+			prog.imprime();
+		}
+
 		public String toString() {
 			return "instr_wh(" + exp + "," + prog + ")";
 		}
@@ -505,6 +1133,19 @@ public class SintaxisAbstractaEval {
 		public Instr_rd(Exp exp) {
 			super();
 			this.exp = exp;
+		}
+
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<read>");
+			exp.imprime();
 		}
 
 		public String toString() {
@@ -520,6 +1161,19 @@ public class SintaxisAbstractaEval {
 			this.exp = exp;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<write>");
+			exp.imprime();
+		}
+
 		public String toString() {
 			return "instr_wr(" + exp + ")";
 		}
@@ -528,6 +1182,14 @@ public class SintaxisAbstractaEval {
 	public static class Instr_nl extends Instr {
 		public Instr_nl() {
 			super();
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("");
 		}
 
 		public String toString() {
@@ -543,6 +1205,19 @@ public class SintaxisAbstractaEval {
 			this.exp = exp;
 		}
 
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<new>");
+			exp.imprime();
+		}
+
 		public String toString() {
 			return "instr_new(" + exp + ")";
 		}
@@ -554,6 +1229,19 @@ public class SintaxisAbstractaEval {
 		public Instr_del(Exp exp) {
 			super();
 			this.exp = exp;
+		}
+
+		public Exp exp() {
+			return exp;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<delete>");
+			exp.imprime();
 		}
 
 		public String toString() {
@@ -571,6 +1259,26 @@ public class SintaxisAbstractaEval {
 			this.paramR = paramR;
 		}
 
+		public String id() {
+			return id;
+		}
+
+		public ParamR paramR() {
+			return paramR;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<call>");
+			System.out.println(id);
+			System.out.println("(");
+			paramR.imprime();
+			System.out.println(")");
+		}
+
 		public String toString() {
 			return "instr_call(" + id + "," + paramR + ")";
 		}
@@ -584,15 +1292,31 @@ public class SintaxisAbstractaEval {
 			this.prog = prog;
 		}
 
+		public Prog prog() {
+			return prog;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			prog.imprime();	
+		}
+
 		public String toString() {
 			return "instr_comp(" + prog + ")";
 		}
 	}
 
-	public static class Instr extends Nodo {
+	public abstract static class Instr extends Nodo {
 		public Instr() {
 			super();
 		}
+
+
+		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Una_instr extends LInstr {
@@ -601,6 +1325,18 @@ public class SintaxisAbstractaEval {
 		public Una_instr(Instr instr) {
 			super();
 			this.instr = instr;
+		}
+
+		public Instr instr() {
+			return instr;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			instr.imprime();
 		}
 
 		public String toString() {
@@ -618,20 +1354,50 @@ public class SintaxisAbstractaEval {
 			this.instr = instr;
 		}
 
+		public LInstr lInstr() {
+			return lInstr;
+		}
+
+		public Instr instr() {
+			return instr;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			lInstr.imprime();
+			System.out.println(";");
+			instr.imprime();
+		}
+
 		public String toString() {
 			return "muchas_instr(" + lInstr + "," + instr + ")";
 		}
 	}
 
-	public static class LInstr extends Nodo {
+	public abstract static class LInstr extends Nodo {
 		public LInstr() {
 			super();
 		}
+
+		public void procesa(Procesamiento p){}
+
+
 	}
 
 	public static class No_inst extends InstrOpt {
 		public No_inst() {
 			super();
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("");
 		}
 
 		public String toString() {
@@ -647,15 +1413,29 @@ public class SintaxisAbstractaEval {
 			this.lInstr = lInstr;
 		}
 
+		public LInstr lInstr() {
+			return lInstr;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			lInstr.imprime();
+		}
+
 		public String toString() {
 			return "si_inst(" + lInstr + ")";
 		}
 	}
 
-	public static class InstrOpt extends Nodo {
+	public abstract static class InstrOpt extends Nodo {
 		public InstrOpt() {
 			super();
 		}
+
+		public void procesa(Procesamiento p){}
 	}
 
 	public static class Campo extends Nodo {
@@ -666,6 +1446,23 @@ public class SintaxisAbstractaEval {
 			super();
 			this.tipo = tipo;
 			this.id = id;
+		}
+
+		public Tipo tipo() {
+			return tipo;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println(tipo);
+			System.out.println(id);
 		}
 
 		public String toString() {
@@ -683,6 +1480,24 @@ public class SintaxisAbstractaEval {
 			this.campo = campo;
 		}
 
+		public LStruct lStruct() {
+			return lStruct;
+		}
+
+		public Campo campo() {
+			return campo;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			lStruct.imprime();
+			System.out.println(",");
+			campo.imprime();
+		}
+
 		public String toString() {
 			return "lista_struct(" + lStruct + "," + campo + ")";
 		}
@@ -696,15 +1511,29 @@ public class SintaxisAbstractaEval {
 			this.campo = campo;
 		}
 
+		public Campo campo() {
+			return campo;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			campo.imprime();
+		}
+
 		public String toString() {
 			return "info_struct(" + campo + ")";
 		}
 	}
 
-	public static class LStruct extends Nodo {
+	public abstract static class LStruct extends Nodo {
 		public LStruct() {
 			super();
 		}
+
+		public void procesa(Procesamiento p){}
 	}
 
 	public static class Tipo_struct extends Tipo {
@@ -713,6 +1542,21 @@ public class SintaxisAbstractaEval {
 		public Tipo_struct(LStruct lStruct) {
 			super();
 			this.lStruct = lStruct;
+		}
+
+		public LStruct lStruct() {
+			return lStruct;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<struct>");
+			System.out.println("{");
+			lStruct.imprime();
+			System.out.println("}");  
 		}
 
 		public String toString() {
@@ -728,6 +1572,18 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public String id() {
+			return id;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println(id);
+		}
+
 		public String toString() {
 			return "tipo_id(" + id + ")";
 		}
@@ -736,6 +1592,14 @@ public class SintaxisAbstractaEval {
 	public static class Tipo_string extends Tipo {
 		public Tipo_string() {
 			super();
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<string>");
 		}
 
 		public String toString() {
@@ -748,6 +1612,14 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<bool>");
+		}
+
 		public String toString() {
 			return "tipo_bool()";
 		}
@@ -756,6 +1628,14 @@ public class SintaxisAbstractaEval {
 	public static class Tipo_real extends Tipo {
 		public Tipo_real() {
 			super();
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<real>");
 		}
 
 		public String toString() {
@@ -768,6 +1648,14 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<int>");
+		}
+
 		public String toString() {
 			return "tipo_int()";
 		}
@@ -778,7 +1666,20 @@ public class SintaxisAbstractaEval {
 
 		public Tipo_punt(Tipo tipo) {
 			super();
-			this.tipo = tipo;
+ 				this.tipo = tipo;
+		}
+
+		public Tipo tipo() {
+			return tipo;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("^");
+			tipo.imprime();
 		}
 
 		public String toString() {
@@ -796,15 +1697,37 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public Tipo tipo() {
+			return tipo;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			tipo.imprime();
+			System.out.println("[");
+			System.out.println(id);
+			System.out.println("]");
+		}
+
 		public String toString() {
 			return "tipo_array(" + tipo + "," + id + ")";
 		}
 	}
 
-	public static class Tipo extends Nodo {
+	public abstract static class Tipo extends Nodo {
 		public Tipo() {
 			super();
 		}
+
+		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Param_cop extends Param {
@@ -815,6 +1738,23 @@ public class SintaxisAbstractaEval {
 			super();
 			this.tipo = tipo;
 			this.id = id;
+		}
+
+		public Tipo tipo() {
+			return tipo;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			tipo.imprime();
+			System.out.println(id);
 		}
 
 		public String toString() {
@@ -832,15 +1772,36 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public Tipo tipo() {
+			return tipo;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			tipo.imprime();
+			System.out.println("&");
+			System.out.println(id);
+		}
+
 		public String toString() {
 			return "param_ref(" + tipo + "," + id + "[" + leeFila() + "," + leeCol() + "]" + ")";
 		}
 	}
 
-	public static class Param extends Nodo {
+	public abstract static class Param extends Nodo {
 		public Param() {
 			super();
 		}
+
+		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Un_param extends LParam {
@@ -849,6 +1810,18 @@ public class SintaxisAbstractaEval {
 		public Un_param(Param param) {
 			super();
 			this.param = param;
+		}
+
+		public Param param() {
+			return param;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			param.imprime();
 		}
 
 		public String toString() {
@@ -866,15 +1839,36 @@ public class SintaxisAbstractaEval {
 			this.param = param;
 		}
 
+		public LParam params() {
+			return params;
+		}
+
+		public Param param() {
+			return param;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			params.imprime();
+			System.out.println(",");
+			param.imprime();
+		}
+
 		public String toString() {
 			return "Muchos_param(" + params + "," + param + ")";
 		}
 	}
 
-	public static class LParam extends Nodo {
+	public abstract static class LParam extends Nodo {
 		public LParam() {
 			super();
 		}
+
+		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Si_parF extends ParamF {
@@ -883,6 +1877,18 @@ public class SintaxisAbstractaEval {
 		public Si_parF(LParam lparam) {
 			super();
 			this.lparam = lparam;
+		}
+
+		public LParam lparam() {
+			return lparam;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			lparam.imprime();
 		}
 
 		public String toString() {
@@ -895,15 +1901,25 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("");
+		}
+
 		public String toString() {
 			return "no_parF()";
 		}
 	}
 
-	public static class ParamF extends Nodo {
+	public abstract static class ParamF extends Nodo {
 		public ParamF() {
 			super();
 		}
+		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Dec_proc extends Dec {
@@ -916,6 +1932,31 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 			this.paramF = paramF;
 			this.prog = prog;
+		}
+
+		public ParamF paramF() {
+			return paramF;
+		}
+
+		public Prog prog() {
+			return prog;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+		public void imprime() {
+			System.out.println("<proc>");
+			System.out.println(id);
+			System.out.println("(");
+			paramF.imprime();
+			System.out.println(")");
+			prog.imprime();
 		}
 
 		public String toString() {
@@ -933,6 +1974,23 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public Tipo tipo() {
+			return tipo;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void imprime() {
+			System.out.println("<type>");
+			tipo.imprime();
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "dec_type(" + tipo + "," + id + "[" + leeFila() + "," + leeCol() + "]" + ")";
 		}
@@ -948,15 +2006,34 @@ public class SintaxisAbstractaEval {
 			this.id = id;
 		}
 
+		public Tipo tipo() {
+			return tipo;
+		}
+
+		public String id() {
+			return id;
+		}
+
+		public void imprime() {
+			tipo.imprime();
+			System.out.println(id);
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "dec_id(" + tipo + "," + id + "[" + leeFila() + "," + leeCol() + "]" + ")";
 		}
 	}
 
-	public static class Dec extends Nodo {
+	public abstract static class Dec extends Nodo {
 		public Dec() {
 			super();
 		}
+		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Una_dec extends LDecs {
@@ -965,6 +2042,18 @@ public class SintaxisAbstractaEval {
 		public Una_dec(Dec dec) {
 			super();
 			this.dec = dec;
+		}
+
+		public Dec dec() {
+			return dec;
+		}
+
+		public void imprime() {
+			dec.imprime();
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -982,6 +2071,24 @@ public class SintaxisAbstractaEval {
 			this.decs = decs;
 		}
 
+		public LDecs decs() {
+			return decs;
+		}
+
+		public Dec dec() {
+			return dec;
+		}
+
+		public void imprime() {
+			decs.imprime();
+			System.out.println(",");
+			dec.imprime();
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
 		public String toString() {
 			return "muchas_decs(" + decs + "," + dec + ")";
 		}
@@ -991,6 +2098,8 @@ public class SintaxisAbstractaEval {
 		public LDecs() {
 			super();
 		}
+		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Si_decs extends Decs {
@@ -999,6 +2108,19 @@ public class SintaxisAbstractaEval {
 		public Si_decs(LDecs decs) {
 			super();
 			this.decs = decs;
+		}
+
+		public LDecs decs() {
+			return decs;
+		}
+
+		public void imprime() {
+			decs.imprime();
+			System.out.println("&&");
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {
@@ -1011,6 +2133,16 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 
+		public void imprime() {
+			System.out.println("");
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
+		}
+
+
+
 		public String toString() {
 			return "no_decs()";
 		}
@@ -1019,6 +2151,25 @@ public class SintaxisAbstractaEval {
 	public static abstract class Decs extends Nodo {
 		public Decs() {
 			super();
+		}
+
+		public void procesa (Procesamiento p){
+		}
+	}
+
+	public static class Analiza extends Nodo {
+		private Prog prog;
+		public Analiza(Prog prog) {
+			super();
+			this.prog = prog;
+		}
+		public void imprime() {
+			prog.imprime();
+			System.out.println("<EOF>");
+		}
+
+		public String toString() {
+			return "Analiza (" + prog + ")";
 		}
 	}
 
@@ -1030,6 +2181,25 @@ public class SintaxisAbstractaEval {
 			super();
 			this.decs = decs;
 			this.instrOpt = instrOpt;
+		}
+
+		public Decs decs() {
+			return decs;
+		}
+
+		public InstrOpt instrOpt() {
+			return instrOpt;
+		}
+
+		public void imprime() {
+			System.out.println("{");
+			decs.imprime();
+			instrOpt.imprime();
+			System.out.println("}");
+		}
+
+		public void procesa(Procesamiento p){
+			p.procesa(this);
 		}
 
 		public String toString() {

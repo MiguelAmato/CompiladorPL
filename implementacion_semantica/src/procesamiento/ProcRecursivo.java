@@ -168,7 +168,7 @@ public class ProcRecursivo extends SintaxisAbstractaEval {
             imprime(((Instr_new)i).exp());
         }
         else if(claseDe(i, Instr_nl.class)){
-            System.out.println("");
+            System.out.println("<nl>");
         }
         else if(claseDe(i, Instr_wr.class)){
             System.out.println("<write>");
@@ -180,19 +180,25 @@ public class ProcRecursivo extends SintaxisAbstractaEval {
         }
         else if(claseDe(i, Instr_wh.class)){
             System.out.println("<while>");
+						// System.out.println("(");
             imprime(((Instr_wh)i).exp());
+						// System.out.println(")");
             imprime(((Instr_wh)i).prog());
         }
         else if(claseDe(i, Instr_else.class)){
             System.out.println("<if>");
+						// System.out.println("(");
             imprime(((Instr_else)i).exp());
+						// System.out.println(")");
             imprime(((Instr_else)i).prog1());
             System.out.println("<else>");
             imprime(((Instr_else)i).prog2());
         }
         else if(claseDe(i, Instr_if.class)){
             System.out.println("<if>");
+						// System.out.println("(");
             imprime(((Instr_if)i).exp());
+						// System.out.println(")");
             imprime(((Instr_if)i).prog());
         }
         else if(claseDe(i, Instr_eval.class)){
@@ -220,16 +226,16 @@ public class ProcRecursivo extends SintaxisAbstractaEval {
 
     public void imprime(Exp e){
         if(claseDe(e, Indir.class)){
+					imprime(((Indir)e).exp());
             System.out.println("^");
-            imprime(((Indir)e).exp());
         }
 				else if(claseDe(e, Asig.class)){
 					imprimeExpBin(((Asig)e).exp1(), "=", ((Asig)e).exp2(),1,0);
 				}
         else if(claseDe(e, Reg.class)){
-            imprime(((Reg)e).exp());
-            System.out.println(".");
-            System.out.println(((Reg)e).id());
+					imprime(((Reg)e).exp()); 
+					System.out.println(".");
+					System.out.println(((Reg)e).id());
         }
         else if(claseDe(e, Index.class)){
             imprime(((Index)e).exp1());
@@ -388,36 +394,9 @@ public class ProcRecursivo extends SintaxisAbstractaEval {
 					return 6;
 				}
 				else {
-					return 1000;
+					return 7;
 				}
 		}
-	
-		public void imprime(Literal_real r){
-				System.out.println(r.num());
-		}
 
-		public void simprime(Literal_ent e){
-				System.out.println(e.num());
-		}
-
-		public void imprime(True t){
-				System.out.println("<true>");
-		}
-
-		public void imprime(False f){
-				System.out.println("<false>");
-		}
-
-		public void imprime(Literal_cadena c){
-				System.out.println(c.id());
-		}
-	
-		public void imprime(Id i){
-				System.out.println(i.id());
-		}
-
-		public void imprime(Null n){
-				System.out.println("<null>");
-		}
 
 }

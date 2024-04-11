@@ -21,7 +21,7 @@ public class MainRecursivo {
 			
 			Prog prog = (Prog) asint.parse().value;
 
-			System.out.println(prog.toString());
+			// System.out.println(prog.toString());
 
 			ProcRecursivo proc = new ProcRecursivo();
 			proc.imprime(prog);

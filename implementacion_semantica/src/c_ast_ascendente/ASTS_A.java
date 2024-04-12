@@ -1096,8 +1096,9 @@ class CUP$ASTS_A$actions {
             {
               Exp RESULT =null;
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
+		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.asig(exp1, exp2); 
+		 RESULT = (Exp) sem.asig(exp1, exp2).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E0",31, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1119,7 +1120,7 @@ class CUP$ASTS_A$actions {
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
 		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.op_rel(op.str(), exp1, exp2); 
+		 RESULT = (Exp) sem.op_rel(op.str(), exp1, exp2).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E1",32, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1139,8 +1140,9 @@ class CUP$ASTS_A$actions {
             {
               Exp RESULT =null;
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
+		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.suma(exp1, exp2); 
+		 RESULT = (Exp) sem.suma(exp1, exp2).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E2",33, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1150,8 +1152,9 @@ class CUP$ASTS_A$actions {
             {
               Exp RESULT =null;
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
+		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.resta(exp1, exp2); 
+		 RESULT = (Exp) sem.resta(exp1, exp2).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E2",33, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1171,8 +1174,9 @@ class CUP$ASTS_A$actions {
             {
               Exp RESULT =null;
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
+		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.and(exp1, exp2); 
+		 RESULT = (Exp) sem.and(exp1, exp2).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E3",34, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1182,8 +1186,9 @@ class CUP$ASTS_A$actions {
             {
               Exp RESULT =null;
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
+		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.or(exp1, exp2); 
+		 RESULT = (Exp) sem.or(exp1, exp2).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E3",34, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1205,7 +1210,7 @@ class CUP$ASTS_A$actions {
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
 		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.op_mul(op.str(), exp1, exp2); 
+		 RESULT = (Exp) sem.op_mul(op.str(), exp1, exp2).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E4",35, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1226,7 +1231,7 @@ class CUP$ASTS_A$actions {
               Exp RESULT =null;
 		StringLocalizado op = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
 		Exp exp = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
-		 RESULT = sem.op_inv(op.str(), exp); 
+		 RESULT = (Exp) sem.op_inv(op.str(), exp).ponFila(op.fila()).ponCol(op.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E5",36, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1246,8 +1251,9 @@ class CUP$ASTS_A$actions {
             {
               Exp RESULT =null;
 		Exp exp1 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-3)).value;
+		StringLocalizado cap = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-2)).value;
 		Exp exp2 = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
-		 RESULT = sem.index(exp1, exp2); 
+		 RESULT = (Exp) sem.index(exp1, exp2).ponFila(cap.fila()).ponCol(cap.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E6",37, RESULT);
             }
           return CUP$ASTS_A$result;
@@ -1268,7 +1274,8 @@ class CUP$ASTS_A$actions {
             {
               Exp RESULT =null;
 		Exp exp = (Exp)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.elementAt(CUP$ASTS_A$top-1)).value;
-		 RESULT = sem.indir(exp); 
+		StringLocalizado pun = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ASTS_A$stack.peek()).value;
+		 RESULT = (Exp) sem.indir(exp).ponFila(pun.fila()).ponCol(pun.col()); 
               CUP$ASTS_A$result = parser.getSymbolFactory().newSymbol("E6",37, RESULT);
             }
           return CUP$ASTS_A$result;

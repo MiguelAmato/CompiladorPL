@@ -1,6 +1,9 @@
 
 import java.io.FileInputStream;
 import java.io.Reader;
+
+import asint.SintaxisAbstractaEval.Prog;
+
 import java.io.InputStreamReader;
 
 import c_ast_ascendente.AnalizadorLexico;
@@ -8,8 +11,9 @@ import c_ast_ascendente.GestionErroresEval.ErrorLexico;
 import c_ast_ascendente.GestionErroresEval.ErrorSintactico;
 import c_ast_ascendente.*;
 import c_ast_descendente.*;
+import procesamiento.ProcRecursivo;
 
-public class MainRecursivo {
+public class Main {
 	public static void main(String[] args) throws Exception {
 		Reader input = new InputStreamReader(new FileInputStream("src/input.txt"));
 		char c = (char) input.read();
@@ -17,8 +21,9 @@ public class MainRecursivo {
 			System.out.println("CONSTRUCCION AST ASCENDENTE");
 			AnalizadorLexico alex = new AnalizadorLexico(input);
 			ASTS_A_DJ asint = new ASTS_A_DJ(alex);
+			Prog prog = null;
 			try {    
-				asint.debug_parse();
+				prog = (Prog)asint.debug_parse().value;
 			}
 			catch(ErrorLexico e) {
 				System.out.println("ERROR_LEXICO"); 
@@ -28,12 +33,16 @@ public class MainRecursivo {
 				System.out.println("ERROR_SINTACTICO");
 				System.exit(1); 
 			}
+			System.out.println("IMPRESION RECURSIVA");	
+			ProcRecursivo proc = new ProcRecursivo();
+			proc.imprime(prog);
 		}
 		else if (c == 'd') {
 			System.out.println("CONSTRUCCION AST DESCENDENTE");
 			ASTS_D_DJ asint = new ASTS_D_DJ(input);
+			Prog prog = null;
 			try {
-				asint.analiza();
+				prog = asint.analiza();
 			}
 			catch(ParseException e) {
 				System.out.println("ERROR_SINTACTICO");
@@ -43,6 +52,15 @@ public class MainRecursivo {
 				System.out.println("ERROR_LEXICO");
 				System.exit(1);
 			}
+			System.out.println("IMPRESION RECURSIVA");	
+			ProcRecursivo proc = new ProcRecursivo();
+			proc.imprime(prog);
 		}
+		else {
+			System.err.println("ERROR: El archivo de entrada debe comenzar con 'a' o 'd'");
+			System.exit(1);
+		}
+
+
 	}
 }

@@ -5,11 +5,11 @@ public class SintaxisAbstractaEval {
 	private static void imprimeOpnd(Exp opnd, int np) {
 
 			if(opnd.prioridad() < np) {
-				System.out.print("(");
+				System.out.println("(");
 			};
 			opnd.imprime();
 			if(opnd.prioridad() < np) {
-				System.out.print(")");
+				System.out.println(")");
 			};
 		}
 
@@ -846,7 +846,7 @@ public class SintaxisAbstractaEval {
 		public void imprime() {
 			// imprimeOpnd(exp, 6);
 			exp.imprime();
-			System.out.print(".");
+			System.out.println(".");
 			System.out.print(id);
 			imprimeVinculo(this);
 		}
@@ -880,7 +880,7 @@ public class SintaxisAbstractaEval {
 
 		public void imprime() {
 			exp.imprime();
-			System.out.println("^");
+			System.out.print("^");
 			imprimeVinculo(this);
 		}
 
@@ -903,7 +903,7 @@ public class SintaxisAbstractaEval {
 		public void procesa(Procesamiento p){		}
 
 		public int prioridad() {
-			return 0;
+			return 7;
 		}
 	}
 
@@ -1006,7 +1006,6 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 		public void imprime() {
-			System.out.println("");
 		}
 	}
 
@@ -1424,7 +1423,6 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println("");
 		}
 
 		public String toString() {
@@ -1938,7 +1936,6 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println("");
 		}
 
 		public String toString() {
@@ -2170,7 +2167,6 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println("");
 		}
 
 		public void procesa(Procesamiento p){

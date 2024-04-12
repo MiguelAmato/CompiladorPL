@@ -1,4 +1,4 @@
-d
+a
 {
 type ^tNodo tArbol;     
 type struct{ 

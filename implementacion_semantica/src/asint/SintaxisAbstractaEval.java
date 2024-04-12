@@ -13,16 +13,27 @@ public class SintaxisAbstractaEval {
 			};
 		}
 
-		private static void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1) {
+		private static void imprimeExpBin(Exp opnd0, String op, Exp opnd1, int np0, int np1, int fila, int col) {
 			imprimeOpnd(opnd0,np0);
-			System.out.print(" "+op+" ");
+			System.out.print(op);
+			imprimeVinculo(fila, col);
 			imprimeOpnd(opnd1,np1);
 		}
 
-		private static void imprimeExpPre(Exp opnd, String op, int np) {
+		private static void imprimeExpPre(Exp opnd, String op, int np, int fila, int col) {
 			System.out.print(op);
+			imprimeVinculo(fila, col);
 			imprimeOpnd(opnd,np);
 		}
+
+		private static void imprimeVinculo(Nodo nodo) {
+			System.out.println("$f:" + nodo.leeFila() + ",c:" + nodo.leeCol() + "$");
+	}
+
+		private static void imprimeVinculo(int fila, int col) {
+				System.out.println("$f:" + fila + ",c:" + col + "$");
+		}
+
 		
 
 	public static abstract class Nodo {
@@ -70,7 +81,9 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println(num);
+			System.out.print(num);
+			imprimeVinculo(this);
+
 		}
 
 		public void procesa(Procesamiento p){
@@ -95,7 +108,9 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println(num);
+			System.out.print(num);
+			imprimeVinculo(this);
+
 		}
 
 		public void procesa(Procesamiento p){
@@ -120,7 +135,9 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
+
 		}
 
 		public void procesa(Procesamiento p){
@@ -138,7 +155,9 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println("<true>");
+			System.out.print("<true>");
+			imprimeVinculo(this);
+
 		}
 
 		public void procesa(Procesamiento p){
@@ -156,7 +175,8 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println("<false>");
+			System.out.print("<false>");
+			imprimeVinculo(this);
 		}
 
 		public void procesa(Procesamiento p){
@@ -181,7 +201,8 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 		public void procesa(Procesamiento p){
@@ -200,7 +221,8 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println("<null>");
+			System.out.print("<null>");
+			imprimeVinculo(this);
 		}
 
 		public void procesa(Procesamiento p){
@@ -230,7 +252,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, "=", exp2, 1, 0);
+			imprimeExpBin(exp1, "=", exp2, 1, 0, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -264,7 +286,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, ">", exp2, 1, 2);
+			imprimeExpBin(exp1, ">", exp2, 1, 2, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -302,7 +324,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, "<", exp2, 1, 2);
+			imprimeExpBin(exp1, "<", exp2, 1, 2, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -332,7 +354,7 @@ public class SintaxisAbstractaEval {
 		}	
 		
 		public void imprime() {
-			imprimeExpBin(exp1, ">=", exp2, 1, 2);
+			imprimeExpBin(exp1, ">=", exp2, 1, 2, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -370,7 +392,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, "<=", exp2, 1, 2);
+			imprimeExpBin(exp1, "<=", exp2, 1, 2, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -404,7 +426,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, "==", exp2, 1, 2);
+			imprimeExpBin(exp1, "==", exp2, 1, 2, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -435,7 +457,7 @@ public class SintaxisAbstractaEval {
 
 
 		public void imprime() {
-			imprimeExpBin(exp1, "!=", exp2, 1, 2);
+			imprimeExpBin(exp1, "!=", exp2, 1, 2, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -469,7 +491,7 @@ public class SintaxisAbstractaEval {
 
 
 		public void imprime() {
-			imprimeExpBin(exp1, "+", exp2, 2, 3);
+			imprimeExpBin(exp1, "+", exp2, 2, 3, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -507,7 +529,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, "-", exp2, 3, 3);
+			imprimeExpBin(exp1, "-", exp2, 3, 3, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -537,7 +559,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, "*", exp2, 4, 5);
+			imprimeExpBin(exp1, "*", exp2, 4, 5, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -576,7 +598,7 @@ public class SintaxisAbstractaEval {
 
 
 		public void imprime() {
-			imprimeExpBin(exp1, "/", exp2, 4, 5);
+			imprimeExpBin(exp1, "/", exp2, 4, 5, this.leeFila(), this.leeCol());
 		}
 
 		
@@ -609,7 +631,7 @@ public class SintaxisAbstractaEval {
 
 
 		public void imprime() {
-			imprimeExpBin(exp1, "%", exp2, 4, 5);
+			imprimeExpBin(exp1, "%", exp2, 4, 5, this.leeFila(), this.leeCol());
 		}
 
 		public int prioridad() {
@@ -648,7 +670,7 @@ public class SintaxisAbstractaEval {
 
 
 		public void imprime() {
-			imprimeExpBin(exp1, "and", exp2, 4, 3);
+			imprimeExpBin(exp1, "<and>", exp2, 4, 3, this.leeFila(), this.leeCol());
 		}
 
 		
@@ -683,7 +705,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpBin(exp1, "or", exp2, 4, 4);
+			imprimeExpBin(exp1, "<or>", exp2, 4, 4, this.leeFila(), this.leeCol());
 		}
 
 
@@ -713,7 +735,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-				imprimeExpPre(exp, "not", 5);
+				imprimeExpPre(exp, "<not>", 5, this.leeFila(), this.leeCol());
 		}
 
 
@@ -744,15 +766,13 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeExpPre(exp, "-", 5);
+			imprimeExpPre(exp, "-", 5, this.leeFila(), this.leeCol());
 		}
 
 		
 		public int prioridad() {
 			return 5;
 		}
-
-
 
 		public String toString() {
 			return "menos(" + exp + ")";
@@ -777,10 +797,13 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeOpnd(exp1, 6);
+			// imprimeOpnd(exp1, 6);
+			exp1.imprime();
 			System.out.print("[");
-			imprimeOpnd(exp2, 6);
-			System.out.print("]");
+			imprimeVinculo(this);
+			// imprimeOpnd(exp2, 6);
+			exp2.imprime();
+			System.out.println("]");
 		}
 
 		
@@ -821,9 +844,11 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			imprimeOpnd(exp, 6);
+			// imprimeOpnd(exp, 6);
+			exp.imprime();
 			System.out.print(".");
 			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 
@@ -854,8 +879,9 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
+			exp.imprime();
 			System.out.println("^");
-			System.out.println(exp);
+			imprimeVinculo(this);
 		}
 
 		
@@ -1189,7 +1215,7 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println("");
+			System.out.println("<nl>");
 		}
 
 		public String toString() {
@@ -1273,7 +1299,8 @@ public class SintaxisAbstractaEval {
 
 		public void imprime() {
 			System.out.println("<call>");
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
 			System.out.println("(");
 			paramR.imprime();
 			System.out.println(")");
@@ -1461,8 +1488,9 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println(tipo);
-			System.out.println(id);
+			tipo.imprime();
+			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 		public String toString() {
@@ -1581,7 +1609,8 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void imprime() {
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 		public String toString() {
@@ -1713,7 +1742,8 @@ public class SintaxisAbstractaEval {
 			tipo.imprime();
 			System.out.println("[");
 			System.out.println(id);
-			System.out.println("]");
+			System.out.print("]");
+			imprimeVinculo(this);
 		}
 
 		public String toString() {
@@ -1754,7 +1784,8 @@ public class SintaxisAbstractaEval {
 
 		public void imprime() {
 			tipo.imprime();
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 		public String toString() {
@@ -1787,7 +1818,8 @@ public class SintaxisAbstractaEval {
 		public void imprime() {
 			tipo.imprime();
 			System.out.println("&");
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 		public String toString() {
@@ -1952,7 +1984,8 @@ public class SintaxisAbstractaEval {
 
 		public void imprime() {
 			System.out.println("<proc>");
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
 			System.out.println("(");
 			paramF.imprime();
 			System.out.println(")");
@@ -1985,6 +2018,8 @@ public class SintaxisAbstractaEval {
 		public void imprime() {
 			System.out.println("<type>");
 			tipo.imprime();
+			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 		public void procesa(Procesamiento p){
@@ -2016,7 +2051,8 @@ public class SintaxisAbstractaEval {
 
 		public void imprime() {
 			tipo.imprime();
-			System.out.println(id);
+			System.out.print(id);
+			imprimeVinculo(this);
 		}
 
 		public void procesa(Procesamiento p){
@@ -2081,7 +2117,7 @@ public class SintaxisAbstractaEval {
 
 		public void imprime() {
 			decs.imprime();
-			System.out.println(",");
+			System.out.println(";");
 			dec.imprime();
 		}
 

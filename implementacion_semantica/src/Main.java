@@ -23,7 +23,9 @@ public class Main {
 			ASTS_A_DJ asint = new ASTS_A_DJ(alex);
 			Prog prog = null;
 			try {    
-				prog = (Prog)asint.debug_parse().value;
+				// prog = (Prog)asint.debug_parse().value;
+				prog = (Prog)asint.parse().value;
+				
 			}
 			catch(ErrorLexico e) {
 				System.out.println("ERROR_LEXICO"); 
@@ -34,8 +36,10 @@ public class Main {
 				System.exit(1); 
 			}
 			System.out.println("IMPRESION RECURSIVA");	
-			ProcRecursivo proc = new ProcRecursivo();
-			proc.imprime(prog);
+			// ProcRecursivo proc = new ProcRecursivo();
+			// proc.imprime(prog); // Recursivo
+			System.out.println("IMPRESION INTERPRETE");	
+			prog.imprime(); // Interprete
 		}
 		else if (c == 'd') {
 			System.out.println("CONSTRUCCION AST DESCENDENTE");

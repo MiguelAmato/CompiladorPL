@@ -10,6 +10,10 @@ import asint.ClaseSemanticaEval;
 
 public class ASTS_D {
     private ClaseSemanticaEval sem = new ClaseSemanticaEval();
+
+	public void setTabSize() {
+      jj_input_stream.setTabSize(1);
+    }
 }
 
 PARSER_END(ASTS_D)

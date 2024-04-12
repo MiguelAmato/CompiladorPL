@@ -12,5 +12,6 @@ public class ASTS_A_DJ extends ASTS_A {
     @SuppressWarnings("deprecation")
     public ASTS_A_DJ(Scanner alex) {
         super(alex);
+        
     }
 }

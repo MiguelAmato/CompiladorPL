@@ -7,6 +7,10 @@ import asint.ClaseSemanticaEval;
 public class ASTS_D implements ASTS_DConstants {
     private ClaseSemanticaEval sem = new ClaseSemanticaEval();
 
+        public void setTabSize() {
+      jj_input_stream.setTabSize(1);
+    }
+
   final public Prog analiza() throws ParseException {
     trace_call("analiza");
     try {

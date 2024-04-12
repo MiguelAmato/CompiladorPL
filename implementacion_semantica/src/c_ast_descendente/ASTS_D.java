@@ -1423,7 +1423,7 @@ public class ASTS_D implements ASTS_DConstants {
     }
   }
 
-  private void trace_token(Token t, String where) {
+  protected void trace_token(Token t, String where) {
     if (trace_enabled) {
       for (int i = 0; i < trace_indent; i++) { System.out.print(" "); }
       System.out.print("Consumed token: <" + tokenImage[t.kind]);

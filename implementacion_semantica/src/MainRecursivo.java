@@ -3,36 +3,46 @@ import java.io.FileInputStream;
 import java.io.Reader;
 import java.io.InputStreamReader;
 
-import asint.SintaxisAbstractaEval.Prog;
 import c_ast_ascendente.AnalizadorLexico;
-import procesamiento.ProcRecursivo;
+import c_ast_ascendente.GestionErroresEval.ErrorLexico;
+import c_ast_ascendente.GestionErroresEval.ErrorSintactico;
 import c_ast_ascendente.*;
+import c_ast_descendente.*;
 
 public class MainRecursivo {
 	public static void main(String[] args) throws Exception {
-
-		if (true) {
-
-			Reader input = new InputStreamReader(new FileInputStream("src/{.txt"));
-
+		Reader input = new InputStreamReader(new FileInputStream("src/input.txt"));
+		char c = (char) input.read();
+		if (c == 'a') {
+			System.out.println("CONSTRUCCION AST ASCENDENTE");
 			AnalizadorLexico alex = new AnalizadorLexico(input);
-
-			Asts asint = new Asts(alex);
-			
-			Prog prog = (Prog) asint.parse().value;
-
-			// System.out.println(prog.toString());
-
-			ProcRecursivo proc = new ProcRecursivo();
-			proc.imprime(prog);
-
-		} 
-		
-		// else {
-		// 	ConstructorASTsEval asint = new ConstructorASTsEval(new FileReader(args[1]));
-		// 	asint.disable_tracing();
-		// 	System.out.println(new Evaluador().evalua(asint.analiza()));
-		// }
-
+			ASTS_A_DJ asint = new ASTS_A_DJ(alex);
+			try {    
+				asint.debug_parse();
+			}
+			catch(ErrorLexico e) {
+				System.out.println("ERROR_LEXICO"); 
+				System.exit(1);
+			}
+			catch(ErrorSintactico e) {
+				System.out.println("ERROR_SINTACTICO");
+				System.exit(1); 
+			}
+		}
+		else if (c == 'd') {
+			System.out.println("CONSTRUCCION AST DESCENDENTE");
+			ASTS_D_DJ asint = new ASTS_D_DJ(input);
+			try {
+				asint.analiza();
+			}
+			catch(ParseException e) {
+				System.out.println("ERROR_SINTACTICO");
+				System.exit(1); 
+			}
+			catch(TokenMgrError e) {
+				System.out.println("ERROR_LEXICO");
+				System.exit(1);
+			}
+		}
 	}
 }

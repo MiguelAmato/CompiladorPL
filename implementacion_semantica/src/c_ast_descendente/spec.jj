@@ -113,50 +113,7 @@ PARSER_END(ASTS_D)
 			<type> tipo = tipo() id = <identificador>
 			{return (Dec)sem.dec_type(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
 		}
-	Dec declaracion_proc() : 
-		{Token id; ParamF paramf; Prog prog;} 
-		{
-			<proc> id = <identificador> "(" paramf = parametros_formales() ")" prog = programa()
-			{return (Dec) sem.dec_proc(id.image, paramf, prog).ponFila(id.beginLine).ponCol(id.beginColumn);}
-		}
-	ParamF parametros_formales() : 
-		{LParam lparam;} 
-		{
-			lparam = lista_parametros() 
-			{return sem.si_parF(lparam);}
-			| 
-			{return sem.no_parF();}
-		}
-	LParam lista_parametros() : 
-		{Param param; LParam lparam;} 
-		{
-			param = parametro() lparam = lista_parametros_re(sem.un_param(param))
-			{ return lparam; }
-		}
-	LParam lista_parametros_re(LParam lparamh) : 
-		{ Param param; LParam lparam; } 
-		{
-			"," param = parametro() lparam = lista_parametros_re(sem.muchos_param(lparamh, param))
-			{return lparam;}
-			| 
-			{return lparamh;}
-		}
-	Param parametro() : 
-		{Tipo tipo; Param param;} 
-		{
-			tipo = tipo() param = parametro_re(tipo)
-			{return param;}
-		}
-	Param parametro_re(Tipo tipoh) : 
-		{Token id;} 
-		{
-			id = <identificador>
-			{return (Param)sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
-			| 
-			"&" id = <identificador>
-			{return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
-		}
-
+	
 	Tipo tipo() : 
 		{Tipo tipo1, tipore;} 
 		{
@@ -227,6 +184,51 @@ PARSER_END(ASTS_D)
 			tipo = tipo() id = <identificador>
 			{return (Campo)sem.campo(tipo, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
 		}
+
+		Dec declaracion_proc() : 
+		{Token id; ParamF paramf; Prog prog;} 
+		{
+			<proc> id = <identificador> "(" paramf = parametros_formales() ")" prog = programa()
+			{return (Dec) sem.dec_proc(id.image, paramf, prog).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+	ParamF parametros_formales() : 
+		{LParam lparam;} 
+		{
+			lparam = lista_parametros() 
+			{return sem.si_parF(lparam);}
+			| 
+			{return sem.no_parF();}
+		}
+	LParam lista_parametros() : 
+		{Param param; LParam lparam;} 
+		{
+			param = parametro() lparam = lista_parametros_re(sem.un_param(param))
+			{ return lparam; }
+		}
+	LParam lista_parametros_re(LParam lparamh) : 
+		{ Param param; LParam lparam; } 
+		{
+			"," param = parametro() lparam = lista_parametros_re(sem.muchos_param(lparamh, param))
+			{return lparam;}
+			| 
+			{return lparamh;}
+		}
+	Param parametro() : 
+		{Tipo tipo; Param param;} 
+		{
+			tipo = tipo() param = parametro_re(tipo)
+			{return param;}
+		}
+	Param parametro_re(Tipo tipoh) : 
+		{Token id;} 
+		{
+			id = <identificador>
+			{return (Param)sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+			| 
+			"&" id = <identificador>
+			{return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+		}
+
 
 	InstrOpt instrucciones_opt() : 
 		{LInstr linstr;} 
@@ -555,6 +557,7 @@ PARSER_END(ASTS_D)
 			| 
 			op = <identificador> 
 			{return (Exp)sem.id(op.image).ponFila(op.beginLine).ponCol(op.beginColumn);}
-			| op = <nulo>
+			| 
+			op = <nulo>
 			{return (Exp)sem.nulo().ponFila(op.beginLine).ponCol(op.beginColumn);}  
 		}

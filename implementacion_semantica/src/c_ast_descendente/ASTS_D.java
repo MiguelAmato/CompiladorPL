@@ -48,7 +48,7 @@ public class ASTS_D implements ASTS_DConstants {
       case struct:
       case type:
       case identificador:
-      case 50:
+      case 46:
         ldecs = lista_declaraciones();
         jj_consume_token(cambioSec);
                          {if (true) return sem.si_decs(ldecs);}
@@ -108,7 +108,7 @@ public class ASTS_D implements ASTS_DConstants {
       case string:
       case struct:
       case identificador:
-      case 50:
+      case 46:
         dec = declaracion_variable();
                          {if (true) return dec;}
         break;
@@ -158,120 +158,6 @@ public class ASTS_D implements ASTS_DConstants {
     }
   }
 
-  final public Dec declaracion_proc() throws ParseException {
-    trace_call("declaracion_proc");
-    try {
-                 Token id; ParamF paramf; Prog prog;
-      jj_consume_token(proc);
-      id = jj_consume_token(identificador);
-      jj_consume_token(44);
-      paramf = parametros_formales();
-      jj_consume_token(45);
-      prog = programa();
-                         {if (true) return (Dec) sem.dec_proc(id.image, paramf, prog).ponFila(id.beginLine).ponCol(id.beginColumn);}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("declaracion_proc");
-    }
-  }
-
-  final public ParamF parametros_formales() throws ParseException {
-    trace_call("parametros_formales");
-    try {
-                 LParam lparam;
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case ent:
-      case real:
-      case bool:
-      case string:
-      case struct:
-      case identificador:
-      case 50:
-        lparam = lista_parametros();
-                         {if (true) return sem.si_parF(lparam);}
-        break;
-      default:
-        jj_la1[3] = jj_gen;
-                         {if (true) return sem.no_parF();}
-      }
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("parametros_formales");
-    }
-  }
-
-  final public LParam lista_parametros() throws ParseException {
-    trace_call("lista_parametros");
-    try {
-                 Param param; LParam lparam;
-      param = parametro();
-      lparam = lista_parametros_re(sem.un_param(param));
-                          {if (true) return lparam;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("lista_parametros");
-    }
-  }
-
-  final public LParam lista_parametros_re(LParam lparamh) throws ParseException {
-    trace_call("lista_parametros_re");
-    try {
-                  Param param; LParam lparam;
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 46:
-        jj_consume_token(46);
-        param = parametro();
-        lparam = lista_parametros_re(sem.muchos_param(lparamh, param));
-                         {if (true) return lparam;}
-        break;
-      default:
-        jj_la1[4] = jj_gen;
-                         {if (true) return lparamh;}
-      }
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("lista_parametros_re");
-    }
-  }
-
-  final public Param parametro() throws ParseException {
-    trace_call("parametro");
-    try {
-                 Tipo tipo; Param param;
-      tipo = tipo();
-      param = parametro_re(tipo);
-                         {if (true) return param;}
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("parametro");
-    }
-  }
-
-  final public Param parametro_re(Tipo tipoh) throws ParseException {
-    trace_call("parametro_re");
-    try {
-                 Token id;
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case identificador:
-        id = jj_consume_token(identificador);
-                         {if (true) return (Param)sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
-        break;
-      case 47:
-        jj_consume_token(47);
-        id = jj_consume_token(identificador);
-                         {if (true) return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
-        break;
-      default:
-        jj_la1[5] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    throw new Error("Missing return statement in function");
-    } finally {
-      trace_return("parametro_re");
-    }
-  }
-
   final public Tipo tipo() throws ParseException {
     trace_call("tipo");
     try {
@@ -290,15 +176,15 @@ public class ASTS_D implements ASTS_DConstants {
     try {
                  Token ent; Tipo tipo_re;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 48:
-        jj_consume_token(48);
+      case 44:
+        jj_consume_token(44);
         ent = jj_consume_token(literal_entero);
-        jj_consume_token(49);
+        jj_consume_token(45);
         tipo_re = tipo_re((Tipo)sem.tipo_array(tipoh, ent.image).ponFila(ent.beginLine).ponCol(ent.beginColumn));
                          {if (true) return tipo_re;}
         break;
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[3] = jj_gen;
                          {if (true) return tipoh;}
       }
     throw new Error("Missing return statement in function");
@@ -312,8 +198,8 @@ public class ASTS_D implements ASTS_DConstants {
     try {
                   Tipo tipo2;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 50:
-        jj_consume_token(50);
+      case 46:
+        jj_consume_token(46);
         tipo2 = tipo1();
                          {if (true) return sem.tipo_punt(tipo2);}
         break;
@@ -327,7 +213,7 @@ public class ASTS_D implements ASTS_DConstants {
                          {if (true) return tipo2;}
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[4] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -367,7 +253,7 @@ public class ASTS_D implements ASTS_DConstants {
                          {if (true) return tip;}
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[5] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -410,14 +296,14 @@ public class ASTS_D implements ASTS_DConstants {
     try {
                  LStruct lstruct; Campo campo;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 46:
-        jj_consume_token(46);
+      case 47:
+        jj_consume_token(47);
         campo = campo();
         lstruct = lista_struct_re(sem.lista_struct(lstructh, campo));
                          {if (true) return lstruct;}
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[6] = jj_gen;
                          {if (true) return lstructh;}
       }
     throw new Error("Missing return statement in function");
@@ -436,6 +322,120 @@ public class ASTS_D implements ASTS_DConstants {
     throw new Error("Missing return statement in function");
     } finally {
       trace_return("campo");
+    }
+  }
+
+  final public Dec declaracion_proc() throws ParseException {
+    trace_call("declaracion_proc");
+    try {
+                 Token id; ParamF paramf; Prog prog;
+      jj_consume_token(proc);
+      id = jj_consume_token(identificador);
+      jj_consume_token(48);
+      paramf = parametros_formales();
+      jj_consume_token(49);
+      prog = programa();
+                         {if (true) return (Dec) sem.dec_proc(id.image, paramf, prog).ponFila(id.beginLine).ponCol(id.beginColumn);}
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("declaracion_proc");
+    }
+  }
+
+  final public ParamF parametros_formales() throws ParseException {
+    trace_call("parametros_formales");
+    try {
+                 LParam lparam;
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ent:
+      case real:
+      case bool:
+      case string:
+      case struct:
+      case identificador:
+      case 46:
+        lparam = lista_parametros();
+                         {if (true) return sem.si_parF(lparam);}
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+                         {if (true) return sem.no_parF();}
+      }
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("parametros_formales");
+    }
+  }
+
+  final public LParam lista_parametros() throws ParseException {
+    trace_call("lista_parametros");
+    try {
+                 Param param; LParam lparam;
+      param = parametro();
+      lparam = lista_parametros_re(sem.un_param(param));
+                          {if (true) return lparam;}
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("lista_parametros");
+    }
+  }
+
+  final public LParam lista_parametros_re(LParam lparamh) throws ParseException {
+    trace_call("lista_parametros_re");
+    try {
+                  Param param; LParam lparam;
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case 47:
+        jj_consume_token(47);
+        param = parametro();
+        lparam = lista_parametros_re(sem.muchos_param(lparamh, param));
+                         {if (true) return lparam;}
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+                         {if (true) return lparamh;}
+      }
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("lista_parametros_re");
+    }
+  }
+
+  final public Param parametro() throws ParseException {
+    trace_call("parametro");
+    try {
+                 Tipo tipo; Param param;
+      tipo = tipo();
+      param = parametro_re(tipo);
+                         {if (true) return param;}
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("parametro");
+    }
+  }
+
+  final public Param parametro_re(Tipo tipoh) throws ParseException {
+    trace_call("parametro_re");
+    try {
+                 Token id;
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case identificador:
+        id = jj_consume_token(identificador);
+                         {if (true) return (Param)sem.param_cop(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+        break;
+      case 50:
+        jj_consume_token(50);
+        id = jj_consume_token(identificador);
+                         {if (true) return (Param)sem.param_ref(tipoh, id.image).ponFila(id.beginLine).ponCol(id.beginColumn);}
+        break;
+      default:
+        jj_la1[9] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    throw new Error("Missing return statement in function");
+    } finally {
+      trace_return("parametro_re");
     }
   }
 
@@ -688,9 +688,9 @@ public class ASTS_D implements ASTS_DConstants {
                  Token id; ParamR param;
       jj_consume_token(call);
       id = jj_consume_token(identificador);
-      jj_consume_token(44);
+      jj_consume_token(48);
       param = parametros_reales();
-      jj_consume_token(45);
+      jj_consume_token(49);
                           {if (true) return (Instr)sem.instr_call(id.image, param).ponFila(id.beginLine).ponCol(id.beginColumn);}
     throw new Error("Missing return statement in function");
     } finally {
@@ -723,7 +723,7 @@ public class ASTS_D implements ASTS_DConstants {
       case literal_entero:
       case literal_cadena:
       case literal_real:
-      case 44:
+      case 48:
       case 54:
         params = lista_parametros_reales();
                          {if (true) return sem.si_param_re(params);}
@@ -756,8 +756,8 @@ public class ASTS_D implements ASTS_DConstants {
     try {
                  Exp exp; LParamR params;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 46:
-        jj_consume_token(46);
+      case 47:
+        jj_consume_token(47);
         exp = E0();
         params = lista_parametros_reales_re(sem.muchos_param_re(paramsh, exp));
                          {if (true) return params;}
@@ -991,7 +991,7 @@ public class ASTS_D implements ASTS_DConstants {
       case literal_entero:
       case literal_cadena:
       case literal_real:
-      case 44:
+      case 48:
         exp = E6();
                          {if (true) return exp;}
         break;
@@ -1024,10 +1024,10 @@ public class ASTS_D implements ASTS_DConstants {
     try {
                  Token corAp, iden, reg; Exp exp, exp_re;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 48:
-        corAp = jj_consume_token(48);
+      case 44:
+        corAp = jj_consume_token(44);
         exp = E0();
-        jj_consume_token(49);
+        jj_consume_token(45);
         exp_re = E6RE((Exp)sem.index(exph, exp).ponFila(corAp.beginLine).ponCol(corAp.beginColumn));
                          {if (true) return exp_re;}
         break;
@@ -1037,8 +1037,8 @@ public class ASTS_D implements ASTS_DConstants {
         exp_re = E6RE((Exp)sem.reg(exph, iden.image).ponFila(iden.beginLine).ponCol(iden.beginColumn));
                          {if (true) return exp_re;}
         break;
-      case 50:
-        reg = jj_consume_token(50);
+      case 46:
+        reg = jj_consume_token(46);
         exp_re = E6RE((Exp)sem.indir(exph).ponFila(reg.beginLine).ponCol(reg.beginColumn));
                          {if (true) return exp_re;}
         break;
@@ -1057,10 +1057,10 @@ public class ASTS_D implements ASTS_DConstants {
     try {
                  Exp exp;
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 44:
-        jj_consume_token(44);
+      case 48:
+        jj_consume_token(48);
         exp = E0();
-        jj_consume_token(45);
+        jj_consume_token(49);
                          {if (true) return exp;}
         break;
       case nulo:
@@ -1237,10 +1237,10 @@ public class ASTS_D implements ASTS_DConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x50447800,0x0,0x50447800,0x40407800,0x0,0x40000000,0x0,0x40407800,0x40407800,0x0,0x2fa80000,0x0,0x2fa80000,0x100000,0xc0038400,0x0,0x0,0x0,0x0,0x0,0x300,0x0,0xc0038400,0x0,0xc0038000,0x0,0x0,0x400,0xc0038000,};
+      jj_la1_0 = new int[] {0x50447800,0x0,0x50447800,0x0,0x40407800,0x40407800,0x0,0x40407800,0x0,0x40000000,0x2fa80000,0x0,0x2fa80000,0x100000,0xc0038400,0x0,0x0,0x0,0x0,0x0,0x300,0x0,0xc0038400,0x0,0xc0038000,0x0,0x0,0x400,0xc0038000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x40000,0x800,0x40000,0x40000,0x4000,0x8000,0x10000,0x40000,0x0,0x4000,0x80200,0x800,0x80200,0x0,0x401003,0x4000,0x100000,0x300003c,0x200000,0x400000,0x0,0x1c000000,0x401003,0x850000,0x1003,0x300003c,0x1c000000,0x400000,0x3,};
+      jj_la1_1 = new int[] {0x4000,0x800,0x4000,0x1000,0x4000,0x0,0x8000,0x4000,0x8000,0x40000,0x80200,0x800,0x80200,0x0,0x410003,0x8000,0x100000,0x300003c,0x200000,0x400000,0x0,0x1c000000,0x410003,0x805000,0x10003,0x300003c,0x1c000000,0x400000,0x3,};
    }
 
   /** Constructor with InputStream. */

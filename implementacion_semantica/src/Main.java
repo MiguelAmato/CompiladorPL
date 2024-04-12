@@ -63,13 +63,15 @@ public class Main {
 			System.out.println("IMPRESION RECURSIVA");	
 			ProcRecursivo proc = new ProcRecursivo();
 			proc.imprime(prog); // Recursivo
-			/*
+			/* 
 			System.out.println("IMPRESION INTERPRETE");	
 			prog.imprime(); // Interprete
+			
 			System.out.println("IMPRESION VISITANTE");	
 			Impresion imp = new Impresion();
 			imp.procesa(prog);
 			*/
+			
 		}
 		else {
 			System.err.println("ERROR: El archivo de entrada debe comenzar con 'a' o 'd'");

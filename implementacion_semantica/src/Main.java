@@ -11,6 +11,7 @@ import c_ast_ascendente.GestionErroresEval.ErrorLexico;
 import c_ast_ascendente.GestionErroresEval.ErrorSintactico;
 import c_ast_ascendente.*;
 import c_ast_descendente.*;
+import procesamiento.Impresion;
 import procesamiento.ProcRecursivo;
 
 public class Main {
@@ -23,7 +24,7 @@ public class Main {
 			ASTS_A_DJ asint = new ASTS_A_DJ(alex);
 			Prog prog = null;
 			try {    
-				// prog = (Prog)asint.debug_parse().value;
+				//prog = (Prog)asint.debug_parse().value;
 				prog = (Prog)asint.parse().value;
 				
 			}
@@ -36,10 +37,13 @@ public class Main {
 				System.exit(1); 
 			}
 			System.out.println("IMPRESION RECURSIVA");	
-			// ProcRecursivo proc = new ProcRecursivo();
-			// proc.imprime(prog); // Recursivo
+			ProcRecursivo proc = new ProcRecursivo();
+			proc.imprime(prog); // Recursivo
 			System.out.println("IMPRESION INTERPRETE");	
 			prog.imprime(); // Interprete
+			System.out.println("IMPRESION VISITANTE");	
+			Impresion imp = new Impresion();
+			imp.procesa(prog);
 		}
 		else if (c == 'd') {
 			System.out.println("CONSTRUCCION AST DESCENDENTE");
@@ -58,7 +62,14 @@ public class Main {
 			}
 			System.out.println("IMPRESION RECURSIVA");	
 			ProcRecursivo proc = new ProcRecursivo();
-			proc.imprime(prog);
+			proc.imprime(prog); // Recursivo
+			/*
+			System.out.println("IMPRESION INTERPRETE");	
+			prog.imprime(); // Interprete
+			System.out.println("IMPRESION VISITANTE");	
+			Impresion imp = new Impresion();
+			imp.procesa(prog);
+			*/
 		}
 		else {
 			System.err.println("ERROR: El archivo de entrada debe comenzar con 'a' o 'd'");

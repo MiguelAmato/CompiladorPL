@@ -1,0 +1,22 @@
+d
+{
+int[9] x;
+type u x;
+type struct {
+  int x,
+  int y
+} z;
+proc x(int i) {}
+&&
+@ x < y <= z > k >= k == k != k;
+@ 5 + 6.0;
+@ 5 - 8;
+@ true and false;
+@ true or x;
+@ null * 5 / 6 % 7;
+@ - not - false;
+@ x[56];
+@ x.y;
+@ 5^;
+call p()
+}

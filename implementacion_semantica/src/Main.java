@@ -16,7 +16,7 @@ import procesamiento.ProcRecursivo;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
-		Reader input = new InputStreamReader(new FileInputStream("src/input.txt"));
+		Reader input = new InputStreamReader(new FileInputStream("casos_prueba_ast/sample1d.in"));
 		char c = (char) input.read();
 		if (c == 'a') {
 			System.out.println("CONSTRUCCION AST ASCENDENTE");
@@ -24,7 +24,7 @@ public class Main {
 			ASTS_A_DJ asint = new ASTS_A_DJ(alex);
 			Prog prog = null;
 			try {    
-				//prog = (Prog)asint.debug_parse().value;
+				// prog = (Prog)asint.debug_parse().value;
 				prog = (Prog)asint.parse().value;
 				
 			}

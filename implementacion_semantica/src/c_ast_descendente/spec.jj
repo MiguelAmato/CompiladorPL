@@ -2,17 +2,17 @@ options  {
   STATIC=false;
   DEBUG_PARSER=true;
 }  
-PARSER_BEGIN(Asts)
+PARSER_BEGIN(ASTS_D)
 package c_ast_descendente;
 
 import asint.SintaxisAbstractaEval.*;
 import asint.ClaseSemanticaEval;
 
-public class Asts {
+public class ASTS_D {
     private ClaseSemanticaEval sem = new ClaseSemanticaEval();
 }
 
-PARSER_END(Asts)
+PARSER_END(ASTS_D)
 	TOKEN:{<#letra:["a"-"z","A"-"Z","_"]>}
 	TOKEN:{<#digitoPositivo:["1"-"9"]>}
 	TOKEN:{<#digito:<digitoPositivo>|"0">}

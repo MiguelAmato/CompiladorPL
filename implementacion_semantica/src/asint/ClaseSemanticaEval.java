@@ -1,5 +1,7 @@
 package asint;
 
+import c_ast_ascendente.UnidadLexica.StringLocalizado;
+
 public class ClaseSemanticaEval extends SintaxisAbstractaEval {
     public ClaseSemanticaEval() {
         super();

@@ -9,7 +9,7 @@ import asint.SintaxisAbstractaEval.*;
 
 public class Tipado extends ProcesamientoDef{
 
-    Set<TipoEnum> tipos = new HashSet<TipoEnum>();
+    Set<Par<TipoEnum, TipoEnum>> tipos;
 
     public Tipado() {
         super();
@@ -36,7 +36,10 @@ public class Tipado extends ProcesamientoDef{
         TipoEnum tipo0 = ref(t0);
         TipoEnum tipo1 = ref(t1);
 
-        //TODO hay que hacer un set para que no se repitan y se quede en un bucle infinito (pag. 24 del pdf)
+        tipos = new HashSet<Par<TipoEnum, TipoEnum>>();
+
+        tipos.add(new Par<TipoEnum, TipoEnum>(TipoEnum.TIPO_INT, TipoEnum.TIPO_REAL));
+
         if (tipo0 == TipoEnum.TIPO_INT && tipo1 == TipoEnum.TIPO_INT)
             return true;
         else if (tipo0 == TipoEnum.TIPO_REAL && tipo1 == TipoEnum.TIPO_INT)
@@ -54,15 +57,18 @@ public class Tipado extends ProcesamientoDef{
         else if (tipo0 == TipoEnum.NULL && tipo1 == TipoEnum.TIPO_PUNT)
             return true;
         else if (tipo0 == TipoEnum.TIPO_PUNT && tipo1 == TipoEnum.TIPO_PUNT)
-            return compatible_puntero(t0, t1, tipos);
+            return compatible_puntero(t0, t1);
         else if (tipo0 == TipoEnum.TIPO_ARRAY && tipo1 == TipoEnum.TIPO_ARRAY)
-            return compatible_array(t0, t1, tipos);
+            return compatible_array(t0, t1);
         else if (tipo0 == TipoEnum.TIPO_STRUCT && tipo1 == TipoEnum.TIPO_STRUCT)
-            return compatible_struct(t0, t1, tipos);
+            return compatible_struct(t0, t1);
         return false;
     }
 
-    private boolean compatible_struct(Nodo t0, Nodo t1, Set<TipoEnum> tipos2) {
+    private boolean compatible_struct(Nodo t0, Nodo t1) {
+        if (tipos.contains(new Par<TipoEnum, TipoEnum>(ref(t0), ref(t1))))
+            return true;
+
         Tipo_struct tipo0 = (Tipo_struct)t0;
         Tipo_struct tipo1 = (Tipo_struct)t1;
 
@@ -82,11 +88,15 @@ public class Tipado extends ProcesamientoDef{
         return true;
     }
 
-    private boolean compatible_array(Nodo t0, Nodo t1, Set<TipoEnum> tipos2) {
+    private boolean compatible_array(Nodo t0, Nodo t1) {
+        if (tipos.contains(new Par<TipoEnum, TipoEnum>(ref(t0), ref(t1))))
+            return true;
         return compatible(t0.tipo(), t1.tipo());
     }
 
-    private boolean compatible_puntero(Nodo t0, Nodo t1, Set<TipoEnum> tipos2) {
+    private boolean compatible_puntero(Nodo t0, Nodo t1) {
+        if (tipos.contains(new Par<TipoEnum, TipoEnum>(ref(t0), ref(t1))))
+            return true;
         return compatible(t0.tipo(), t1.tipo());
     }
 

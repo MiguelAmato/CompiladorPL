@@ -1,6 +1,7 @@
 package procesamiento;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import asint.ProcesamientoDef;
@@ -25,6 +26,10 @@ public class Tipado extends ProcesamientoDef{
         if (tipo.getClass() == Tipo_id.class)
             return ref(((Dec_type)tipo.getVinculo()).tipo());
         return tipo.getTipo();
+    }
+
+    private void aviso_error(Nodo a){
+        System.err.println("Error de tipos en " + a.leeFila() + " y columna " + a.leeCol());
     }
 
     private boolean compatible(Nodo t0, Nodo t1) {
@@ -61,14 +66,19 @@ public class Tipado extends ProcesamientoDef{
         Tipo_struct tipo0 = (Tipo_struct)t0;
         Tipo_struct tipo1 = (Tipo_struct)t1;
 
-        // if (tipo0.lStruct().getCampos().size() != tipo1.lStruct().getCampos().size())
-        //     return false;
+        if (tipo0.lStruct().getCampos().size() != tipo1.lStruct().getCampos().size())
+            return false;
 
-        // for (int i = 0; i < tipo0.lStruct().getCampos().size(); i++){
-        //     if (!compatible(tipo0.lStruct().getCampos().get(i).tipo(), tipo1.lStruct().getCampos().get(i).tipo()))
-        //         return false;
-        // }
-        //TODO cuando este la vinculacion de los campos
+        Iterator<Campo> it0 = tipo0.lStruct().getCampos().values().iterator();
+        Iterator<Campo> it1 = tipo1.lStruct().getCampos().values().iterator();
+
+        while (it0.hasNext() && it1.hasNext()){
+            Campo c0 = it0.next();
+            Campo c1 = it1.next();
+
+            if (!compatible(c0, c1))
+                return false;
+        }
         return true;
     }
 
@@ -200,7 +210,7 @@ public class Tipado extends ProcesamientoDef{
         if (ref(a.exp()) == TipoEnum.TIPO_PUNT)
             a.setTipo(TipoEnum.OK);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -213,12 +223,12 @@ public class Tipado extends ProcesamientoDef{
             if (ref(a.exp()) == TipoEnum.TIPO_INT || ref(a.exp()) == TipoEnum.TIPO_REAL || ref(a.exp()) == TipoEnum.TIPO_STRING)
                 a.setTipo(TipoEnum.OK);
             else{
-                // aviso_error();
+                aviso_error(a);
                 a.setTipo(TipoEnum.ERROR);
             }
         }
         else{
-            //error; TODO
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -230,7 +240,7 @@ public class Tipado extends ProcesamientoDef{
         if (ref(a.exp()) == TipoEnum.TIPO_INT || ref(a.exp()) == TipoEnum.TIPO_REAL || ref(a.exp()) == TipoEnum.TIPO_STRING || ref(a.exp()) == TipoEnum.TIPO_BOOL)
             a.setTipo(TipoEnum.OK);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -242,7 +252,7 @@ public class Tipado extends ProcesamientoDef{
         if (ref(a.exp()) == TipoEnum.TIPO_PUNT) 
             a.setTipo(TipoEnum.OK);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -291,7 +301,7 @@ public class Tipado extends ProcesamientoDef{
         if (a.exp1().es_designador() && compatible(a.exp1(), a.exp2()))
             a.setTipo(a.exp1().getTipo());
         else{
-            // aviso_error(); 
+            aviso_error(a); 
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -348,12 +358,12 @@ public class Tipado extends ProcesamientoDef{
             else if ((tipo_exp1 == TipoEnum.NULL) && (tipo_exp2 == TipoEnum.TIPO_PUNT))
                 a.setTipo(TipoEnum.TIPO_BOOL);
             else{
-                // aviso_error();
+                aviso_error(a);
                 a.setTipo(TipoEnum.ERROR);
             }
         }
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -394,7 +404,7 @@ public class Tipado extends ProcesamientoDef{
         else if (tipo_exp1 == TipoEnum.TIPO_REAL && tipo_exp2 == TipoEnum.TIPO_INT)
             a.setTipo(TipoEnum.TIPO_REAL);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -407,7 +417,7 @@ public class Tipado extends ProcesamientoDef{
         if (ref(a.exp1()) == TipoEnum.TIPO_INT && ref(a.exp2()) == TipoEnum.TIPO_INT)
             a.setTipo(TipoEnum.TIPO_INT);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -429,7 +439,7 @@ public class Tipado extends ProcesamientoDef{
         if (ref(exp1) == TipoEnum.TIPO_BOOL && ref(exp2) == TipoEnum.TIPO_BOOL)
             a.setTipo(TipoEnum.TIPO_BOOL);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -443,7 +453,7 @@ public class Tipado extends ProcesamientoDef{
         else if (ref(a.exp()) == TipoEnum.TIPO_REAL)
             a.setTipo(TipoEnum.TIPO_REAL);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -455,7 +465,7 @@ public class Tipado extends ProcesamientoDef{
         if (ref(a.exp()) == TipoEnum.TIPO_BOOL)
             a.setTipo(TipoEnum.TIPO_BOOL);
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -466,9 +476,9 @@ public class Tipado extends ProcesamientoDef{
         a.exp2().procesa(this);
 
         if (ref(a.exp1()) == TipoEnum.TIPO_ARRAY && ref(a.exp2()) == TipoEnum.TIPO_INT)
-            a.setTipo(a.exp1().getTipo()); //TODO el tipo base del array, puede que no sea esto
+            a.setTipo(a.exp2().getTipo());
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -476,11 +486,13 @@ public class Tipado extends ProcesamientoDef{
     @Override
     public void procesa(Reg a) {
         a.exp().procesa(this);
+        Exp exp;
 
         if (ref(a.exp()) == TipoEnum.TIPO_STRUCT)
-            a.setTipo(TipoEnum.TIPO_INT); //TODO el tipo del campo, no TIPO_INT
+            exp = a.exp();
+            //TODO el tipo es el tipo del campo
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -490,9 +502,9 @@ public class Tipado extends ProcesamientoDef{
         a.exp().procesa(this);
 
         if (ref(a.exp()) == TipoEnum.TIPO_PUNT)
-            a.setTipo(TipoEnum.TIPO_INT); //TODO el tipo base del puntero, no TIPO_INT
+            ; //TODO el tipo base del puntero, no TIPO_INT
         else{
-            // aviso_error();
+            aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -509,12 +521,12 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Id a) {
-        // if (a.getVinculo().getTipo() == DecEnum.VAR) TODO
-        //     a.setTipo(((Dec_tipado)a.getVinculo()).tipo().getTipo());
-        // else{
-        //     aviso_error();
-        //     a.setTipo(TipoEnum.ERROR);
-        // }
+        if (a.getVinculo() instanceof Dec_id)
+            a.setTipo(((Dec_id)a.getVinculo()).tipo().getTipo());
+        else{
+            aviso_error(a);
+            a.setTipo(TipoEnum.ERROR);
+        }
     }   
 
     @Override

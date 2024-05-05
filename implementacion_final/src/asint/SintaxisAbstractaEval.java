@@ -1,5 +1,7 @@
 package asint;
 
+import java.util.Map;
+
 public class SintaxisAbstractaEval {
 
 	private static void imprimeOpnd(Exp opnd, int np) {
@@ -54,6 +56,10 @@ public class SintaxisAbstractaEval {
 		}
 
 		public abstract void imprime();
+
+		public Map<String, Campo> getCampos(){
+			return null;
+		}
 
 		public Tipo tipo(){
 			return null;
@@ -885,11 +891,9 @@ public class SintaxisAbstractaEval {
 			imprimeVinculo(this);
 		}
 
-
 		public int prioridad() {
 			return 6;
 		}
-
 
 		public String toString() {
 			return "reg(" + exp + "," + id + ")";
@@ -1600,8 +1604,15 @@ public class SintaxisAbstractaEval {
 	}
 
 	public abstract static class LStruct extends Nodo {
+
+		Map<String, Campo> campos;
+
 		public LStruct() {
 			super();
+		}
+
+		public Map<String, Campo> getCampos() {
+			return campos;
 		}
 
 		public void procesa(Procesamiento p){}

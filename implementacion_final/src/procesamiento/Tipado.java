@@ -259,8 +259,44 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Instr_call a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
+        a.paramR().procesa(this);
+        if (a.paramR().getTipo() == TipoEnum.OK)
+            a.setTipo(tipo_params(((Dec_proc) a.getVinculo()).paramF(), a.paramR()));
+        else{
+            aviso_error(a);
+            a.setTipo(TipoEnum.ERROR);
+        }
+    }
+
+    private TipoEnum tipo_params(ParamF paramF, ParamR paramR){
+        if (paramF.getClass() == Si_parF.class && paramR.getClass() == Si_param_re.class)
+            return tipo_si_params(((Si_parF)paramF).lparam(), ((Si_param_re)paramR).lParamR());
+        else if (paramF.getClass() == No_parF.class && paramR.getClass() == No_param_re.class)
+            return TipoEnum.OK;
+        return TipoEnum.ERROR;
+    }
+
+    private TipoEnum tipo_si_params(LParam lparam, LParamR lParamR) {
+        if (lparam.getClass() == Un_param.class && lParamR.getClass() == Un_param_re.class)
+            return tipo_param(((Un_param)lparam).param(), ((Un_param_re)lParamR).exp());
+        else if (lparam.getClass() == Muchos_param.class && lParamR.getClass() == Muchos_param_re.class){
+            TipoEnum t1 = tipo_si_params(((Muchos_param)lparam).params(), ((Muchos_param_re)lParamR).lParamR());
+            TipoEnum t2 = tipo_param(((Muchos_param)lparam).param(), ((Muchos_param_re)lParamR).exp());
+            return ambosOK(t1, t2);
+        }
+        return TipoEnum.ERROR;
+    }
+
+    private TipoEnum tipo_param(Param param, Exp exp) {
+        if (param.getClass() == Param_cop.class && compatible(param, exp))
+            return TipoEnum.OK;
+        else if (param.getClass() == Param_ref.class && exp.es_designador() && compatible(param, exp)){
+            Class<?> tipo1 = ref(param).getClass(), tipo2 = ref(exp).getClass();
+            if (!(tipo1 == Tipo_real.class && tipo2 == Tipo_real.class) && (tipo1 == Tipo_real.class || tipo2 == Tipo_real.class))
+                return TipoEnum.ERROR;
+            return TipoEnum.OK;
+        }
+        return TipoEnum.ERROR;
     }
 
     @Override
@@ -486,12 +522,18 @@ public class Tipado extends ProcesamientoDef{
     @Override
     public void procesa(Reg a) {
         a.exp().procesa(this);
-        Exp exp;
 
-        if (ref(a.exp()) == TipoEnum.TIPO_STRUCT)
-            exp = a.exp();
-            //TODO el tipo es el tipo del campo
-        else{
+        if (ref(a.exp()) == TipoEnum.TIPO_STRUCT){
+            Tipo_struct tipo = (Tipo_struct) (Nodo) a.exp();
+            
+            Campo c = tipo.lStruct().getCampos().get(a.id());
+            if (c != null)
+                a.setTipo(c.getTipo());
+            else{
+                aviso_error(a);
+                a.setTipo(TipoEnum.ERROR);
+            }
+        }else{
             aviso_error(a);
             a.setTipo(TipoEnum.ERROR);
         }
@@ -502,7 +544,7 @@ public class Tipado extends ProcesamientoDef{
         a.exp().procesa(this);
 
         if (ref(a.exp()) == TipoEnum.TIPO_PUNT)
-            ; //TODO el tipo base del puntero, no TIPO_INT
+            a.setTipo(a.exp().tipo().getTipo());
         else{
             aviso_error(a);
             a.setTipo(TipoEnum.ERROR);

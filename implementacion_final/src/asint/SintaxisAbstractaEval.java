@@ -55,6 +55,10 @@ public class SintaxisAbstractaEval {
 
 		public abstract void imprime();
 
+		public Tipo tipo(){
+			return null;
+		}
+
 		public Nodo ponCol(int col) {
 			this.col = col;
 			return this;
@@ -1058,10 +1062,7 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 
-		public void procesa(Procesamiento p){}
-
-
-		
+		public void procesa(Procesamiento p){}		
 	}
 
 	public static class Instr_eval extends Instr {
@@ -1767,7 +1768,7 @@ public class SintaxisAbstractaEval {
 
 		public Tipo_punt(Tipo tipo) {
 			super();
- 				this.tipo = tipo;
+			this.tipo = tipo;
 		}
 
 		public Tipo tipo() {

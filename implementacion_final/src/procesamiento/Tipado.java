@@ -29,7 +29,7 @@ public class Tipado extends ProcesamientoDef{
     }
 
     private void aviso_error(Nodo a){
-        System.err.println("Error de tipos en " + a.leeFila() + " y columna " + a.leeCol());
+        System.err.println("Error de tipos en " + a);
     }
 
     private boolean compatible(Nodo t0, Nodo t1) {
@@ -160,8 +160,8 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Muchas_instr a) {
-        a.instr().procesa(this);
         a.lInstr().procesa(this);
+        a.instr().procesa(this);
         a.setTipo(ambosOK(a.instr().getTipo(), a.lInstr().getTipo()));
     }
 

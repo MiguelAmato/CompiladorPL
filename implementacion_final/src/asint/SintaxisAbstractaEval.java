@@ -55,6 +55,10 @@ public class SintaxisAbstractaEval {
 
 		public abstract void imprime();
 
+		public Tipo tipo(){
+			return null;
+		}
+
 		public Nodo ponCol(int col) {
 			this.col = col;
 			return this;
@@ -231,6 +235,11 @@ public class SintaxisAbstractaEval {
 
 		public String toString() {
 			return "id(" + id + "[" + leeFila() + "," + leeCol() + "])";
+		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
 		}
 	}
 
@@ -839,6 +848,11 @@ public class SintaxisAbstractaEval {
 		public String toString() {
 			return "index(" + exp1 + "," + exp2 + ")";
 		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
+		}
 	}
 
 	public static class Reg extends Exp {
@@ -880,6 +894,11 @@ public class SintaxisAbstractaEval {
 		public String toString() {
 			return "reg(" + exp + "," + id + ")";
 		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
+		}
 	}
 
 	public static class Indir extends Exp {
@@ -913,6 +932,11 @@ public class SintaxisAbstractaEval {
 		public String toString() {
 			return "indir(" + exp + ")";
 		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
+		}
 	}
 
 	public static abstract class Exp extends Nodo {
@@ -925,6 +949,10 @@ public class SintaxisAbstractaEval {
 		public int prioridad() {
 			return 7;
 		}
+
+        public boolean es_designador() {
+            return false;
+        }
 	}
 
 	public static class Muchos_param_re extends LParamR {
@@ -1034,10 +1062,7 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 
-		public void procesa(Procesamiento p){}
-
-
-		
+		public void procesa(Procesamiento p){}		
 	}
 
 	public static class Instr_eval extends Instr {
@@ -1743,7 +1768,7 @@ public class SintaxisAbstractaEval {
 
 		public Tipo_punt(Tipo tipo) {
 			super();
- 				this.tipo = tipo;
+			this.tipo = tipo;
 		}
 
 		public Tipo tipo() {

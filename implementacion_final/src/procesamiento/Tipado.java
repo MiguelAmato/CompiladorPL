@@ -1,10 +1,18 @@
 package procesamiento;
 
-import asint.Procesamiento;
+import java.util.HashSet;
+import java.util.Set;
+
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaEval.*;
 
 public class Tipado extends ProcesamientoDef{
+
+    Set<TipoEnum> tipos = new HashSet<TipoEnum>();
+
+    public Tipado() {
+        super();
+    }
 
     private TipoEnum ambosOK(TipoEnum t0, TipoEnum t1) {
         if (t0 == TipoEnum.ERROR || t1 == TipoEnum.ERROR)
@@ -13,9 +21,63 @@ public class Tipado extends ProcesamientoDef{
             return TipoEnum.OK;
     }
 
-    private TipoEnum ref(TipoEnum tipo) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'ref'");
+    private TipoEnum ref(Nodo tipo) {
+        if (tipo.getClass() == Tipo_id.class)
+            return ref(((Dec_type)tipo.getVinculo()).tipo());
+        return tipo.getTipo();
+    }
+
+    private boolean compatible(Nodo t0, Nodo t1) {
+        TipoEnum tipo0 = ref(t0);
+        TipoEnum tipo1 = ref(t1);
+
+        //TODO hay que hacer un set para que no se repitan y se quede en un bucle infinito (pag. 24 del pdf)
+        if (tipo0 == TipoEnum.TIPO_INT && tipo1 == TipoEnum.TIPO_INT)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_REAL && tipo1 == TipoEnum.TIPO_INT)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_INT && tipo1 == TipoEnum.TIPO_REAL)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_REAL && tipo1 == TipoEnum.TIPO_REAL)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_BOOL && tipo1 == TipoEnum.TIPO_BOOL)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_STRING && tipo1 == TipoEnum.TIPO_STRING)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_PUNT && tipo1 == TipoEnum.NULL)
+            return true;
+        else if (tipo0 == TipoEnum.NULL && tipo1 == TipoEnum.TIPO_PUNT)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_PUNT && tipo1 == TipoEnum.TIPO_PUNT)
+            return compatible_puntero(t0, t1, tipos);
+        else if (tipo0 == TipoEnum.TIPO_ARRAY && tipo1 == TipoEnum.TIPO_ARRAY)
+            return compatible_array(t0, t1, tipos);
+        else if (tipo0 == TipoEnum.TIPO_STRUCT && tipo1 == TipoEnum.TIPO_STRUCT)
+            return compatible_struct(t0, t1, tipos);
+        return false;
+    }
+
+    private boolean compatible_struct(Nodo t0, Nodo t1, Set<TipoEnum> tipos2) {
+        Tipo_struct tipo0 = (Tipo_struct)t0;
+        Tipo_struct tipo1 = (Tipo_struct)t1;
+
+        // if (tipo0.lStruct().getCampos().size() != tipo1.lStruct().getCampos().size())
+        //     return false;
+
+        // for (int i = 0; i < tipo0.lStruct().getCampos().size(); i++){
+        //     if (!compatible(tipo0.lStruct().getCampos().get(i).tipo(), tipo1.lStruct().getCampos().get(i).tipo()))
+        //         return false;
+        // }
+        //TODO cuando este la vinculacion de los campos
+        return true;
+    }
+
+    private boolean compatible_array(Nodo t0, Nodo t1, Set<TipoEnum> tipos2) {
+        return compatible(t0.tipo(), t1.tipo());
+    }
+
+    private boolean compatible_puntero(Nodo t0, Nodo t1, Set<TipoEnum> tipos2) {
+        return compatible(t0.tipo(), t1.tipo());
     }
 
     @Override
@@ -109,7 +171,7 @@ public class Tipado extends ProcesamientoDef{
         a.prog1().procesa(this);
         a.prog2().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_BOOL)
+        if (ref(a.exp()) == TipoEnum.TIPO_BOOL)
             a.setTipo(ambosOK(a.prog1().getTipo(), a.prog2().getTipo()));
         else
             a.setTipo(TipoEnum.ERROR);
@@ -120,7 +182,7 @@ public class Tipado extends ProcesamientoDef{
         a.exp().procesa(this);
         a.prog().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_BOOL)
+        if (ref(a.exp()) == TipoEnum.TIPO_BOOL)
             a.setTipo(a.prog().getTipo());
         else
             a.setTipo(TipoEnum.ERROR);
@@ -133,12 +195,12 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Instr_new a) {
-        a.exp().procesa(this); //TODO no se cual es el tipo de punt
+        a.exp().procesa(this);
         
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_PUNT)
+        if (ref(a.exp()) == TipoEnum.TIPO_PUNT)
             a.setTipo(TipoEnum.OK);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -147,11 +209,11 @@ public class Tipado extends ProcesamientoDef{
     public void procesa(Instr_rd a) {
         a.exp().procesa(this);
 
-        if (es_designador(a.exp())){
-            if (ref(a.exp().getTipo()) == TipoEnum.TIPO_INT || ref(a.exp().getTipo()) == TipoEnum.TIPO_REAL || ref(a.exp().getTipo()) == TipoEnum.TIPO_STRING)
+        if (a.exp().es_designador()){
+            if (ref(a.exp()) == TipoEnum.TIPO_INT || ref(a.exp()) == TipoEnum.TIPO_REAL || ref(a.exp()) == TipoEnum.TIPO_STRING)
                 a.setTipo(TipoEnum.OK);
             else{
-                //aviso_error();
+                // aviso_error();
                 a.setTipo(TipoEnum.ERROR);
             }
         }
@@ -160,15 +222,15 @@ public class Tipado extends ProcesamientoDef{
             a.setTipo(TipoEnum.ERROR);
         }
     }
-    
+
     @Override
     public void procesa(Instr_wr a) {
         a.exp().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_INT || ref(a.exp().getTipo()) == TipoEnum.TIPO_REAL || ref(a.exp().getTipo()) == TipoEnum.TIPO_STRING || ref(a.exp().getTipo()) == TipoEnum.TIPO_BOOL)
+        if (ref(a.exp()) == TipoEnum.TIPO_INT || ref(a.exp()) == TipoEnum.TIPO_REAL || ref(a.exp()) == TipoEnum.TIPO_STRING || ref(a.exp()) == TipoEnum.TIPO_BOOL)
             a.setTipo(TipoEnum.OK);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -177,10 +239,10 @@ public class Tipado extends ProcesamientoDef{
     public void procesa(Instr_del a) {
         a.exp().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_PUNT) //TODO no se cual es el tipo de punt
+        if (ref(a.exp()) == TipoEnum.TIPO_PUNT) 
             a.setTipo(TipoEnum.OK);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -198,9 +260,14 @@ public class Tipado extends ProcesamientoDef{
     }
 
     @Override
-    public void procesa(Si_param_re a) { //TODO por que no hay no_param_re?
+    public void procesa(Si_param_re a) { 
         a.lParamR().procesa(this);
         a.setTipo(a.lParamR().getTipo());
+    }
+
+    @Override
+    public void procesa(No_param_re a) { 
+        a.setTipo(TipoEnum.OK);
     }
 
     @Override
@@ -221,10 +288,10 @@ public class Tipado extends ProcesamientoDef{
         a.exp1().procesa(this);
         a.exp2().procesa(this);
 
-        if (es_designador(a.exp1()) && compatible(a.exp1().getTipo(), a.exp2().getTipo()))
+        if (a.exp1().es_designador() && compatible(a.exp1(), a.exp2()))
             a.setTipo(a.exp1().getTipo());
         else{
-            //aviso_error(); 
+            // aviso_error(); 
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -260,11 +327,11 @@ public class Tipado extends ProcesamientoDef{
     }
 
     private void tipado_comparacion(Exp exp1, Exp exp2, Exp a, boolean op_igualdad) {
-        exp1.procesa(this); //TODO no se si es this o a
+        exp1.procesa(this);
         exp2.procesa(this);
 
-        TipoEnum tipo_exp1 = ref(exp1.getTipo());
-        TipoEnum tipo_exp2 = ref(exp2.getTipo());
+        TipoEnum tipo_exp1 = ref(exp1);
+        TipoEnum tipo_exp2 = ref(exp2);
 
         if (tipo_exp1 == TipoEnum.TIPO_INT || tipo_exp1 == TipoEnum.TIPO_REAL)
             if (tipo_exp2 == TipoEnum.TIPO_INT || tipo_exp2 == TipoEnum.TIPO_REAL)
@@ -281,12 +348,12 @@ public class Tipado extends ProcesamientoDef{
             else if ((tipo_exp1 == TipoEnum.NULL) && (tipo_exp2 == TipoEnum.TIPO_PUNT))
                 a.setTipo(TipoEnum.TIPO_BOOL);
             else{
-                //aviso_error();
+                // aviso_error();
                 a.setTipo(TipoEnum.ERROR);
             }
         }
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -312,11 +379,11 @@ public class Tipado extends ProcesamientoDef{
     }
 
     private void tipado_aritmetico(Exp exp1, Exp exp2, Exp a) {
-        exp1.procesa(this); //TODO no se si es this o a
+        exp1.procesa(this);
         exp2.procesa(this);
 
-        TipoEnum tipo_exp1 = ref(exp1.getTipo());
-        TipoEnum tipo_exp2 = ref(exp2.getTipo());
+        TipoEnum tipo_exp1 = ref(exp1);
+        TipoEnum tipo_exp2 = ref(exp2);
 
         if (tipo_exp1 == TipoEnum.TIPO_INT && tipo_exp2 == TipoEnum.TIPO_INT)
             a.setTipo(TipoEnum.TIPO_INT);
@@ -327,7 +394,7 @@ public class Tipado extends ProcesamientoDef{
         else if (tipo_exp1 == TipoEnum.TIPO_REAL && tipo_exp2 == TipoEnum.TIPO_INT)
             a.setTipo(TipoEnum.TIPO_REAL);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -337,10 +404,10 @@ public class Tipado extends ProcesamientoDef{
         a.exp1().procesa(this);
         a.exp2().procesa(this);
 
-        if (ref(a.exp1().getTipo()) == TipoEnum.TIPO_INT && ref(a.exp2().getTipo()) == TipoEnum.TIPO_INT)
+        if (ref(a.exp1()) == TipoEnum.TIPO_INT && ref(a.exp2()) == TipoEnum.TIPO_INT)
             a.setTipo(TipoEnum.TIPO_INT);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -356,13 +423,13 @@ public class Tipado extends ProcesamientoDef{
     }
 
     private void tipado_logico(Exp exp1, Exp exp2, Exp a) {
-        exp1.procesa(this); //TODO no se si es this o a
+        exp1.procesa(this);
         exp2.procesa(this);
 
-        if (ref(exp1.getTipo()) == TipoEnum.TIPO_BOOL && ref(exp2.getTipo()) == TipoEnum.TIPO_BOOL)
+        if (ref(exp1) == TipoEnum.TIPO_BOOL && ref(exp2) == TipoEnum.TIPO_BOOL)
             a.setTipo(TipoEnum.TIPO_BOOL);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -371,12 +438,12 @@ public class Tipado extends ProcesamientoDef{
     public void procesa(Menos a) {
         a.exp().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_INT)
+        if (ref(a.exp()) == TipoEnum.TIPO_INT)
             a.setTipo(TipoEnum.TIPO_INT);
-        else if (ref(a.exp().getTipo()) == TipoEnum.TIPO_REAL)
+        else if (ref(a.exp()) == TipoEnum.TIPO_REAL)
             a.setTipo(TipoEnum.TIPO_REAL);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -385,10 +452,10 @@ public class Tipado extends ProcesamientoDef{
     public void procesa(Not a) {
         a.exp().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_BOOL)
+        if (ref(a.exp()) == TipoEnum.TIPO_BOOL)
             a.setTipo(TipoEnum.TIPO_BOOL);
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -398,10 +465,10 @@ public class Tipado extends ProcesamientoDef{
         a.exp1().procesa(this);
         a.exp2().procesa(this);
 
-        if (ref(a.exp1().getTipo()) == TipoEnum.TIPO_ARRAY && ref(a.exp2().getTipo()) == TipoEnum.TIPO_INT)
-            a.setTipo(TipoEnum.TIPO_INT); //TODO el tipo base del array, no TIPO_INT
+        if (ref(a.exp1()) == TipoEnum.TIPO_ARRAY && ref(a.exp2()) == TipoEnum.TIPO_INT)
+            a.setTipo(a.exp1().getTipo()); //TODO el tipo base del array, puede que no sea esto
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -410,10 +477,10 @@ public class Tipado extends ProcesamientoDef{
     public void procesa(Reg a) {
         a.exp().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_STRUCT)
+        if (ref(a.exp()) == TipoEnum.TIPO_STRUCT)
             a.setTipo(TipoEnum.TIPO_INT); //TODO el tipo del campo, no TIPO_INT
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -422,10 +489,10 @@ public class Tipado extends ProcesamientoDef{
     public void procesa(Indir a) {
         a.exp().procesa(this);
 
-        if (ref(a.exp().getTipo()) == TipoEnum.TIPO_PUNT)
+        if (ref(a.exp()) == TipoEnum.TIPO_PUNT)
             a.setTipo(TipoEnum.TIPO_INT); //TODO el tipo base del puntero, no TIPO_INT
         else{
-            //aviso_error();
+            // aviso_error();
             a.setTipo(TipoEnum.ERROR);
         }
     }
@@ -442,8 +509,13 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Id a) {
-        //TODO necesito el vinculo
-    }
+        // if (a.getVinculo().getTipo() == DecEnum.VAR) TODO
+        //     a.setTipo(((Dec_tipado)a.getVinculo()).tipo().getTipo());
+        // else{
+        //     aviso_error();
+        //     a.setTipo(TipoEnum.ERROR);
+        // }
+    }   
 
     @Override
     public void procesa(False a) {
@@ -463,108 +535,5 @@ public class Tipado extends ProcesamientoDef{
     @Override
     public void procesa(Literal_ent a) {
         a.setTipo(TipoEnum.TIPO_INT);
-    }
-
-    @Override
-    public void procesa(No_parF a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Si_parF a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Muchos_param a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Un_param a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Param_ref a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Param_cop a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_array a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_punt a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_int a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_real a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_bool a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_string a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_id a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_struct a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Info_struct a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Lista_struct a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Campo a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-    
+    }    
 }

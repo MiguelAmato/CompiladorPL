@@ -44,6 +44,7 @@ public interface Procesamiento {
     void procesa(Instr_if a);
     void procesa(Instr_eval a);
     void procesa(Si_param_re a);
+    void procesa(No_param_re a);
     void procesa(Un_param_re a);
     void procesa(Muchos_param_re a);
     void procesa(Indir a);

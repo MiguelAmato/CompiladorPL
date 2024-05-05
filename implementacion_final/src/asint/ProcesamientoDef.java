@@ -3,7 +3,7 @@ import asint.SintaxisAbstractaEval.*;
 
 public class ProcesamientoDef implements Procesamiento {
 	
-	 	public void procesa(Prog a){}
+    public void procesa(Prog a){}
     public void procesa(No_decs a){}
     public void procesa(Si_decs a){}
     public void procesa(Muchas_decs a){}

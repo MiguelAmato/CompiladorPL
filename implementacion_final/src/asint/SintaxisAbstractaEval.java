@@ -37,13 +37,16 @@ public class SintaxisAbstractaEval {
 		
 
 	public static abstract class Nodo {
-		public Nodo() {
-			fila = col = -1;
-		}
-
 		private TipoEnum tipo;
+		private Dec vinculo;
+
 		private int fila;
 		private int col;
+
+		public Nodo() {
+			fila = col = -1;
+			vinculo = null;
+		}
 
 		public Nodo ponFila(int fila) {
 			this.fila = fila;
@@ -71,6 +74,14 @@ public class SintaxisAbstractaEval {
 
 		public TipoEnum getTipo() {
 			return tipo;
+		}
+
+		public void setVinculo(Dec vinculo) {
+			this.vinculo = vinculo;
+		}
+
+		public Dec getVinculo() {
+			return vinculo;
 		}
 
 		// public abstract void procesa(Procesamiento p);

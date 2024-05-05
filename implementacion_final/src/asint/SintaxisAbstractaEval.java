@@ -2052,7 +2052,6 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 		public void procesa(Procesamiento p){}
-
 	}
 
 	public static class Dec_proc extends Dec {

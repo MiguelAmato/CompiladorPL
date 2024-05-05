@@ -9,10 +9,10 @@ import asint.SintaxisAbstractaEval.*;
 
 public class Vinculacion extends ProcesamientoDef {
 	
-	Stack<Map<String, Dec>> ts;
+	Stack<Map<String, Nodo>> ts;
 
 	public Vinculacion(Prog prog) {
-		ts = new Stack<Map<String, Dec>>();
+		ts = new Stack<Map<String, Nodo>>();
 		procesa(prog);
 	}
 
@@ -288,7 +288,11 @@ public class Vinculacion extends ProcesamientoDef {
 		else if (dec instanceof Dec_proc) {
 			inserta(((Dec_proc) dec).id(), dec);
 			// FUNCION QUE HACE QUE SE PROCESE UN BLOQUE Y QUE EL AMBITO CONTEMPLE EL ID DEL PROC DECLARADO
-			procesaProgProc(((Dec_proc) dec).prog(), ((Dec_proc) dec).id(), dec); 
+			abreAmbito();
+			inserta(((Dec_proc) dec).id(), dec);
+			vincula1(((Dec_proc) dec).paramF());
+			((Dec_proc) dec).prog().procesa(this);
+			cierraAmbito();
 		}
 	}
 
@@ -354,11 +358,12 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	public void vincula1(Param param) {
+		vincula1(param.tipo());
 		if (param instanceof Param_cop) {
-			inserta(((Param_cop) param).id(), new Dec_id(((Param_cop) param).tipo(), ((Param_cop) param).id())); // No se si hacer una dec_id esta del todo bien
+			inserta(((Param_cop) param).id(), param); // No se si hacer una dec_id esta del todo bien
 		}
 		else if (param instanceof Param_ref) {
-			inserta(((Param_ref) param).id(), new Dec_id(((Param_ref) param).tipo(), ((Param_ref) param).id())); // No se si hacer una dec_id esta del todo bien
+			inserta(((Param_ref) param).id(), param); // No se si hacer una dec_id esta del todo bien
 		}
 	}
 	
@@ -393,11 +398,9 @@ public class Vinculacion extends ProcesamientoDef {
 		}
 		else if (tipo instanceof Tipo_punt) {
 			if (((Tipo_punt) tipo).tipo() instanceof Tipo_id) {
+				((Tipo_punt) tipo).tipo().setVinculo(vinculoDe(((Tipo_id) tipo.tipo()).id()));
 				if (!(((Tipo_punt) tipo).tipo().getVinculo() instanceof Dec_type))
 					error(tipo);
-				else {
-					((Tipo_punt) tipo).tipo().setVinculo(vinculoDe(((Tipo_id) tipo).id())); // ???
-				}
 			}
 			else
 				vincula2(((Tipo_punt) tipo).tipo());
@@ -449,7 +452,7 @@ public class Vinculacion extends ProcesamientoDef {
 	// ================================== AUX ==================================
 
 	private void abreAmbito() {
-		ts.push(new HashMap<String, Dec>());
+		ts.push(new HashMap<String, Nodo>());
 	}
 
 	private void cierraAmbito() {
@@ -457,7 +460,7 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	// Si el id ya está en el ámbito actual, error. En caso contrario se añade el vinculo con su declaracion
-	private void inserta(String id, Dec dec) {
+	private void inserta(String id, Nodo dec) {
 		if (ts.peek().containsKey(id)) 
 			error(dec);
 		else 
@@ -471,8 +474,12 @@ public class Vinculacion extends ProcesamientoDef {
 			campos.put(id, campo);
 	}
 
-	private Dec vinculoDe(String id) {
-		return ts.peek().get(id);
+	private Nodo vinculoDe(String id) {
+		for (int i = ts.size() - 1; i >= 0; i--) {
+			if (ts.get(i).containsKey(id)) 
+				return ts.get(i).get(id);
+		}
+		return null;
 	}
 
 	private void error(Nodo nodo) {

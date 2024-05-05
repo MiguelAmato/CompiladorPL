@@ -41,7 +41,7 @@ public class SintaxisAbstractaEval {
 
 	public static abstract class Nodo {
 		private TipoEnum tipo;
-		private Dec vinculo;
+		private Nodo vinculo;
 
 		private int fila;
 		private int col;
@@ -87,11 +87,11 @@ public class SintaxisAbstractaEval {
 			return tipo;
 		}
 
-		public void setVinculo(Dec vinculo) {
+		public void setVinculo(Nodo vinculo) {
 			this.vinculo = vinculo;
 		}
 
-		public Dec getVinculo() {
+		public Nodo getVinculo() {
 			return vinculo;
 		}
 

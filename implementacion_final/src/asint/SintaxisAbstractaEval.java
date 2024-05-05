@@ -232,6 +232,11 @@ public class SintaxisAbstractaEval {
 		public String toString() {
 			return "id(" + id + "[" + leeFila() + "," + leeCol() + "])";
 		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
+		}
 	}
 
 	public static class Null extends Exp {
@@ -839,6 +844,11 @@ public class SintaxisAbstractaEval {
 		public String toString() {
 			return "index(" + exp1 + "," + exp2 + ")";
 		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
+		}
 	}
 
 	public static class Reg extends Exp {
@@ -880,6 +890,11 @@ public class SintaxisAbstractaEval {
 		public String toString() {
 			return "reg(" + exp + "," + id + ")";
 		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
+		}
 	}
 
 	public static class Indir extends Exp {
@@ -913,6 +928,11 @@ public class SintaxisAbstractaEval {
 		public String toString() {
 			return "indir(" + exp + ")";
 		}
+
+		@Override
+		public boolean es_designador() {
+			return true;
+		}
 	}
 
 	public static abstract class Exp extends Nodo {
@@ -925,6 +945,10 @@ public class SintaxisAbstractaEval {
 		public int prioridad() {
 			return 7;
 		}
+
+        public boolean es_designador() {
+            return false;
+        }
 	}
 
 	public static class Muchos_param_re extends LParamR {

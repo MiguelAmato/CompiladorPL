@@ -1,6 +1,5 @@
 package procesamiento;
 
-import asint.Procesamiento;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaEval.*;
 
@@ -13,9 +12,50 @@ public class Tipado extends ProcesamientoDef{
             return TipoEnum.OK;
     }
 
+    private void aviso_error(TipoEnum t0, TipoEnum t1){
+        // if (t0 != TipoEnum.ERROR && t1 != TipoEnum.ERROR)
+            //error;
+    }
+
+    private void aviso_error(TipoEnum t){
+        // if (t != TipoEnum.ERROR)
+        //     error;
+    }
+
+    private void aviso_error(){
+        //error;
+    }
+
     private TipoEnum ref(TipoEnum tipo) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'ref'");
+    }
+
+    private boolean compatible(TipoEnum t0, TipoEnum t1) {
+        TipoEnum tipo0 = ref(t0);
+        TipoEnum tipo1 = ref(t1);
+
+        if (tipo0 == TipoEnum.TIPO_INT && tipo1 == TipoEnum.TIPO_INT)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_REAL && tipo1 == TipoEnum.TIPO_INT)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_INT && tipo1 == TipoEnum.TIPO_REAL)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_REAL && tipo1 == TipoEnum.TIPO_REAL)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_BOOL && tipo1 == TipoEnum.TIPO_BOOL)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_STRING && tipo1 == TipoEnum.TIPO_STRING)
+            return true;
+        else if (tipo0 == TipoEnum.TIPO_PUNT && tipo1 == TipoEnum.NULL)
+            return true;
+        else if (tipo0 == TipoEnum.NULL && tipo1 == TipoEnum.TIPO_PUNT)
+            return true;
+        //TODO
+        //STRUCT 
+        //ARRAY
+        //PUNTERO
+        return false;
     }
 
     @Override
@@ -147,7 +187,7 @@ public class Tipado extends ProcesamientoDef{
     public void procesa(Instr_rd a) {
         a.exp().procesa(this);
 
-        if (es_designador(a.exp())){
+        if (a.exp().es_designador()){
             if (ref(a.exp().getTipo()) == TipoEnum.TIPO_INT || ref(a.exp().getTipo()) == TipoEnum.TIPO_REAL || ref(a.exp().getTipo()) == TipoEnum.TIPO_STRING)
                 a.setTipo(TipoEnum.OK);
             else{
@@ -160,7 +200,7 @@ public class Tipado extends ProcesamientoDef{
             a.setTipo(TipoEnum.ERROR);
         }
     }
-    
+
     @Override
     public void procesa(Instr_wr a) {
         a.exp().procesa(this);
@@ -204,6 +244,11 @@ public class Tipado extends ProcesamientoDef{
     }
 
     @Override
+    public void procesa(No_param_re a) { //TODO por que no hay no_param_re?
+        a.setTipo(TipoEnum.OK);
+    }
+
+    @Override
     public void procesa(Un_param_re a) {
         a.exp().procesa(this);
         a.setTipo(a.exp().getTipo());
@@ -221,7 +266,7 @@ public class Tipado extends ProcesamientoDef{
         a.exp1().procesa(this);
         a.exp2().procesa(this);
 
-        if (es_designador(a.exp1()) && compatible(a.exp1().getTipo(), a.exp2().getTipo()))
+        if (a.exp1().es_designador() && compatible(a.exp1().getTipo(), a.exp2().getTipo()))
             a.setTipo(a.exp1().getTipo());
         else{
             //aviso_error(); 
@@ -442,8 +487,13 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Id a) {
-        //TODO necesito el vinculo
-    }
+        // if (a.getVinculo().getTipo() == DecEnum.VAR) TODO
+        //     a.setTipo(((Dec_tipado)a.getVinculo()).tipo().getTipo());
+        // else{
+        //     //aviso_error();
+        //     a.setTipo(TipoEnum.ERROR);
+        // }
+    }   
 
     @Override
     public void procesa(False a) {
@@ -463,108 +513,5 @@ public class Tipado extends ProcesamientoDef{
     @Override
     public void procesa(Literal_ent a) {
         a.setTipo(TipoEnum.TIPO_INT);
-    }
-
-    @Override
-    public void procesa(No_parF a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Si_parF a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Muchos_param a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Un_param a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Param_ref a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Param_cop a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_array a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_punt a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_int a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_real a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_bool a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_string a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_id a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Tipo_struct a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Info_struct a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Lista_struct a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-
-    @Override
-    public void procesa(Campo a) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'procesa'");
-    }
-    
+    }    
 }

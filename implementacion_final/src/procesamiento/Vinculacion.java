@@ -94,7 +94,98 @@ public class Vinculacion extends ProcesamientoDef {
 		exp.prog().procesa(this);
 	}
 
-	
+	public void procesa(ParamR paramR) {
+		if (paramR instanceof Si_param_re) {
+			((Si_param_re)paramR).lParamR().procesa(this);
+		}
+	}
+
+	public void procesa(LParamR lParamR) {
+		if (lParamR instanceof Muchos_param_re) {
+			((Muchos_param_re)lParamR).lParamR().procesa(this);
+			((Muchos_param_re)lParamR).exp().procesa(this);
+		}
+		else if (lParamR instanceof Un_param_re) {
+			((Un_param_re)lParamR).exp().procesa(this);
+		}
+	}
+
+	public void procesa(Exp exp) {
+		if (exp instanceof Asig) {
+			((Asig) exp).exp1().procesa(this);
+			((Asig) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Mayor) {
+			((Mayor) exp).exp1().procesa(this);
+			((Mayor) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Menor) {
+			((Menor) exp).exp1().procesa(this);
+			((Menor) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Menor_igual) {
+			((Menor_igual) exp).exp1().procesa(this);
+			((Menor_igual) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Mayor_igual) {
+			((Mayor_igual) exp).exp1().procesa(this);
+			((Mayor_igual) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Igual) {
+			((Igual) exp).exp1().procesa(this);
+			((Igual) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Distinto) {
+			((Distinto) exp).exp1().procesa(this);
+			((Distinto) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Suma) {
+			((Suma) exp).exp1().procesa(this);
+			((Suma) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof And) {
+			((And) exp).exp1().procesa(this);
+			((And) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Or) {
+			((Or) exp).exp1().procesa(this);
+			((Or) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Mul) {
+			((Mul) exp).exp1().procesa(this);
+			((Mul) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Div) {
+			((Div) exp).exp1().procesa(this);
+			((Div) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Mod) {
+			((Mod) exp).exp1().procesa(this);
+			((Mod) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Menos) {
+			((Menos) exp).exp().procesa(this);
+		}
+		else if (exp instanceof Not) {
+			((Not) exp).exp().procesa(this);
+		}
+		else if (exp instanceof Index) {
+			((Index) exp).exp1().procesa(this);
+			((Index) exp).exp2().procesa(this);
+		}
+		else if (exp instanceof Reg) {
+			((Reg) exp).exp().procesa(this);
+		}
+		else if (exp instanceof Indir) {
+			((Indir) exp).exp().procesa(this);
+		}
+		else if (exp instanceof Id) {
+			Dec dec = vinculoDe(((Id)exp).id());
+			if (dec == null) {
+				error();
+			}
+		}
+	}
 
 	// ================================== VINCULA 1 ==================================
 
@@ -135,7 +226,7 @@ public class Vinculacion extends ProcesamientoDef {
 	public void vincula1(Tipo tipo) {
 		if (tipo instanceof Tipo_array) {
 			vincula1(((Tipo_array) tipo).tipo());
-			if (Integer.parseInt(((Tipo_array) tipo).id()) < 0)
+			if (Integer.parseInt(((Tipo_array) tipo).id()) < 0) // Si el tamaño del array es negativo error
 				error();
 		}
 		else if (tipo instanceof Tipo_punt) {
@@ -147,11 +238,21 @@ public class Vinculacion extends ProcesamientoDef {
 			if (!(dec instanceof Dec_type)) // Si no es una declaracion de tipo significa que estas usando un id como tipo no declarado
 				error();
 		}
+		else if (tipo instanceof Tipo_struct) {
+			vincula1(((Tipo_struct) tipo).lStruct());
+		}
 	}
 
-	/*
-	* Hacer el tipo struct que no se como hacerlo 
-	*/
+	public void vincula1(LStruct lStruct) {
+		
+		if (lStruct instanceof Lista_struct) {
+			vincula1(((Lista_struct) lStruct).lStruct());
+			vincula1(((Lista_struct) lStruct).campo());
+		}
+		else if (lStruct instanceof Info_struct) {
+			vincula1(((Info_struct) lStruct).campo());
+		}
+	}
 
 	public void vincula1(ParamF paramF) {
 		if (paramF instanceof Si_parF) {

@@ -1,5 +1,6 @@
 package asint;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SintaxisAbstractaEval {
@@ -1609,6 +1610,7 @@ public class SintaxisAbstractaEval {
 
 		public LStruct() {
 			super();
+			campos = new HashMap<String, Campo>();
 		}
 
 		public Map<String, Campo> getCampos() {

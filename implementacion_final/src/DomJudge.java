@@ -14,11 +14,12 @@ import c_ast_descendente.*;
 import procesamiento.Impresion;
 import procesamiento.ProcRecursivo;
 import procesamiento.Tipado;
+import procesamiento.Vinculacion;
 
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
 		// Reader input = new InputStreamReader(System.in);
-		Reader input = new InputStreamReader(new FileInputStream("src/input.txt"));
+		Reader input = new InputStreamReader(new FileInputStream("src/input1.txt"));
 		char c = (char) input.read();
 		if (c == 'a') {
 			System.out.println("CONSTRUCCION AST ASCENDENTE");
@@ -46,6 +47,7 @@ public class DomJudge {
 			System.out.println("IMPRESION VISITANTE");	
 			Impresion imp = new Impresion();
 			imp.procesa(prog);
+			new Vinculacion(prog);
 			new Tipado().procesa(prog);
 		}
 		else if (c == 'd') {
@@ -74,6 +76,7 @@ public class DomJudge {
 			System.out.println("IMPRESION VISITANTE");	
 			Impresion imp = new Impresion();
 			imp.procesa(prog);
+			new Vinculacion(prog);
 			new Tipado().procesa(prog);
 		}
 		else {

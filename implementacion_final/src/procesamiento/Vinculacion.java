@@ -382,6 +382,9 @@ public class Vinculacion extends ProcesamientoDef {
 		else if (dec instanceof Dec_type) {
 			vincula2(((Dec_type) dec).tipo());
 		}
+		else if (dec instanceof Dec_proc) {
+			vincula2(((Dec_proc) dec).paramF());
+		}
 	}
 
 	public void vincula2(Tipo tipo) {

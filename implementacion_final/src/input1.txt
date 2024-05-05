@@ -1,6 +1,7 @@
 a
 {
-	int y
-	&&
-	@ y = i
+   real k
+   &&
+   @ k = "hola";
+   write k; nl
 }

@@ -38,7 +38,7 @@ public class Tipado extends ProcesamientoDef{
 
         tipos = new HashSet<Par<TipoEnum, TipoEnum>>();
 
-        tipos.add(new Par<TipoEnum, TipoEnum>(TipoEnum.TIPO_INT, TipoEnum.TIPO_REAL));
+        tipos.add(new Par<TipoEnum, TipoEnum>(tipo0, tipo1));
 
         if (tipo0 == TipoEnum.TIPO_INT && tipo1 == TipoEnum.TIPO_INT)
             return true;

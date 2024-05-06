@@ -46,6 +46,15 @@ public class SintaxisAbstractaEval {
 		private int fila;
 		private int col;
 
+		private int dir;
+		private int dir_ant;
+		private int max_dir_ant;
+		private int max_dir;
+        private int nivel;
+        private int tam;
+		
+        
+        
 		public Nodo() {
 			fila = col = -1;
 			vinculo = null;
@@ -94,6 +103,46 @@ public class SintaxisAbstractaEval {
 		public Nodo getVinculo() {
 			return vinculo;
 		}
+		
+		public int getMaxDir(){ 
+			return max_dir;
+		}
+		
+		public void setMaxDir(int max_dir){
+			this.max_dir = max_dir;
+		}
+		
+		public int getMaxDirAnt(){ 
+			return max_dir_ant;
+		}
+		
+		public void setMaxDirAnt(int max_dir_ant){
+			this.max_dir_ant = max_dir_ant; 
+		}
+		
+		public int getDirAnt(){
+			return dir_ant; 
+		}
+		
+		public void setDirAnt(int dir_ant){ 
+			this.dir_ant = dir_ant; 
+		}
+		
+		public void setDir(int dir){
+            this.dir = dir;
+        }
+        public int getNivel(){
+            return nivel;
+        }
+        public void setNivel(int nivel){
+            this.nivel = nivel;
+        }
+        public int getTam(){
+            return tam;
+        }
+        public void setTam(int tam){
+            this.tam = tam;
+        }
 
 		// public abstract void procesa(Procesamiento p);
 		// public abstract void imprime();
@@ -2052,6 +2101,7 @@ public class SintaxisAbstractaEval {
 			super();
 		}
 		public void procesa(Procesamiento p){}
+
 	}
 
 	public static class Dec_proc extends Dec {

@@ -104,8 +104,8 @@ public class AsigEspacio extends ProcesamientoDef{
 		tipo.setTam(1);
 	}
 
-	public void asig_tam1(Tipo_id tipo) { /////////////añsldkfjasñldkfjañlsdfjañlsdkfjañsldkjf
-		// No sé que poner
+	public void asig_tam1(Tipo_id tipo) { 
+		tipo.setTam(1);
 	}
 
 	public void asig_tam1(Tipo_struct tipo) {
@@ -119,14 +119,14 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void asig_tam1(Info_struct struct) {
-		procesa1(struct.campo());
+		procesa1(struct.campo(), struct.campo().getTam());
 		struct.setTam(struct.campo().getTam());
 	}
 
-	public void asig_tam1(Campo campo){
+	public void procesa1(Campo campo, int desp){
 		procesa1(campo.tipo());
 		campo.setTam(campo.tipo().getTam());
-		campo.setDesp(desp); // desp? ////////añlkjfañlskdjfañlskdfjañslkdfjasñdlkfjasdlñkfjasñdlf
+		campo.setDesp(desp);
 	}
 
 	public void procesa1(Si_parF parF) {

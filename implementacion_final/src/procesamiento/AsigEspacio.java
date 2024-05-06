@@ -114,7 +114,7 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 	
 	public void asig_tam1(Lista_struct lStruct) {
-		procesa1(lStruct.lStruct());
+		procesa1(lStruct.lStruct(), struct.campo().getTam());
 		lStruct.campo().procesa(this);
 	}
 

@@ -52,6 +52,7 @@ public class SintaxisAbstractaEval {
 		private int max_dir;
         private int nivel;
         private int tam;
+		private int des;
 		
         
         
@@ -143,6 +144,12 @@ public class SintaxisAbstractaEval {
         public void setTam(int tam){
             this.tam = tam;
         }
+		public int getDesp() {
+			return des;
+		}
+		public void setDesp(int des) {
+			this.des = des;
+		}
 
 		// public abstract void procesa(Procesamiento p);
 		// public abstract void imprime();

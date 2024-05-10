@@ -7,8 +7,6 @@ import java.util.Stack;
 import asint.ProcesamientoDef;
 import asint.SintaxisAbstractaEval.*;
 
-import asint.ProcesamientoDef;
-
 public class AsigEspacio extends ProcesamientoDef{
 	
 	int dir;
@@ -22,24 +20,24 @@ public class AsigEspacio extends ProcesamientoDef{
 		procesa(prog);
 	}
 
-	// ================================== AsigEspacio1 ==================================
-
-	
+	// Voy a seguir el orden de la memoria, luego si quieren se organiza en bloques mejor
 
 	public void procesa(Prog prog) {
 		prog.decs().procesa(this);
 		prog.instrOpt().procesa(this);
 	}
-	
 
 	public void procesa(Si_decs decs) {
 		procesa1(decs.decs());
 		procesa2(decs.decs());
 	}
-	
-	public void procesa(No_decs decs) {
-	}
 
+	public void procesa1(LDecs decs) {
+		if (decs instanceof Muchas_decs)
+			procesa1((Muchas_decs) decs);
+		else if (decs instanceof Una_dec)
+			procesa1((Una_dec) decs);
+	}
 
 	public void procesa1(Muchas_decs decs) {
 		procesa1(decs.decs());
@@ -48,6 +46,15 @@ public class AsigEspacio extends ProcesamientoDef{
 
 	public void procesa1(Una_dec dec) {
 		procesa1(dec.dec());
+	}
+
+	public void procesa1(Dec dec) {
+		if (dec instanceof Dec_type)
+			procesa1((Dec_type) dec);
+		else if (dec instanceof Dec_id)
+			procesa1((Dec_id) dec);
+		else if (dec instanceof Dec_proc)
+			procesa1((Dec_proc) dec);
 	}
 
 	public void procesa1(Dec_type dec) {
@@ -77,15 +84,32 @@ public class AsigEspacio extends ProcesamientoDef{
 		nivel--;
 	}
 
+	public void asig_tam1(Tipo tipo) {
+		if (tipo instanceof Tipo_array)
+			asig_tam1((Tipo_array) tipo);
+		else if (tipo instanceof Tipo_punt)
+			asig_tam1((Tipo_punt) tipo);
+		else if (tipo instanceof Tipo_int)
+			asig_tam1((Tipo_int) tipo);
+		else if (tipo instanceof Tipo_real)
+			asig_tam1((Tipo_real) tipo);
+		else if (tipo instanceof Tipo_bool)
+			asig_tam1((Tipo_bool) tipo);
+		else if (tipo instanceof Tipo_string)
+			asig_tam1((Tipo_string) tipo);
+		else if (tipo instanceof Tipo_id)
+			asig_tam1((Tipo_id) tipo);
+		else if (tipo instanceof Tipo_struct)
+			asig_tam1((Tipo_struct) tipo);
+	}
+
 	public void asig_tam1(Tipo_array tipo) {
-		procesa1(tipo.tipo());
+		asig_tam1(tipo.tipo());
 		tipo.setTam(tipo.tipo().getTam() * Integer.parseInt(tipo.id()));
 	}
 
 	public void asig_tam1(Tipo_punt tipo) {
-		if(!tipo.tipo() == tipo.tipo().getVinculo()) // comprobar //////////////////////////asdñlfjalsñkdjfañsldjkf
-				procesa1(tipo.tipo());
-		tipo.setTam(1);
+		// TODO
 	}
 
 	public void asig_tam1(Tipo_int tipo) {
@@ -105,35 +129,56 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void asig_tam1(Tipo_id tipo) { 
-		tipo.setTam(1);
+		//tipo.setVinculo(???); // Dice que es $.vinculo = dec_type(T, id); 
+		// TODO
+		tipo.setTam(tipo.tipo().getTam());
 	}
 
 	public void asig_tam1(Tipo_struct tipo) {
-		procesa1(tipo.lStruct());
+		asig_tam1(tipo.lStruct());
 		tipo.setTam(tipo.lStruct().getTam());
+	}
+
+	public void asig_tam1(LStruct lStruct) {
+		if (lStruct instanceof Lista_struct)
+			asig_tam1((Lista_struct) lStruct);
+		else if (lStruct instanceof Info_struct)
+			asig_tam1((Info_struct) lStruct);	
 	}
 	
 	public void asig_tam1(Lista_struct lStruct) {
-		procesa1(lStruct.lStruct(), struct.campo().getTam());
-		lStruct.campo().procesa(this);
+		asig_tam1(lStruct.lStruct());
+		asig_tam1(lStruct.campo(), lStruct.campo().getTam());
+		lStruct.setTam(lStruct.lStruct().getTam() + lStruct.campo().getTam());
 	}
 
 	public void asig_tam1(Info_struct struct) {
-		procesa1(struct.campo(), struct.campo().getTam());
+		asig_tam1(struct.campo(), 0);
 		struct.setTam(struct.campo().getTam());
 	}
 
-	public void procesa1(Campo campo, int desp){
-		procesa1(campo.tipo());
+	public void asig_tam1(Campo campo, int desp) {
+		asig_tam1(campo.tipo());
 		campo.setTam(campo.tipo().getTam());
 		campo.setDesp(desp);
+	}
+
+	public void procesa1(ParamF parF) {
+		if (parF instanceof Si_parF)
+			procesa1((Si_parF) parF);
+		else if (parF instanceof No_parF)
+			procesa1((No_parF) parF);
 	}
 
 	public void procesa1(Si_parF parF) {
 		procesa1(parF.lparam());
 	}
 
-	public void procesa1(No_parF parF) {
+	public void procesa1(LParam lparam) {
+		if (lparam instanceof Muchos_param)
+			procesa1((Muchos_param) lparam);
+		else if (lparam instanceof Un_param)
+			procesa1((Un_param) lparam);
 	}
 	
 	public void procesa1(Muchos_param lparam) {
@@ -142,21 +187,35 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void procesa1(Un_param param) {
-		param.param().procesa(this);
+		procesa1(param.param());
+	}
+
+	public void procesa1(Param param) {
+		if (param instanceof Param_ref)
+			procesa1((Param_ref) param);
+		else if (param instanceof Param_cop)
+			procesa1((Param_cop) param);
 	}
 
 	public void procesa1(Param_ref param) {
-		procesa1(param.tipo());
+		asig_tam1(param.tipo());
 		param.setDir(dir);
 		param.setNivel(nivel); 
 		añadir_dir(dir);
 	}
 
 	public void procesa1(Param_cop param) {
-		procesa1(param.tipo());
+		asig_tam1(param.tipo());
 		param.setDir(dir); 
 		param.setNivel(nivel); 
 		añadir_dir(dir);
+	}
+
+	public void procesa2(LDecs decs) {
+		if (decs instanceof Muchas_decs)
+			procesa2((Muchas_decs) decs);
+		else if (decs instanceof Una_dec)
+			procesa2((Una_dec) decs);
 	}
 
 	public void procesa2(Muchas_decs decs){
@@ -168,6 +227,15 @@ public class AsigEspacio extends ProcesamientoDef{
 		procesa2(dec.dec());
 	}
 
+	public void procesa2(Dec dec){
+		if(dec instanceof Dec_type)
+			procesa2((Dec_type) dec);
+		else if(dec instanceof Dec_id)
+			procesa2((Dec_id) dec);
+		else if(dec instanceof Dec_proc)
+			procesa2((Dec_proc) dec);
+	}
+
 	public void procesa2(Dec_type dec){
 		asig_tam2(dec.tipo());
 	}
@@ -176,50 +244,75 @@ public class AsigEspacio extends ProcesamientoDef{
 		asig_tam2(dec.tipo());
 	}
 
-	public void procesa2(Dec_proc dec){
+	public void asig_tam2(Tipo tipo) {
+		if (tipo instanceof Tipo_array)
+			asig_tam2((Tipo_array) tipo);
+		else if (tipo instanceof Tipo_punt)
+			asig_tam2((Tipo_punt) tipo);
+		else if (tipo instanceof Tipo_int)
+			asig_tam2((Tipo_int) tipo);
+		else if (tipo instanceof Tipo_real)
+			asig_tam2((Tipo_real) tipo);
+		else if (tipo instanceof Tipo_bool)
+			asig_tam2((Tipo_bool) tipo);
+		else if (tipo instanceof Tipo_string)
+			asig_tam2((Tipo_string) tipo);
+		else if (tipo instanceof Tipo_id)
+			asig_tam2((Tipo_id) tipo);
+		else if (tipo instanceof Tipo_struct)
+			asig_tam2((Tipo_struct) tipo);
 	}
 
 	public void asig_tam2(Tipo_array tipo){
-		procesa2(tipo.tipo());
+		asig_tam2(tipo.tipo());
 	}
 
-	public void asig_tam2(Tipo_punt tipo){ // ?? slñdkjfaslñdkfjasñldkfjasñldkfjasñlfjk
-		// No sé 
+	public void asig_tam2(Tipo_punt tipo){ 
+		//TODO
 	}
 
-	public void asig_tam2(Tipo_int tipo){
+	public void asig_tam2(Tipo_struct tipo) {
+		asig_tam2(tipo.lStruct());
 	}
 
-	public void asig_tam2(Tipo_real tipo){
-	}
-
-	public void asig_tam2(Tipo_bool tipo){
-	}
-
-	public void asig_tam2(Tipo_string tipo){
-	}
-
-	public void asig_tam2(Tipo_id tipo){
+	public void asig_tam2(LStruct lStruct) {
+		if (lStruct instanceof Lista_struct)
+			asig_tam2((Lista_struct) lStruct);
+		else if (lStruct instanceof Info_struct)
+			asig_tam2((Info_struct) lStruct);
 	}
 
 	public void asig_tam2(Lista_struct lStruct){
-		procesa2(lStruct.lStruct());
-		procesa2(lStruct.campo());
+		asig_tam2(lStruct.lStruct());
+		asig_tam2(lStruct.campo());
 	}
 
 	public void asig_tam2(Info_struct struct){
-		procesa2(struct.campo());
+		asig_tam2(struct.campo());
 	}
 
 	public void asig_tam2(Campo campo){
-		procesa2(campo.tipo());
+		asig_tam2(campo.tipo());
 	}
 
-	public void procesa2(No_parF parF){
+	public void procesa2(ParamF parF) {
+		if (parF instanceof Si_parF)
+			procesa2((Si_parF) parF);
+		else if (parF instanceof No_parF)
+			procesa2((No_parF) parF);
 	}
 	
 	public void procesa2(Si_parF parF){
 		procesa2(parF.lparam());
+	}
+
+	public void procesa2(No_parF parF) {}
+
+	public void procesa2(LParam lparam){
+		if(lparam instanceof Muchos_param)
+			procesa2((Muchos_param) lparam);
+		else if(lparam instanceof Un_param)
+			procesa2((Un_param) lparam);
 	}
 
 	public void procesa2(Muchos_param lparam){
@@ -231,33 +324,42 @@ public class AsigEspacio extends ProcesamientoDef{
 		procesa2(param.param());
 	}
 
+	public void procesa2(Param param){
+		if(param instanceof Param_ref)
+			procesa2((Param_ref) param);
+		else if(param instanceof Param_cop)
+			procesa2((Param_cop) param);
+	}
+
+	public void procesa2(Param_cop param){
+		asig_tam2(param.tipo());
+	}
+
 	public void procesa2(Param_ref param){
-		procesa2(param.tipo());
+		asig_tam2(param.tipo());
 	}
 
 	public void procesa(Si_inst instr){
 		procesa2(instr.lInstr());
 	}
 
-	public void procesa(No_inst instr){
+	public void procesa2(LInstr lInstr){
+		// TODO:
 	}
 
 	public void procesa(Muchas_instr lInstr){
-		procesa2(lInstr.instr());
-		procesa2(lInstr.lInstr());
+		lInstr.lInstr().procesa(this);
+		lInstr.instr().procesa(this);
 	}
 
 	public void procesa(Una_instr instr){
-		procesa2(instr.instr());
-	}
-
-	public void procesa(Instr_eval instr){
+		instr.instr().procesa(this);
 	}
 
 	public void procesa(Instr_if instr){
 		instr.setDirAnt(dir);
 		instr.prog().procesa(this);
-		dir = instr.getMaxDirAnt();
+		dir = instr.getDirAnt();
 	}
 
 	public void procesa(Instr_else instr){
@@ -270,27 +372,8 @@ public class AsigEspacio extends ProcesamientoDef{
 
 	public void procesa(Instr_wh instr){
 		instr.setDir(dir);
-		instr.exp().procesa(this);
+		instr.prog().procesa(this);
 		dir = instr.getDirAnt();
-	}
-
-	public void procesa(Instr_rd instr){
-		
-	}
-
-	public void procesa(Instr_wr instr){
-	}
-
-	public void procesa(Instr_nl instr){
-	}
-
-	public void procesa(Instr_new instr){
-	}
-
-	public void procesa(Instr_del instr){
-	}
-
-	public void procesa(Instr_call instr){
 	}
 
 	public void procesa(Instr_comp instr){

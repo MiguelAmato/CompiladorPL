@@ -19,7 +19,7 @@ import procesamiento.Vinculacion;
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
 		// Reader input = new InputStreamReader(System.in);
-		Reader input = new InputStreamReader(new FileInputStream("src/input1.txt"));
+		Reader input = new InputStreamReader(new FileInputStream("src/input.txt"));
 		char c = (char) input.read();
 		if (c == 'a') {
 			System.out.println("CONSTRUCCION AST ASCENDENTE");
@@ -48,7 +48,7 @@ public class DomJudge {
 			Impresion imp = new Impresion();
 			imp.procesa(prog);
 			new Vinculacion(prog);
-			new Tipado().procesa(prog);
+			//new Tipado().procesa(prog);
 		}
 		else if (c == 'd') {
 			System.out.println("CONSTRUCCION AST DESCENDENTE");
@@ -77,7 +77,7 @@ public class DomJudge {
 			Impresion imp = new Impresion();
 			imp.procesa(prog);
 			new Vinculacion(prog);
-			new Tipado().procesa(prog);
+			//new Tipado().procesa(prog);
 		}
 		else {
 			System.err.println("ERROR: El archivo de entrada debe comenzar con 'a' o 'd'");

@@ -1,0 +1,44 @@
+d
+{
+type int[20] tValores; 
+type struct{
+  tValores valores,
+  int nValores
+} tLista;
+tLista lista;
+int i 
+&&
+
+## Lectura de la lista
+write "Numero de valores?(0-20)"; nl;
+read lista.nValores;
+while (lista.nValores < 0) or (lista.nValores > 20) { 
+   write "Numero de valores?(0-20)";
+   read lista.nValores
+};
+@ i =0;
+## Escritura de la lista
+write "Introduce los valores de la lista"; nl;
+while i < lista.nValores { 
+   read lista.valores[i];
+   @ i = i + 1
+};
+write "Los valores introducidos son: "; nl;
+@ i=0;
+while i < lista.nValores {
+   write lista.valores[i]; nl;
+   @ i = i + 1
+};
+nl
+}
+$$
+8
+7
+-6
+9
+-60
+345
+56
+43
+1
+   

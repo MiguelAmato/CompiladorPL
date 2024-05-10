@@ -1,0 +1,16 @@
+d
+{
+int x; 
+bool y; 
+string z; 
+real k
+&&
+@ x = 25;
+@ y = true;
+@ z = "Esto es un mensaje";
+@ k = 25.6;
+write x; nl;
+write y; nl;
+write z; nl;
+write k; nl
+}

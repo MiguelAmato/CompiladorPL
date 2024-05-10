@@ -40,7 +40,7 @@ public class SintaxisAbstractaEval {
 		
 
 	public static abstract class Nodo {
-		private TipoEnum tipo;
+		private Tipo tipo;
 		private Nodo vinculo;
 
 		private int fila;
@@ -53,11 +53,10 @@ public class SintaxisAbstractaEval {
         private int nivel;
         private int tam;
 		
-        
-        
 		public Nodo() {
 			fila = col = -1;
 			vinculo = null;
+			tipo = null;
 		}
 
 		public Nodo ponFila(int fila) {
@@ -88,11 +87,11 @@ public class SintaxisAbstractaEval {
 			return col;
 		}
 
-		public void setTipo(TipoEnum tipo) {
+		public void setTipo(Tipo tipo) {
 			this.tipo = tipo;
 		}
 
-		public TipoEnum getTipo() {
+		public Tipo getTipo() {
 			return tipo;
 		}
 
@@ -1696,10 +1695,10 @@ public class SintaxisAbstractaEval {
 			return "tipo_struct(" + lStruct + ")";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_STRUCT;
+		public Tipo getTipode(String id) {
+			return lStruct.getCampos().get(id).tipo();
 		}
+
 	}
 
 	public static class Tipo_id extends Tipo {
@@ -1727,10 +1726,6 @@ public class SintaxisAbstractaEval {
 			return "tipo_id(" + id + ")";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_ID;
-		}
 	}
 
 	public static class Tipo_string extends Tipo {
@@ -1750,10 +1745,6 @@ public class SintaxisAbstractaEval {
 			return "tipo_string()";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_STRING;
-		}
 	}
 
 	public static class Tipo_bool extends Tipo {
@@ -1773,10 +1764,6 @@ public class SintaxisAbstractaEval {
 			return "tipo_bool()";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_BOOL;
-		}
 	}
 
 	public static class Tipo_real extends Tipo {
@@ -1796,10 +1783,6 @@ public class SintaxisAbstractaEval {
 			return "tipo_real()";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_REAL;
-		}
 	}
 
 	public static class Tipo_int extends Tipo {
@@ -1819,10 +1802,6 @@ public class SintaxisAbstractaEval {
 			return "tipo_int()";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_INT;
-		}
 	}
 
 	public static class Tipo_punt extends Tipo {
@@ -1850,10 +1829,6 @@ public class SintaxisAbstractaEval {
 			return "tipo_punt(" + tipo + ")";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_PUNT;
-		}
 	}
 
 	public static class Tipo_array extends Tipo {
@@ -1890,14 +1865,6 @@ public class SintaxisAbstractaEval {
 			return "tipo_array(" + tipo + "," + id + ")";
 		}
 
-		@Override
-		public TipoEnum getTipo() {
-			return TipoEnum.TIPO_ARRAY;
-		}
-	}
-
-	public enum TipoEnum {
-		TIPO_INT, TIPO_REAL, TIPO_STRING, TIPO_BOOL, TIPO_ID, TIPO_PUNT, TIPO_ARRAY, TIPO_STRUCT, ERROR, OK, NULL
 	}
 
 	public abstract static class Tipo extends Nodo {
@@ -1906,8 +1873,6 @@ public class SintaxisAbstractaEval {
 		}
 
 		public void procesa(Procesamiento p){}
-
-		public abstract TipoEnum getTipo();
 
 	}
 
@@ -2325,8 +2290,6 @@ public class SintaxisAbstractaEval {
 		public void procesa(Procesamiento p){
 			p.procesa(this);
 		}
-
-
 
 		public String toString() {
 			return "no_decs()";

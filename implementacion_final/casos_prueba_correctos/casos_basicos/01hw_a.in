@@ -1,0 +1,5 @@
+a
+{ 
+  write "Hola mundo";
+  nl
+}

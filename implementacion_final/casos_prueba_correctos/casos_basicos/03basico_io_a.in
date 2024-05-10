@@ -1,0 +1,17 @@
+a
+{
+int x; 
+int y; 
+int z
+&&
+  read x;
+  write "LEIDO: "; write x; nl;
+  read y;
+  write "LEIDO: "; write y; nl;
+  read z;
+  write "LEIDO: "; write z
+}
+$$
+56
+-45
+789

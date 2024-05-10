@@ -1,0 +1,17 @@
+d
+{
+^struct{
+    int[20] valores, 
+    int nValores
+} lista; 
+int i
+&&
+  new lista;
+  read i;
+  read lista^.valores[i]; 
+  write lista^.valores[i]; nl; 
+  delete lista
+}
+$$
+7
+5632

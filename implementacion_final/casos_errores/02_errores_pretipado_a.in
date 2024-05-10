@@ -1,0 +1,40 @@
+a
+{
+## campos duplicados, vinculaciones a no tipos y dimensiones negativas
+type struct {
+  int[-5] a,
+  struct {
+        int ia,
+	int ib,
+	int ia,
+	int ib
+  } b,
+  int[0] ia,
+  int[-1] ib,
+  int a,
+  int b
+} t1;
+struct {
+  int a,
+  int b,
+  int a
+} v1;
+v1 v2;
+proc p (struct {t1 a, int b, t1 a} p1, struct {p a, p1 b} & p2) {
+  struct {
+    int a,
+    p2 a,
+    int a
+  } v
+  && 
+}  
+&&
+{ 
+  struct{
+    v2 a,
+    p b,
+    p a
+  } v
+  &&
+}
+}

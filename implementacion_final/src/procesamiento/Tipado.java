@@ -9,7 +9,7 @@ import asint.SintaxisAbstractaEval.*;
 
 public class Tipado extends ProcesamientoDef{
 
-    Set<Par<TipoEnum, TipoEnum>> tipos;
+    private Set<Par<Tipo, Tipo>> tipos;
 
     public Tipado() {
         super();

@@ -1,0 +1,24 @@
+d
+{
+proc ack(int m, int n, int & resul) { 
+  if m == 0 {
+    @ resul = n + 1
+  }
+  else { 
+     if (m > 0) and (n == 0) { 
+        call ack(m - 1, 1, resul)
+     }
+     else {
+         int  resul_inner
+         &&
+           call ack(m,n - 1, resul_inner);
+           call ack(m - 1, resul_inner, resul)
+     }
+ }
+};
+int resul
+&&
+   call ack(3 , 2 , resul);
+   write resul; nl
+}
+

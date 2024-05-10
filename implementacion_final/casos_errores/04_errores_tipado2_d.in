@@ -1,0 +1,26 @@
+d
+{
+ ## probando la comprobacion de la compatibilidad estructural
+ type ^tNodo1 tLista1;
+ type struct {
+       int[10] vals,
+       tLista1 sig
+      } tNodo1; 
+ type ^tNodo2 tLista2;
+ type struct {
+       int[10] vs,
+       ^struct{
+          int[10] valores,
+          ^tNodo2 siguiente
+        } s
+      } tNodo2; 
+ tLista1 l1;
+ tLista2 l2;
+ proc v(tLista1 l1, tLista2& l2) {}
+ &&
+ @ l1 = l2;
+ call v(l2,l1);
+ call v(l2);
+ call l1(true + 5, "hola" and true)
+
+}

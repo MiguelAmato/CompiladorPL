@@ -1,0 +1,19 @@
+d
+{
+ proc suma(int & x, int inc) { 
+  proc incrementa(int dx) {
+   @x = x +  dx
+  }
+  &&
+   call incrementa(inc)
+ };
+
+ int v;
+ int delta
+ &&
+  @v=5;
+  @delta=6;
+  call suma(v, delta);
+  write v;
+  nl
+}

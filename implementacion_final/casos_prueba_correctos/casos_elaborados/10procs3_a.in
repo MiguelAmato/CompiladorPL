@@ -1,0 +1,119 @@
+a
+{
+type struct {
+  string nombre,
+  int edad
+} tPersona;
+type struct{
+  tPersona[80] personas,
+  int n
+} tPersonas;
+
+proc lee_personas(tPersonas& personas) {
+  proc lee_num_personas() {
+     write "Cuantas personas?[0-80]"; nl;
+     read personas.n;
+     while((personas.n < 0) or (personas.n > 80)) {
+       write "El valor debe estar [0-80]"; nl;
+       write "Prueba otra vez"; nl;
+       read personas.n
+     }
+  };
+  proc lee_persona(int i) {
+    write "Introduce los datos de la persona nº "; write i + 1; nl;
+    write "Nombre?"; nl;
+    read personas.personas[i].nombre;
+    write "Edad?"; nl;
+    read personas.personas[i].edad
+  };
+  int i
+  && 
+  call lee_num_personas();
+  @ i = 0;
+  while i < personas.n {
+     call lee_persona(i);
+     @ i = i + 1
+  }
+};
+proc ordena_personas(tPersonas& personas) {
+   proc quicksort(int i, int j) {
+      proc redistribuye(int i, int j, int &p) {
+         proc swap(tPersona& a, tPersona& b) {
+           tPersona tmp
+           &&
+             @tmp = a;
+             @a = b;
+             @b = tmp
+         };
+         int inf;
+         int sup
+         &&
+          @inf = i + 1;
+          @sup = j + 1;
+          while inf < sup {
+            if personas.personas[inf].nombre >= personas.personas[i].nombre {
+              @sup = sup - 1;
+              call swap(personas.personas[inf],personas.personas[sup])
+            } 
+            else {
+              @inf = inf + 1
+            }
+          };
+          @sup = sup - 1;
+          call swap(personas.personas[i],personas.personas[sup]);
+          @p = sup 
+      };
+      int p
+      &&
+      if(i<j) {
+       call redistribuye(i,j,p);
+       call quicksort(i,p - 1);
+       call quicksort(p + 1,j)
+      }
+   }
+   &&
+   call quicksort(0,personas.n - 1)
+  };
+
+  proc muestra_personas(tPersonas personas) {
+    proc muestra_persona(tPersona persona) {
+      write "nombre:"; write persona.nombre; write " edad:";
+      write persona.edad; nl
+    };
+    int i
+    &&
+    @i=0;
+    while(i < personas.n) {
+      call muestra_persona(personas.personas[i]);
+      @i = i + 1
+    }
+  };
+
+tPersonas personas
+&&
+  call lee_personas(personas);
+  call ordena_personas(personas);
+  call muestra_personas(personas)
+}
+$$
+10
+Camilo
+23
+Amparo
+21
+Creta
+22
+Marta
+25
+Carlos
+21
+Jose
+22
+Rodrigo
+20
+Sancho
+19
+Virginia
+26
+Javier
+23

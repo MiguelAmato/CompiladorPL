@@ -1,0 +1,92 @@
+d
+{
+real x;
+^int u;
+^bool v;
+int[20] a;
+type struct {
+  ^int[30] ps,
+  int c
+} tr;
+type tr tr2;
+type tr tr3;
+tr3 r;
+proc p(int x, int & y) {
+ @ x = u^ + y
+};
+proc p2(real x, real& y) {}
+&&
+## expresiones bien tipadas
+@ x = 5;
+@ x = 5.0;
+@ 5 < 6;
+@ 5.0 > 6;
+@ 5 <= 5.0;
+@ 5.0 >= 6.7;
+@ "hola" < "adios";
+@ false == true;
+@ u == null;
+@ u != v;
+@ 5 + 5;
+@ 5 - 5.0;
+@ 5.0 * 5;
+@ 5.0 / 5.0;
+@ u^ % 2;
+@ - - 5;
+@ - - 5.0;
+@ not (((x < 5) or (u != null)) and true);
+@ r.ps[a[6]]^ + x;
+call p(u^ + 5, u^);
+call p2(u^,x);
+new r.ps[25];
+delete u;
+read r.ps[25]^;
+write r.ps[25]^ + 50;
+write 57.9;
+write "hola";
+if x == 56 {
+  if x < 7 {
+  }
+  else {
+   while x < 7 {
+    @ x = x - 1
+   }
+  }
+};
+## expresiones mal tipadas
+@ x = x == 5;
+@ 5 < true;
+@ 5.0 == true;
+@ "hola" != "hola" == "adios";
+@ u == u^;
+@ 5 + "hola";
+@ u^ % 2.0;
+@ - - "hola";
+@ not null;
+@ r.x;
+@ r[5];
+@ a[true];
+@ a.x;
+call p(u^ + 5.0, u^);
+call p(u^ + 5, x);
+call p2(x,u^);
+call p2(x,5.0);
+@ x + p;
+@ x + tr2;
+@ u^ = x;
+new r.ps[25]^;
+delete u^;
+read r.ps[25]^ + 8;
+@ 56.0 = u^;
+read u;
+write u;
+if x  {
+  if u^ {
+  }
+  else {
+   while x  {
+    @ x = x - 1
+   }
+  }
+}
+}

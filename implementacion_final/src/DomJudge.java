@@ -19,7 +19,7 @@ import procesamiento.Vinculacion;
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
 		// Reader input = new InputStreamReader(System.in);
-		Reader input = new InputStreamReader(new FileInputStream("src/input.txt"));
+		Reader input = new InputStreamReader(new FileInputStream("casos_prueba_correctos/casos_tipado/09ejemplo_a.in"));
 		char c = (char) input.read();
 		if (c == 'a') {
 			System.out.println("CONSTRUCCION AST ASCENDENTE");
@@ -28,8 +28,7 @@ public class DomJudge {
 			Prog prog = null;
 			try {    
 				prog = (Prog)asint.debug_parse().value;
-				//prog = (Prog)asint.parse().value;
-				
+				// prog = (Prog)asint.parse().value;
 			}
 			catch(ErrorLexico e) {
 				System.out.println("ERROR_LEXICO"); 

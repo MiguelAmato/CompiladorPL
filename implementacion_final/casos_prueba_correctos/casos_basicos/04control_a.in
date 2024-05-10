@@ -1,0 +1,21 @@
+a
+{
+int  x;
+int y
+&&
+  write "Algoritmo de Euclides"; nl;
+  read x;
+  read y;
+  while x != y {
+    if x < y {
+       @ y = y - x
+    }
+    else { 
+      @ x = x - y
+    }
+  };
+  write "El MCD es: "; write x; nl
+}
+$$
+640
+50

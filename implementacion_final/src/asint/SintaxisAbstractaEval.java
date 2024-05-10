@@ -154,6 +154,20 @@ public class SintaxisAbstractaEval {
 		// public abstract void imprime();
 	}
 
+	public static class Tipo_error extends Tipo {
+		@Override
+		public void imprime() {
+			throw new UnsupportedOperationException("Unimplemented method 'imprime'");
+		}
+	}
+
+	public static class Tipo_ok extends Tipo {
+		@Override
+		public void imprime() {
+			throw new UnsupportedOperationException("Unimplemented method 'imprime'");
+		}
+	}
+
 	public static class Literal_ent extends Exp {
 		private String num;
 
@@ -1675,6 +1689,19 @@ public class SintaxisAbstractaEval {
 		public void procesa(Procesamiento p){}
 	}
 
+	public static class Tipo_null extends Tipo {
+		public Tipo_null() {
+			super();
+		}
+
+		public void procesa(Procesamiento p){
+		}
+
+		public void imprime() {
+			System.out.println("<null>");
+		}
+	}
+
 	public static class Tipo_struct extends Tipo {
 		LStruct lStruct;
 
@@ -1702,7 +1729,7 @@ public class SintaxisAbstractaEval {
 			return "tipo_struct(" + lStruct + ")";
 		}
 
-		public Tipo getTipode(String id) {
+		public Tipo getTipoCampo(String id) {
 			return lStruct.getCampos().get(id).tipo();
 		}
 

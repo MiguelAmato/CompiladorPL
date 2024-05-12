@@ -17,6 +17,11 @@ import procesamiento.ProcRecursivo;
 import procesamiento.Tipado;
 import procesamiento.Vinculacion;
 
+/*
+ * Implementacion hecha de Asignacion de Espacio, Maquina P y Etiquetado. 
+ * No aplicadas en el main.
+ */
+
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
 		// Reader input = new InputStreamReader(System.in);
@@ -47,25 +52,23 @@ public class DomJudge {
 			// Impresion imp = new Impresion();
 			// imp.procesa(prog);
 			Errores errores = new Errores();
-			boolean error = false;
 			new Vinculacion(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				error = true;
+				System.exit(0);
 			}
 			if (errores.hayErrores1()) {
 				errores.printErrores1();
-				error = true;
+				System.exit(0);
 			}
 			new Tipado(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				error = true;
+				System.exit(0);
 			}
-			if (!error) { // Si no hay error imprime 
-				Impresion imp = new Impresion();
-				imp.procesa(prog);
-			}
+		
+			Impresion imp = new Impresion();
+			imp.procesa(prog);
 		}
 		else if (c == 'd') {
 			ASTS_D_DJ asint = new ASTS_D_DJ(input);
@@ -91,25 +94,23 @@ public class DomJudge {
 			// Impresion imp = new Impresion();
 			// imp.procesa(prog);
 			Errores errores = new Errores();
-			boolean error = false;
 			new Vinculacion(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				error = true;
+				System.exit(0);
 			}
 			if (errores.hayErrores1()) {
 				errores.printErrores1();
-				error = true;
+				System.exit(0);
 			}
 			new Tipado(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				error = true;
+				System.exit(0);
 			}
-			if (!error) { // Si no hay error imprime 
-				Impresion imp = new Impresion();
-				imp.procesa(prog);
-			}
+		
+			Impresion imp = new Impresion();
+			imp.procesa(prog);
 		}
 		else {
 			System.err.println("ERROR: El archivo de entrada debe comenzar con 'a' o 'd'");

@@ -9,7 +9,6 @@ import java.util.Stack;
 import asint.SintaxisAbstractaEval.Tipo_int;
 import asint.SintaxisAbstractaEval.Tipo_real;
 import asint.SintaxisAbstractaEval.Tipo_string;
-import procesamiento.MaquinaP.Instruccion;
 
 public class MaquinaP {
     public static class EAccesoIlegitimo extends RuntimeException {

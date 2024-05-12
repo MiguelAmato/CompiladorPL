@@ -47,9 +47,8 @@ public class Tipado extends ProcesamientoDef{
     }
 
     private void aviso_error(Nodo a){
-        String s = "Errores_tipado fila " + a.leeFila() + " col " + a.leeCol();
+        String s = "Errores_tipado fila:" + a.leeFila() + " col:" + a.leeCol();
         errores.addError(a.leeFila(), a.leeCol(), s);
-        System.out.println(s);
     }
 
     private boolean compatible(Tipo t0, Tipo t1) {
@@ -546,7 +545,13 @@ public class Tipado extends ProcesamientoDef{
 
         if (ref(a.exp().getTipo()).getClass() == Tipo_struct.class){
             Tipo_struct tipo = (Tipo_struct) ref(a.exp().getTipo());
-            a.setTipo(tipo.getTipoCampo(a.id()));
+            Tipo t = tipo.getTipoCampo(a.id());
+            if (t == null){
+                aviso_error(a);
+                a.setTipo(new Tipo_error());
+            }
+            else
+                a.setTipo(tipo.getTipoCampo(a.id()));
         }else{
             aviso_error(a);
             a.setTipo(new Tipo_error());
@@ -577,7 +582,6 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Id a) {
-        System.out.println("TIPO ID: " + a);
         if(a.getVinculo().getClass() == Dec_id.class){
             Dec_id dec = (Dec_id) a.getVinculo();
             a.setTipo(dec.tipo());

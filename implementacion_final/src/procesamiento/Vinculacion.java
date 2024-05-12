@@ -105,15 +105,21 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	public void procesa(Instr_call inst) {
-		inst.setVinculo(vinculoDe(inst.id()));
-		if (!(inst.getVinculo() instanceof Dec_proc))
+		Nodo v = vinculoDe(inst.id());
+		if (v == null){
 			error(inst);
-		else
-			inst.paramR().procesa(this);
+			return;
+		}
+		inst.setVinculo(v);
+		inst.paramR().procesa(this);
 	}
 
 	public void procesa(Instr_comp exp) {
 		exp.prog().procesa(this);
+	}
+
+	public void procesa(Si_param_re s){
+		procesa(s.lParamR());
 	}
 
 	public void procesa(ParamR paramR) {

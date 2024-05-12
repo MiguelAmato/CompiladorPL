@@ -20,7 +20,7 @@ import procesamiento.Vinculacion;
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
 		// Reader input = new InputStreamReader(System.in);
-		Reader input = new InputStreamReader(new FileInputStream("casos_errores/02_errores_pretipado_a.in"));
+		Reader input = new InputStreamReader(new FileInputStream("casos_errores/03_errores_tipado1_a.in"));
 		char c = (char) input.read();
 		if (c == 'a') {
 			AnalizadorLexico alex = new AnalizadorLexico(input);

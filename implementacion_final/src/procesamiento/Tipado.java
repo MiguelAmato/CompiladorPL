@@ -2,7 +2,6 @@ package procesamiento;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -74,11 +73,11 @@ public class Tipado extends ProcesamientoDef{
         else if (tipo0.getClass() == Tipo_null.class && tipo1.getClass() == Tipo_punt.class)
             return true;
         else if (tipo0.getClass() == Tipo_punt.class && tipo1.getClass() == Tipo_punt.class)
-            return son_unificables(ref(t0).tipo(), ref(t1).tipo());
+            return son_unificables(tipo0.tipo(), tipo1.tipo());
         else if (tipo0.getClass() == Tipo_array.class && tipo1.getClass() == Tipo_array.class)
-            return son_unificables(ref(t0).tipo(), ref(t1).tipo());
+            return son_unificables(tipo0.tipo(), tipo1.tipo());
         else if (tipo0.getClass() == Tipo_struct.class && tipo1.getClass() == Tipo_struct.class)
-            return struct_son_unificables(ref(t0).lStruct(), ref(t1).lStruct()); //TODO poner esto en todos lados
+            return struct_son_unificables(((Tipo_struct)tipo0).lStruct(), ((Tipo_struct)tipo1).lStruct()); 
         return false;
     }
     private boolean son_unificables(Tipo t0, Tipo t1){
@@ -90,11 +89,14 @@ public class Tipado extends ProcesamientoDef{
     }
 
     private boolean struct_son_unificables(LStruct l0, LStruct l1){
-        if(l0.getClass() == Lista_structs.class && l1.getClass() == Lista_structs.class){
-            return struct_son_unificables(l0.lStruct(), l1.lStruct()) && son_unificables(l0.campo().tipo(), l1.campo().tipo());
+        Lista_struct ls0 = (Lista_struct)l0;
+        Lista_struct ls1 = (Lista_struct)l1;
+
+        if(ls0.getClass() == Lista_struct.class && ls1.getClass() == Lista_struct.class){
+            return struct_son_unificables(ls0.lStruct(), ls1.lStruct()) && son_unificables(ls0.campo().tipo(), ls1.campo().tipo());
         }
         else if(l0.getClass() == Info_struct.class && l1.getClass() == Info_struct.class){
-            return sonUnificables(l0.campo().tipo(), l1.campo().tipo());
+            return son_unificables(ls0.campo().tipo(), ls1.campo().tipo());
         }
         else 
             return false;

@@ -271,9 +271,11 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void asig_tam2(Tipo_punt tipo){ 
-		if (ref(tipo.tipo()) instanceof Tipo_id) { // OJO???
-			tipo.tipo().setVinculo();
-		}
+		Tipo t = ((Dec_type) tipo.tipo().getVinculo()).tipo();
+		if (ref(tipo.tipo()) instanceof Tipo_id) // OJO???
+			tipo.setTam(t.getTam());
+		else
+			asig_tam2(t);
 	}
 
 	public void asig_tam2(Tipo_struct tipo) {
@@ -345,11 +347,14 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void procesa(Si_inst instr){
-		procesa2(instr.lInstr());
+		procesa(instr.lInstr());
 	}
 
-	public void procesa2(LInstr lInstr){
-		// TODO:
+	public void procesa(LInstr lInstr){
+		if (lInstr instanceof Muchas_instr)
+			procesa(((Muchas_instr) lInstr));
+		else if (lInstr instanceof Una_instr) 
+			procesa(((Una_instr) lInstr));
 	}
 
 	public void procesa(Muchas_instr lInstr){
@@ -359,6 +364,17 @@ public class AsigEspacio extends ProcesamientoDef{
 
 	public void procesa(Una_instr instr){
 		instr.instr().procesa(this);
+	}
+
+	public void procesa(Instr instr) {
+		if (instr instanceof Instr_if)
+			procesa((Instr_if) instr);
+		else if (instr instanceof Instr_else)
+			procesa((Instr_else) instr);
+		else if (instr instanceof Instr_wh)
+			procesa((Instr_wh) instr);
+		else if (instr instanceof Instr_comp)
+			procesa((Instr_comp) instr);	
 	}
 
 	public void procesa(Instr_if instr){

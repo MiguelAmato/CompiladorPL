@@ -53,11 +53,14 @@ public class SintaxisAbstractaEval {
         private int nivel;
         private int tam;
 		private int des;
+		private int prim;
+		private int sig;
 		
 		public Nodo() {
 			fila = col = -1;
 			vinculo = null;
 			tipo = null;
+			prim = sig = 0;
 		}
 
 		public Nodo ponFila(int fila) {
@@ -149,7 +152,18 @@ public class SintaxisAbstractaEval {
 		public void setDesp(int des) {
 			this.des = des;
 		}
-
+		public int getPrim() {
+			return prim;
+		}
+		public void setPrim(int prim) {
+			this.prim = prim;
+		}
+		public int getSig() {
+			return sig;
+		}
+		public void setSig(int sig) {
+			this.sig = sig;
+		}
 		// public abstract void procesa(Procesamiento p);
 		// public abstract void imprime();
 	}

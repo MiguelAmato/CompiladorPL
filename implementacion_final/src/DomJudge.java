@@ -20,10 +20,9 @@ import procesamiento.Vinculacion;
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
 		// Reader input = new InputStreamReader(System.in);
-		Reader input = new InputStreamReader(new FileInputStream("casos_errores/03_errores_tipado1_a.in"));
+		Reader input = new InputStreamReader(new FileInputStream("casos_errores/02_errores_pretipado_a.in"));
 		char c = (char) input.read();
 		if (c == 'a') {
-			System.out.println("CONSTRUCCION AST ASCENDENTE");
 			AnalizadorLexico alex = new AnalizadorLexico(input);
 			ASTS_A_DJ asint = new ASTS_A_DJ(alex);
 			Prog prog = null;
@@ -51,16 +50,21 @@ public class DomJudge {
 			new Vinculacion(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
+				//System.exit(0);
+			}
+			if (errores.hayErrores1()) {
+				errores.printErrores1();
 				System.exit(0);
 			}
+			/*
 			new Tipado(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
 				System.exit(0);
 			}
+			*/
 		}
 		else if (c == 'd') {
-			System.out.println("CONSTRUCCION AST DESCENDENTE");
 			ASTS_D_DJ asint = new ASTS_D_DJ(input);
 			asint.setTabSize();
 			Prog prog = null;

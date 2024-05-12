@@ -312,7 +312,7 @@ public class Vinculacion extends ProcesamientoDef {
 		}
 		else if (dec instanceof Dec_proc) {
 			inserta(((Dec_proc) dec).id(), ((Dec_proc) dec));
-			// FUNCION QUE HACE QUE SE PROCESE UN BLOQUE Y QUE EL AMBITO CONTEMPLE EL ID DEL PROC DECLARADO
+
 			abreAmbito();
 			// inserta(((Dec_proc) dec).id(), ((Dec_proc) dec));
 			vincula1(((Dec_proc) dec).paramF());
@@ -321,20 +321,12 @@ public class Vinculacion extends ProcesamientoDef {
 		}
 	}
 
-	// FUNCION QUE HACE QUE SE PROCESE UN BLOQUE Y QUE EL AMBITO CONTEMPLE EL ID DEL PROC DECLARADO
-	private void procesaProgProc(Prog prog, String id, Dec dec) {
-		abreAmbito();
-		inserta(id, dec);
-		prog.decs().procesa(this);
-		prog.instrOpt().procesa(this);
-		cierraAmbito();
-	}
 
 	public void vincula1(Tipo tipo) {
 		if (tipo instanceof Tipo_array) {
 			vincula1(((Tipo_array) tipo).tipo());
 			if (Integer.parseInt(((Tipo_array) tipo).id()) < 0) // Si el tamaño del array es negativo error
-				error(tipo);
+				errorPretipado(tipo);
 		}
 		else if (tipo instanceof Tipo_punt) {
 			if (!(((Tipo_punt) tipo).tipo() instanceof Tipo_id))
@@ -494,7 +486,7 @@ public class Vinculacion extends ProcesamientoDef {
 
 	private void insertaCampo(Map<String, Campo> campos, String id, Campo campo) {
 		if (campos.containsKey(id)) 
-			error(campo);
+			errorPretipado(campo);
 		else 
 			campos.put(id, campo);
 	}
@@ -508,8 +500,13 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	private void error(Nodo nodo) {
-		String s = "Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol();
+		String s = "Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol() + nodo;
 		errores.addError(nodo.leeFila(), nodo.leeCol(), s);
+	}
+
+	private void errorPretipado(Nodo nodo) {
+		String s = "Errores_pretipado fila:" + nodo.leeFila() + " col:" + nodo.leeCol();
+		errores.addError1(nodo.leeFila(), nodo.leeCol(), s);
 	}
 
 }

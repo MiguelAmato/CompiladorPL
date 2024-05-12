@@ -47,22 +47,25 @@ public class DomJudge {
 			// Impresion imp = new Impresion();
 			// imp.procesa(prog);
 			Errores errores = new Errores();
+			boolean error = false;
 			new Vinculacion(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				//System.exit(0);
+				error = true;
 			}
 			if (errores.hayErrores1()) {
 				errores.printErrores1();
-				System.exit(0);
+				error = true;
 			}
-			/*
 			new Tipado(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				System.exit(0);
+				error = true;
 			}
-			*/
+			if (!error) { // Si no hay error imprime 
+				Impresion imp = new Impresion();
+				imp.procesa(prog);
+			}
 		}
 		else if (c == 'd') {
 			ASTS_D_DJ asint = new ASTS_D_DJ(input);
@@ -82,23 +85,30 @@ public class DomJudge {
 			// System.out.println("IMPRESION RECURSIVA");	
 			// ProcRecursivo proc = new ProcRecursivo();
 			// proc.imprime(prog); // Recursivo
-			
 			// System.out.println("IMPRESION INTERPRETE");	
 			// prog.imprime(); // Interprete
-			
-			System.out.println("IMPRESION VISITANTE");	
-			Impresion imp = new Impresion();
-			imp.procesa(prog);
+			// System.out.println("IMPRESION VISITANTE");	
+			// Impresion imp = new Impresion();
+			// imp.procesa(prog);
 			Errores errores = new Errores();
+			boolean error = false;
 			new Vinculacion(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				System.exit(0);
+				error = true;
+			}
+			if (errores.hayErrores1()) {
+				errores.printErrores1();
+				error = true;
 			}
 			new Tipado(prog, errores);
 			if (errores.hayErrores()) {
 				errores.printErrores();
-				System.exit(0);
+				error = true;
+			}
+			if (!error) { // Si no hay error imprime 
+				Impresion imp = new Impresion();
+				imp.procesa(prog);
 			}
 		}
 		else {

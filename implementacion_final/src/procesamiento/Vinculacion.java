@@ -487,7 +487,7 @@ public class Vinculacion extends ProcesamientoDef {
 	private void insertaCampo(Map<String, Campo> campos, String id, Campo campo) {
 		if (campos.containsKey(id)) 
 			errorPretipado(campo);
-		else 
+		else
 			campos.put(id, campo);
 	}
 
@@ -500,7 +500,7 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	private void error(Nodo nodo) {
-		String s = "Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol() + nodo;
+		String s = "Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol();
 		errores.addError(nodo.leeFila(), nodo.leeCol(), s);
 	}
 

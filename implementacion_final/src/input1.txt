@@ -2,6 +2,5 @@ a
 {
    real k
    &&
-   @ k = "fumada";
-   write k; nl
+   @ y = k
 }

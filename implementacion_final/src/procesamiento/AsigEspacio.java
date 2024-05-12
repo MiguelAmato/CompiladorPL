@@ -109,7 +109,10 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void asig_tam1(Tipo_punt tipo) {
-		// TODO
+		if (!(ref(tipo.tipo()) instanceof Tipo_id)) // OJO CON EL PIOJO
+			asig_tam1(tipo.tipo());
+		else 
+			tipo.setTam(1);
 	}
 
 	public void asig_tam1(Tipo_int tipo) {
@@ -129,9 +132,9 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void asig_tam1(Tipo_id tipo) { 
-		//tipo.setVinculo(???); // Dice que es $.vinculo = dec_type(T, id); 
-		// TODO
-		tipo.setTam(tipo.tipo().getTam());
+		Tipo t = ((Dec_type) tipo.getVinculo()).tipo();
+		t.procesa(this);
+		tipo.setTam(t.getTam());
 	}
 
 	public void asig_tam1(Tipo_struct tipo) {
@@ -268,7 +271,9 @@ public class AsigEspacio extends ProcesamientoDef{
 	}
 
 	public void asig_tam2(Tipo_punt tipo){ 
-		//TODO
+		if (ref(tipo.tipo()) instanceof Tipo_id) { // OJO???
+			tipo.tipo().setVinculo();
+		}
 	}
 
 	public void asig_tam2(Tipo_struct tipo) {
@@ -386,5 +391,11 @@ public class AsigEspacio extends ProcesamientoDef{
 	        dir += tam;
 	        if(dir > max_dir)
 	            max_dir = dir;
-	    }
+	}
+
+	private Tipo ref(Tipo tipo) {
+        if (tipo.getClass() == Tipo_id.class)
+            return ref(((Dec_type)tipo.getVinculo()).tipo());
+        return tipo.getTipo();
+    }
 }

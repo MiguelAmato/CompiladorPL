@@ -10,9 +10,11 @@ import asint.SintaxisAbstractaEval.*;
 public class Vinculacion extends ProcesamientoDef {
 	
 	Stack<Map<String, Nodo>> ts;
+	Errores errores;
 
-	public Vinculacion(Prog prog) {
+	public Vinculacion(Prog prog, Errores errores) {
 		ts = new Stack<Map<String, Nodo>>();
+		this.errores = errores;
 		procesa(prog);
 	}
 
@@ -302,17 +304,17 @@ public class Vinculacion extends ProcesamientoDef {
 	public void vincula1(Dec dec) {
 		if (dec instanceof Dec_id) {
 			vincula1(((Dec_id) dec).tipo());
-			inserta(((Dec_id) dec).id(), dec);
+			inserta(((Dec_id) dec).id(), ((Dec_id) dec));
 		}
 		else if (dec instanceof Dec_type) {
 			vincula1(((Dec_type) dec).tipo());
-			inserta(((Dec_type) dec).id(), dec);
+			inserta(((Dec_type) dec).id(), ((Dec_type) dec));
 		}
 		else if (dec instanceof Dec_proc) {
-			inserta(((Dec_proc) dec).id(), dec);
+			inserta(((Dec_proc) dec).id(), ((Dec_proc) dec));
 			// FUNCION QUE HACE QUE SE PROCESE UN BLOQUE Y QUE EL AMBITO CONTEMPLE EL ID DEL PROC DECLARADO
 			abreAmbito();
-			inserta(((Dec_proc) dec).id(), dec);
+			// inserta(((Dec_proc) dec).id(), ((Dec_proc) dec));
 			vincula1(((Dec_proc) dec).paramF());
 			((Dec_proc) dec).prog().procesa(this);
 			cierraAmbito();
@@ -423,7 +425,7 @@ public class Vinculacion extends ProcesamientoDef {
 			if (((Tipo_punt) tipo).tipo() instanceof Tipo_id) {
 				((Tipo_punt) tipo).tipo().setVinculo(vinculoDe(((Tipo_id) tipo.tipo()).id()));
 				if (!(((Tipo_punt) tipo).tipo().getVinculo() instanceof Dec_type))
-					error(tipo);
+					error(tipo.tipo());
 			}
 			else
 				vincula2(((Tipo_punt) tipo).tipo());
@@ -506,7 +508,8 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	private void error(Nodo nodo) {
-		System.err.println("Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol() + " " + nodo);
+		String s = "Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol();
+		errores.addError(nodo.leeFila(), nodo.leeCol(), s);
 	}
 
 }

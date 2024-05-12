@@ -6,9 +6,11 @@ import java.util.List;
 public class Errores{
 
     List<Error> errores;
+    List<Error> errores1;
 
     public Errores() {
         this.errores = new ArrayList<Error>();
+        this.errores1 = new ArrayList<Error>();
     }
 
     public void addError(int fila, int col, String mensaje) {
@@ -16,20 +18,41 @@ public class Errores{
         errores.add(error);
     }
 
+    public void addError1(int fila, int col, String mensaje) {
+        Error error = new Error(fila, col, mensaje);
+        errores1.add(error);
+    }
+
     private void sortErrores() {
         errores.sort(null);
     }
 
+    private void sortErrores1() {
+        errores1.sort(null);
+    }
+
     public void printErrores() {
         sortErrores();
-
+        
         for (Error error : errores) {
+            System.out.println(error.mensaje);
+        }
+    }
+    
+    public void printErrores1() {
+        sortErrores1();
+
+        for (Error error : errores1) {
             System.out.println(error.mensaje);
         }
     }
 
     public boolean hayErrores() {
         return !errores.isEmpty();
+    }
+
+    public boolean hayErrores1() {
+        return !errores1.isEmpty();
     }
 
 

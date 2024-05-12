@@ -327,12 +327,12 @@ public class Tipado extends ProcesamientoDef{
     @Override
     public void procesa(Si_param_re a) { 
         a.lParamR().procesa(this);
-        // a.setTipo(a.lParamR().getTipo()); TODO no se si comentarlo o no
+        // a.setTipo(a.lParamR().getTipo()); //TODO no se si comentarlo o no
     }
 
     @Override
     public void procesa(No_param_re a) { 
-        // a.setTipo(new Tipo_ok());
+        a.setTipo(new Tipo_ok());
     }
 
     @Override
@@ -398,8 +398,8 @@ public class Tipado extends ProcesamientoDef{
         Tipo tipo_exp1 = ref(exp1.getTipo());
         Tipo tipo_exp2 = ref(exp2.getTipo());
 
-        if ((tipo_exp1.getClass() == Tipo_int.class) || (tipo_exp1.getClass() == Tipo_real.class)){
-            if ((tipo_exp2.getClass() == Tipo_int.class) || (tipo_exp2.getClass() == Tipo_real.class))
+        if (((tipo_exp1.getClass() == Tipo_int.class) || (tipo_exp1.getClass() == Tipo_real.class)) &&
+            ((tipo_exp2.getClass() == Tipo_int.class) || (tipo_exp2.getClass() == Tipo_real.class))){
                 a.setTipo(new Tipo_bool());
         }
         else if ((tipo_exp1.getClass() == Tipo_bool.class) && (tipo_exp2.getClass() == Tipo_bool.class))
@@ -472,7 +472,7 @@ public class Tipado extends ProcesamientoDef{
         a.exp1().procesa(this);
         a.exp2().procesa(this);
 
-        if (ref(a.exp1().getTipo()).getClass() == Tipo_int.class && ref(a.exp2().getTipo()).getClass() == Tipo_int.class)
+        if ((ref(a.exp1().getTipo()).getClass() == Tipo_int.class) && (ref(a.exp2().getTipo()).getClass() == Tipo_int.class))
             a.setTipo(new Tipo_int());
         else{
             aviso_error(a);
@@ -572,7 +572,7 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Literal_real a) {
-        a.setTipo(new Tipo_int());
+        a.setTipo(new Tipo_real());
     }
 
     @Override

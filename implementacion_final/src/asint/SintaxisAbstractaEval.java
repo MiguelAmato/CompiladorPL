@@ -1739,7 +1739,10 @@ public class SintaxisAbstractaEval {
 		}
 
 		public Tipo getTipoCampo(String id) {
-			return campos.get(id).tipo();
+			if (campos.containsKey(id)) {
+				return campos.get(id).tipo();
+			}
+			return null;
 		}
 
 		public Map<String, Campo> getCampos() {

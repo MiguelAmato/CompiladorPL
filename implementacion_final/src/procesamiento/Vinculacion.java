@@ -43,6 +43,29 @@ public class Vinculacion extends ProcesamientoDef {
 		instr.instr().procesa(this);
 	}
 
+	public void procesa(Instr instr) {
+		if (instr instanceof Instr_eval)
+			procesa((Instr_eval)instr);
+		else if (instr instanceof Instr_if)
+			procesa((Instr_if)instr);
+		else if (instr instanceof Instr_else)
+			procesa((Instr_else)instr);
+		else if (instr instanceof Instr_wh)
+			procesa((Instr_wh)instr);
+		else if (instr instanceof Instr_rd)
+			procesa((Instr_rd)instr);
+		else if (instr instanceof Instr_wr)
+			procesa((Instr_wr)instr);
+		else if (instr instanceof Instr_new)
+			procesa((Instr_new)instr);
+		else if (instr instanceof Instr_del)
+			procesa((Instr_del)instr);
+		else if (instr instanceof Instr_call)
+			procesa((Instr_call)instr);
+		else if (instr instanceof Instr_comp)
+			procesa((Instr_comp)instr);
+	}
+
 	public void procesa(Instr_eval inst) {
 		inst.exp().procesa(this);
 	}
@@ -483,7 +506,7 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	private void error(Nodo nodo) {
-		System.err.println("Error semantico: " + nodo);
+		System.err.println("Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol() + " " + nodo);
 	}
 
 }

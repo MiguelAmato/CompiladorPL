@@ -346,24 +346,24 @@ public class Vinculacion extends ProcesamientoDef {
 				error(tipo);
 		}
 		else if (tipo instanceof Tipo_struct) {
-			vincula1(((Tipo_struct) tipo).lStruct());
+			vincula1(((Tipo_struct) tipo).lStruct(), ((Tipo_struct) tipo));
 		}
 	}
 
-	public void vincula1(LStruct lStruct) {
+	public void vincula1(LStruct lStruct, Tipo_struct struct) {
 		
 		if (lStruct instanceof Lista_struct) {
-			vincula1(((Lista_struct) lStruct).lStruct());
-			vincula1(((Lista_struct) lStruct).campo(), lStruct);
+			vincula1(((Lista_struct) lStruct).lStruct(), struct);
+			vincula1(((Lista_struct) lStruct).campo(), struct);
 		}
 		else if (lStruct instanceof Info_struct) {
-			vincula1(((Info_struct) lStruct).campo(), lStruct);
+			vincula1(((Info_struct) lStruct).campo(), struct);
 		}
 	}
 
-	public void vincula1(Campo campo, LStruct lStruct) {
+	public void vincula1(Campo campo, Tipo_struct struct) {
 		vincula1(campo.tipo());
-		insertaCampo(lStruct.getCampos(), campo.id(), campo);
+		insertaCampo(struct.getCampos(), campo.id(), campo);
 	}
 
 	public void vincula1(ParamF paramF) {

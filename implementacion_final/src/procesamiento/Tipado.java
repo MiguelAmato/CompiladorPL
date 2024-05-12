@@ -399,9 +399,10 @@ public class Tipado extends ProcesamientoDef{
         Tipo tipo_exp1 = ref(exp1.getTipo());
         Tipo tipo_exp2 = ref(exp2.getTipo());
 
-        if (tipo_exp1.getClass() == Tipo_int.class || tipo_exp1.getClass() == Tipo_real.class)
-            if (tipo_exp2.getClass() == Tipo_int.class || tipo_exp2.getClass() == Tipo_real.class)
+        if ((tipo_exp1.getClass() == Tipo_int.class) || (tipo_exp1.getClass() == Tipo_real.class)){
+            if ((tipo_exp2.getClass() == Tipo_int.class) || (tipo_exp2.getClass() == Tipo_real.class))
                 a.setTipo(new Tipo_bool());
+        }
         else if ((tipo_exp1.getClass() == Tipo_bool.class) && (tipo_exp2.getClass() == Tipo_bool.class))
             a.setTipo(new Tipo_bool());
         else if ((tipo_exp1.getClass() == Tipo_string.class) && (tipo_exp2.getClass() == Tipo_string.class))
@@ -576,6 +577,7 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Id a) {
+        System.out.println("TIPO ID: " + a);
         if(a.getVinculo().getClass() == Dec_id.class){
             Dec_id dec = (Dec_id) a.getVinculo();
             a.setTipo(dec.tipo());

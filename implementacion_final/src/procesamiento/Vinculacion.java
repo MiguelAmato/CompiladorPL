@@ -10,9 +10,11 @@ import asint.SintaxisAbstractaEval.*;
 public class Vinculacion extends ProcesamientoDef {
 	
 	Stack<Map<String, Nodo>> ts;
+	Errores errores;
 
-	public Vinculacion(Prog prog) {
+	public Vinculacion(Prog prog, Errores errores) {
 		ts = new Stack<Map<String, Nodo>>();
+		this.errores = errores;
 		procesa(prog);
 	}
 
@@ -41,6 +43,29 @@ public class Vinculacion extends ProcesamientoDef {
 
 	public void procesa(Una_instr instr) {
 		instr.instr().procesa(this);
+	}
+
+	public void procesa(Instr instr) {
+		if (instr instanceof Instr_eval)
+			procesa((Instr_eval)instr);
+		else if (instr instanceof Instr_if)
+			procesa((Instr_if)instr);
+		else if (instr instanceof Instr_else)
+			procesa((Instr_else)instr);
+		else if (instr instanceof Instr_wh)
+			procesa((Instr_wh)instr);
+		else if (instr instanceof Instr_rd)
+			procesa((Instr_rd)instr);
+		else if (instr instanceof Instr_wr)
+			procesa((Instr_wr)instr);
+		else if (instr instanceof Instr_new)
+			procesa((Instr_new)instr);
+		else if (instr instanceof Instr_del)
+			procesa((Instr_del)instr);
+		else if (instr instanceof Instr_call)
+			procesa((Instr_call)instr);
+		else if (instr instanceof Instr_comp)
+			procesa((Instr_comp)instr);
 	}
 
 	public void procesa(Instr_eval inst) {
@@ -279,37 +304,29 @@ public class Vinculacion extends ProcesamientoDef {
 	public void vincula1(Dec dec) {
 		if (dec instanceof Dec_id) {
 			vincula1(((Dec_id) dec).tipo());
-			inserta(((Dec_id) dec).id(), dec);
+			inserta(((Dec_id) dec).id(), ((Dec_id) dec));
 		}
 		else if (dec instanceof Dec_type) {
 			vincula1(((Dec_type) dec).tipo());
-			inserta(((Dec_type) dec).id(), dec);
+			inserta(((Dec_type) dec).id(), ((Dec_type) dec));
 		}
 		else if (dec instanceof Dec_proc) {
-			inserta(((Dec_proc) dec).id(), dec);
-			// FUNCION QUE HACE QUE SE PROCESE UN BLOQUE Y QUE EL AMBITO CONTEMPLE EL ID DEL PROC DECLARADO
+			inserta(((Dec_proc) dec).id(), ((Dec_proc) dec));
+
 			abreAmbito();
-			inserta(((Dec_proc) dec).id(), dec);
+			// inserta(((Dec_proc) dec).id(), ((Dec_proc) dec));
 			vincula1(((Dec_proc) dec).paramF());
 			((Dec_proc) dec).prog().procesa(this);
 			cierraAmbito();
 		}
 	}
 
-	// FUNCION QUE HACE QUE SE PROCESE UN BLOQUE Y QUE EL AMBITO CONTEMPLE EL ID DEL PROC DECLARADO
-	private void procesaProgProc(Prog prog, String id, Dec dec) {
-		abreAmbito();
-		inserta(id, dec);
-		prog.decs().procesa(this);
-		prog.instrOpt().procesa(this);
-		cierraAmbito();
-	}
 
 	public void vincula1(Tipo tipo) {
 		if (tipo instanceof Tipo_array) {
 			vincula1(((Tipo_array) tipo).tipo());
 			if (Integer.parseInt(((Tipo_array) tipo).id()) < 0) // Si el tamaño del array es negativo error
-				error(tipo);
+				errorPretipado(tipo);
 		}
 		else if (tipo instanceof Tipo_punt) {
 			if (!(((Tipo_punt) tipo).tipo() instanceof Tipo_id))
@@ -321,24 +338,24 @@ public class Vinculacion extends ProcesamientoDef {
 				error(tipo);
 		}
 		else if (tipo instanceof Tipo_struct) {
-			vincula1(((Tipo_struct) tipo).lStruct());
+			vincula1(((Tipo_struct) tipo).lStruct(), ((Tipo_struct) tipo));
 		}
 	}
 
-	public void vincula1(LStruct lStruct) {
+	public void vincula1(LStruct lStruct, Tipo_struct struct) {
 		
 		if (lStruct instanceof Lista_struct) {
-			vincula1(((Lista_struct) lStruct).lStruct());
-			vincula1(((Lista_struct) lStruct).campo(), lStruct);
+			vincula1(((Lista_struct) lStruct).lStruct(), struct);
+			vincula1(((Lista_struct) lStruct).campo(), struct);
 		}
 		else if (lStruct instanceof Info_struct) {
-			vincula1(((Info_struct) lStruct).campo(), lStruct);
+			vincula1(((Info_struct) lStruct).campo(), struct);
 		}
 	}
 
-	public void vincula1(Campo campo, LStruct lStruct) {
+	public void vincula1(Campo campo, Tipo_struct struct) {
 		vincula1(campo.tipo());
-		insertaCampo(lStruct.getCampos(), campo.id(), campo);
+		insertaCampo(struct.getCampos(), campo.id(), campo);
 	}
 
 	public void vincula1(ParamF paramF) {
@@ -400,7 +417,7 @@ public class Vinculacion extends ProcesamientoDef {
 			if (((Tipo_punt) tipo).tipo() instanceof Tipo_id) {
 				((Tipo_punt) tipo).tipo().setVinculo(vinculoDe(((Tipo_id) tipo.tipo()).id()));
 				if (!(((Tipo_punt) tipo).tipo().getVinculo() instanceof Dec_type))
-					error(tipo);
+					error(tipo.tipo());
 			}
 			else
 				vincula2(((Tipo_punt) tipo).tipo());
@@ -469,7 +486,7 @@ public class Vinculacion extends ProcesamientoDef {
 
 	private void insertaCampo(Map<String, Campo> campos, String id, Campo campo) {
 		if (campos.containsKey(id)) 
-			error(campo);
+			errorPretipado(campo);
 		else 
 			campos.put(id, campo);
 	}
@@ -483,7 +500,13 @@ public class Vinculacion extends ProcesamientoDef {
 	}
 
 	private void error(Nodo nodo) {
-		System.err.println("Error semantico: " + nodo);
+		String s = "Errores_vinculacion fila:" + nodo.leeFila() + " col:" + nodo.leeCol() + nodo;
+		errores.addError(nodo.leeFila(), nodo.leeCol(), s);
+	}
+
+	private void errorPretipado(Nodo nodo) {
+		String s = "Errores_pretipado fila:" + nodo.leeFila() + " col:" + nodo.leeCol();
+		errores.addError1(nodo.leeFila(), nodo.leeCol(), s);
 	}
 
 }

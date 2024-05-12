@@ -1689,15 +1689,8 @@ public class SintaxisAbstractaEval {
 
 	public abstract static class LStruct extends Nodo {
 
-		Map<String, Campo> campos;
-
 		public LStruct() {
 			super();
-			campos = new HashMap<String, Campo>();
-		}
-
-		public Map<String, Campo> getCampos() {
-			return campos;
 		}
 
 		public void procesa(Procesamiento p){}
@@ -1718,10 +1711,12 @@ public class SintaxisAbstractaEval {
 
 	public static class Tipo_struct extends Tipo {
 		LStruct lStruct;
+		Map<String, Campo> campos;
 
 		public Tipo_struct(LStruct lStruct) {
 			super();
 			this.lStruct = lStruct;
+			this.campos = new HashMap<String, Campo>();
 		}
 
 		public LStruct lStruct() {
@@ -1744,7 +1739,11 @@ public class SintaxisAbstractaEval {
 		}
 
 		public Tipo getTipoCampo(String id) {
-			return lStruct.getCampos().get(id).tipo();
+			return campos.get(id).tipo();
+		}
+
+		public Map<String, Campo> getCampos() {
+			return campos;
 		}
 
 	}

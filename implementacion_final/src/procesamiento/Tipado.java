@@ -13,9 +13,12 @@ public class Tipado extends ProcesamientoDef{
     private Set<Par<Tipo, Tipo>> tipos;
     private List<Exp> lExp;
     private List<Param> lParam;
+    Errores errores;
 
-    public Tipado() {
+    public Tipado(Prog prog, Errores errores) {
         super();
+        this.errores = errores;
+        procesa(prog);
     }
 
     private Tipo ambosTipo_ok(Tipo t0, Tipo t1) {
@@ -40,11 +43,13 @@ public class Tipado extends ProcesamientoDef{
     private Tipo ref(Tipo tipo) {
         if (tipo.getClass() == Tipo_id.class)
             return ref(((Dec_type)tipo.getVinculo()).tipo());
-        return tipo.getTipo();
+        return tipo;
     }
 
     private void aviso_error(Nodo a){
-        System.err.println("Tipo_error de tipos en " + a);
+        String s = "Errores_tipado fila " + a.leeFila() + " col " + a.leeCol();
+        errores.addError(a.leeFila(), a.leeCol(), s);
+        System.out.println(s);
     }
 
     private boolean compatible(Tipo t0, Tipo t1) {
@@ -394,9 +399,10 @@ public class Tipado extends ProcesamientoDef{
         Tipo tipo_exp1 = ref(exp1.getTipo());
         Tipo tipo_exp2 = ref(exp2.getTipo());
 
-        if (tipo_exp1.getClass() == Tipo_int.class || tipo_exp2.getClass() == Tipo_real.class)
-            if (tipo_exp2.getClass() == Tipo_int.class || tipo_exp2.getClass() == Tipo_real.class)
+        if ((tipo_exp1.getClass() == Tipo_int.class) || (tipo_exp1.getClass() == Tipo_real.class)){
+            if ((tipo_exp2.getClass() == Tipo_int.class) || (tipo_exp2.getClass() == Tipo_real.class))
                 a.setTipo(new Tipo_bool());
+        }
         else if ((tipo_exp1.getClass() == Tipo_bool.class) && (tipo_exp2.getClass() == Tipo_bool.class))
             a.setTipo(new Tipo_bool());
         else if ((tipo_exp1.getClass() == Tipo_string.class) && (tipo_exp2.getClass() == Tipo_string.class))
@@ -571,6 +577,7 @@ public class Tipado extends ProcesamientoDef{
 
     @Override
     public void procesa(Id a) {
+        System.out.println("TIPO ID: " + a);
         if(a.getVinculo().getClass() == Dec_id.class){
             Dec_id dec = (Dec_id) a.getVinculo();
             a.setTipo(dec.tipo());

@@ -24,8 +24,8 @@ import procesamiento.Vinculacion;
 
 public class DomJudge {
 	public static void main(String[] args) throws Exception {
-		// Reader input = new InputStreamReader(System.in);
-		Reader input = new InputStreamReader(new FileInputStream("casos_errores/03_errores_tipado1_a.in"));
+		 Reader input = new InputStreamReader(System.in);
+		//Reader input = new InputStreamReader(new FileInputStream("casos_errores/03_errores_tipado1_a.in"));
 		char c = (char) input.read();
 		if (c == 'a') {
 			AnalizadorLexico alex = new AnalizadorLexico(input);
@@ -37,11 +37,11 @@ public class DomJudge {
 			}
 			catch(ErrorLexico e) {
 				System.out.println("ERROR_LEXICO"); 
-				System.exit(1);
+				System.exit(0);
 			}
 			catch(ErrorSintactico e) {
 				System.out.println("ERROR_SINTACTICO");
-				System.exit(1); 
+				System.exit(0); 
 			}
 			// System.out.println("IMPRESION RECURSIVA");	
 			// ProcRecursivo proc = new ProcRecursivo();
@@ -79,11 +79,11 @@ public class DomJudge {
 			}
 			catch(ParseException e) {
 				System.out.println("ERROR_SINTACTICO");
-				System.exit(1); 
+				System.exit(0); 
 			}
 			catch(TokenMgrError e) {
 				System.out.println("ERROR_LEXICO");
-				System.exit(1);
+				System.exit(0);
 			}
 			// System.out.println("IMPRESION RECURSIVA");	
 			// ProcRecursivo proc = new ProcRecursivo();
@@ -114,7 +114,7 @@ public class DomJudge {
 		}
 		else {
 			System.err.println("ERROR: El archivo de entrada debe comenzar con 'a' o 'd'");
-			System.exit(1);
+			System.exit(0);
 		}
 
 

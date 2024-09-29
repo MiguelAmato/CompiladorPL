@@ -1,0 +1,185 @@
+Ejercicio 2
+
+(b)
+
+Sin adaptar
+
+I →  E [ E ] 
+	I.a = indx(E0.a, E1.a) 
+I →  E [ ] 
+	I.a = vindx(E.a) 
+I →  E  
+	I.a = E.a 
+E →  E   B 
+	E0.a = seq(E1.a, B.a) 
+E →  E @ B 
+	E0.a = at(E1.a, B.a) 
+E →  B 
+	E.a = off(B.a) 
+B → o  
+	B.a = ord(o.lex) 
+B → ( I )  
+	B.a = I.a
+
+Adaptada
+
+I -> E Ir
+	Ir.ah = E.a
+	I.a = Ir.a
+Ir → [ E ] 
+	Ir.a = index(Ir.ah, E.a)
+Ir → [ ] 
+	Ir.a = vindx(Ir.ah)
+Ir → 3 
+	Ir.a = Ir.ah
+E →  B Er
+	Er.ah = off(B.a)
+	E.a = Er.a
+Er →  B Er
+	Er1.ah = seq(Er0.ah, B.a)
+	Er0.a = Er1.a
+Er →  @ B Er 
+	Er1.ah = at(Er0.ah, B.a)
+	Er0.a = Er1.a
+Er →  3  
+	Er.a = Er.ah
+B → o  
+	B.a = ord(o.lex)
+B → ( I )  
+	B.a = I.a
+
+Ejercicio 3
+
+(a)
+
+with = (w|W)(i|I)(t|T)(h|H)
+alternate = ... 
+until = ...
+end = ...
+
+Al solo agregar palabras reservadas, no habria que ampliar el automata lexico
+
+(b)
+
+Instruccion -> Instruccion_alt
+Instruccion_alt -> with id alternate Instruccion ; and Instruccion ; until Expresion end
+
+Asumire que hay un error y se trata de una instruccion de evaluacion
+
+(c)
+
+Generos:
+	Instruccion -> Instr
+	Expresion -> Expr
+
+Constructores:
+
+Instruccion -> with id alternate Instruccion ; and Instruccion ; until Expresion end
+	instruccion_alt: string x Instr x Instr x Exp -> Instr
+
+(d)
+
+Instruccion_alt -> with id alternate Instruccion ; and Instruccion ; until Expresion end
+	Instruccion_alt.a = instruccion_alt(id.lex, Instruccion0.a, Instruccion1.a, Exp.a)
+
+(e)
+No hace falta realizar ninguna modificacion puesto que no hay que refactorizar ni elimi-
+nar la recursion a izquierdas.
+
+(f)
+vincula(instruccion_alt(id, Instruccion0, Instruccion1, Exp)) : 
+	$.vinculo = vinculoDe(ts, id);
+	if ($.vinculo == dec_type(_,_))
+		vincula(Instruccion0)
+		vincula(Instruccion1)
+		vincula(Exp)
+	else
+		error
+
+(g)
+tipado(instruccion_alt(id, Instruccion0, Instruccion1, Exp)) : 
+	tipado(id)
+	if (ref!(id.tipo) != tipo_struct())
+		$.tipo = error
+	else
+		tipado(Intruccion0)
+		tipado(Instruccion1)
+		$.tipo = ambasOk(Intruccion0.tipo, Instruccion1.tipo)
+		tipado(Exp)
+		if ($.tipo == ok  && Exp.tipo == tipo_bool)
+			$.tipo = ok
+		else 
+			$.tipo = error
+
+(h)
+
+asig_espacio(instruccion_alt(id, Instruccion0, Instruccion1, Exp)) :
+	$.dir_ant = dir
+	asig_espacio(Instruccion0)
+	dir = $.dir_ant
+	asig_espacio(Instruccion1)
+	dir = $.dir_ant
+
+
+
+
+Orden -> Comando Refac Orden_re
+Orden → ? Comando Orden_re
+Orden_re → @ Comando Orden_re
+Orden_re → ! Orden_re
+Orden_re -> 3
+Refac → % Comando 
+Refac → $  
+Refac → 3
+Comando → msg 
+Comando → ( Orden ) 
+
+
+Escena -> Grupo E0
+	E0.ah = Grupo.a
+	Escena.a = E0.a
+E0 → * Escena 
+	E0.a = escena_compleja(E0.ah, Escena.a);
+E0 → 3
+	E0.a = escena_simple(E0.ah);
+Grupo → Elemento GR
+	GR.ah = grupo_simple(Elemento.a)
+	Grupo.a = GR.a
+Grupo → ( Elemento ) GR
+	GR.ah = grupo_simple(Elemento.a)
+	Grupo.a = GR.a
+GR → & Elemento GR
+	GR1.ah = grupo_and(GR0.ah, Elemento.a);
+	GR0.a = GR1.a
+GR → @ Elemento GR
+	GR1.ah = grupo_at(GR0.ah, Elemento.a);
+	GR0.a = GR1.a
+GR -> 3
+	GR.a = GR.ah
+Elemento →  Personaje P0 ER
+	P0.ah = Personaje.a
+	ER.ah = P0.a
+	Elemento = ER.a
+ER → :: num ER
+	ER1.ah = personaje_ponderado(ER0.ah, num.lex);
+	ER0.a = ER1.a
+ER -> 3 
+	ER.a = ER.ah
+P0 → !
+	P0.a = Personaje_principal(P0.ah);
+P0 -> 3 
+	P0.a = Personaje_secundario(P0.ah);
+Personaje → id  
+	Personaje.desc = id.lex 
+
+C := D  ! | ? B;
+B := A ! n | D : n;
+A := i;
+D := * D | i;
+
+A := B | C D ;
+B := E | F a ;
+C := a C | a ;
+D := F | E C ;
+E := b ;
+F := b ;

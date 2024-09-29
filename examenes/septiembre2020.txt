@@ -1,0 +1,195 @@
+EJERCICIO 2
+
+(a)
+
+mas a menos prioritario: (/), (*), (+, =)
+asociativo a derechas:  
+asociativo a izquierdas: +, *
+no asociativo: =, /
+
+(b)
+E0 -> E1 E0r E0i
+	E0r.ah = E1.a
+	E0i.ah = E0r.a
+	E0.a = E0i.a
+E0i -> + E1 E0i
+	E0i1.ah = suma(E0i0.ah, E1.a)
+	E0i0.a = E0i1.a
+E0i -> 3
+	E0i.a = E0i.ah
+E0r -> = E1 
+	E0r.a = igual(E0r.ah, E1.a)
+E0r -> 3 
+	E0r.a = E0r.ah 
+E1 -> E2 E1i
+	E1i.ah = E2.a
+	E1.a = E1i.a
+E1i -> * E2 E1i 
+	E1i1.ah = mul(E1i0.ah, E2.a)
+	E1i0.a = E1i1.a
+E1i -> 3
+	E1i.a = E1i.ah
+E2 -> E3 E2R
+	E2R.ah = E3.a
+	E2.a = E2R.a
+E2R -> / E3 
+	E2R.a = div(E2R.ah, E3.a)
+E2R -> 3 
+	E2R.a = E2R.ah
+E3 -> n 
+	E3.a = num(n.lex) 
+E3 -> ( E0 )
+	E3.a = E0.a
+
+EJERCICIO 3:
+
+(a)
+
+Agregar las nuevas palabras reservadas al lenguaje teniendo en cuenta que les da igual las mayusculas y las minusculas ejemplo
+
+ejem : (e | E)(j | J)(e | E)(m | M)
+
+Las nuevas palabras reservadas son: do, when, unless, finish, enddo
+
+(b)
+
+Ennnuetro lenguaje tiny no hay ninguna regla que sean listas de instrucciones separadas todas por punto y coma, por lo tanto habria que agregar
+una nueva regla auxiliar. En tiny tenemos que exite Instruccion, Expresion.
+
+Dicho esto, la gramatica añadiría las siguientes nuevas reglas:
+
+intruccion -> instruccion_dowhen
+instruccion_dowhen -> do lIntrucciones when Expresion finish lIntrucciones unless Expresion finish lIntrucciones enddo
+lIntrucciones -> lIntrucciones ; Instruccion
+lIntrucciones -> Instruccion ;
+
+No se dice nada de que las listas de insturcciones puede estar vacia, asi que asumimos que son obligatorias para la construccion de la insturccion.
+
+(c)
+
+Primero abstraemos la gramatica para poder sacar sus constructores, es decir, eliminamos reglas puente y quitamos caracteres que no tengan carga semantica
+
+intruccion -> do lIntrucciones  Expresion  lIntrucciones  Expresion  lIntrucciones enddo
+lIntrucciones -> lIntrucciones ; Instruccion
+lIntrucciones -> Instruccion ;
+
+Generos:
+	intruccion -> Instr
+	Expreison -> Exp
+	lIntrucciones -> LInstr
+
+Constructores:
+intruccion -> do lIntrucciones  Expresion  lIntrucciones  Expresion  lIntrucciones enddo
+	inst_do : lInstr x Exp x lInstr x Exp x LInstr -> Instr
+lIntrucciones -> lIntrucciones ; Instruccion
+	muchas_inst : LInstr x Instr -> LInstr
+lIntrucciones -> Instruccion ;
+	una_inst : Instr -> LInstr
+
+(d)
+
+intruccion -> instruccion_dowhen
+	instruccion.a = instruccion_dowhen.a
+instruccion_dowhen -> do lIntrucciones when Expresion finish lIntrucciones unless Expresion finish lIntrucciones enddo
+	instruccion_dowhen.a = inst_do(lIntrucciones0.a, Expresion0.a, lIntrucciones1.a, Expresion1.a, lIntrucciones2.a)
+lIntrucciones -> lIntrucciones ; Instruccion
+	lIntrucciones = muchas_inst(lIntrucciones.a, Insturccion.a)
+lIntrucciones -> Instruccion ;
+	lIntrucciones = una_inst(Insturccion.a)
+
+(e)
+
+Tenemos que eliminar la recursion a izquierdas de lInstrucciones
+
+lIntrucciones -> Instruccion ; Ir
+	Ir.ah = una_inst(Insturccion.a)
+	lIntrucciones.a = Ir.a 
+Ir -> ; Instruccion Ir
+	Ir1.ah = muchas_inst(Ir0.ah, Insturccion.a)
+	Ir0.a = Ir1.a
+Ir -> 3
+	Ir.a = Ir.ah
+
+Seria lo que habria que adaptar para poder hacer una implementacion descendente
+
+
+(f)
+
+vincula(inst_do(lInstr1, Exp1, lInstr2, Exp2, lInstr3)) : 
+	vincula(lInstr1)
+	vincula(Exp1)
+	vincula(lInstr2)
+	vincula(Exp2)
+	vincula(lInstr3)
+vincula(muchas_inst(lIntr, Inst)) :
+	vincula(lInstr)
+	vincula(Inst)
+vincula(una_inst(Inst)) : 
+	vincula(Inst)
+
+(g)
+
+tipado(inst_do(lInstr1, Exp1, lInstr2, Exp2, lInstr3)) :
+	tipado(lInstr1)
+	tipado(Exp1)
+	tipado(lInstr2)
+	tipado(Exp2)
+	tipado(lInstr3)
+	if (ref!(Exp1.tipo) == tipo_bool && ref!(Exp2.tipo) == tipo_bool)
+		$.tipo = tresOK(lInstr1, lInstr2, lInstr3)
+	else
+		if Exp1.tipo != tipo_bool
+			avisa_error(Exp1)
+		endif
+		if Exp.tipo != tipo_bool
+			avisa_error(Exp2)
+		endif
+		$.tipo = error
+	endif
+tipado(muchas_inst(lIntr, Inst)) :
+	tipado(lInstr)
+	tipado(Inst)
+tipado(una_inst(Inst)) : 
+	tipado(Inst)
+
+(h)
+
+asig_espacio(inst_do(lInstr1, Exp1, lInstr2, Exp2, lInstr3)) : 
+	asig_espacio(lInstr1)
+	asig_espacio(lInstr2)
+	asig_espacio(lInstr3)
+asig_espacio(muchas_inst(lIntr, Inst)) :
+	asig_espacio(lInstr)
+	asig_espacio(Inst)
+asig_espacio(una_inst(Inst)) : 
+	asig_espacio(Inst)
+
+(i)
+
+etiquetado(inst_do(lInstr1, Exp1, lInstr2, Exp2, lInstr3)) : 
+	$.prim = etq
+	etiquetado(lInstr1)
+	etiquetado(Exp1)
+	etq++
+	etiquetado(lInstr2)
+	etiquetado(Exp2)
+	etq++
+	etiquetado(lInstr3)
+	etq++
+	$.sig = etq
+
+(j)
+
+Si no existe el ir_f se agregan pero como en nuestro proyecto existen no hace falta añadir mas
+
+(k)
+
+gen-codigo(inst_do(lInstr1, Exp1, lInstr2, Exp2, lInstr3)) : 
+	gen-cod(lInstr1)
+	gen-cod(Exp1)
+	ir_t($.sig)
+	gen-cod(lInstr2)
+	gen-cod(Exp2)
+	ir_f($.sig)
+	gen-cod(lInstr3)
+	ir_a($.prim)

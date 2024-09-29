@@ -1,0 +1,169 @@
+EJERCICIO 3
+
+A -> @ B A RA
+	RA.ah = grupo(B.a, A1.a)
+	A0.a = RA.a
+A -> @ B B RA
+	RA.ah = grupo(B0.a, B1.a)
+	A.a = RA.a
+RA -> , B RA
+	RA1.ah = lista(RA0.ah, B.a)
+	RA0.a = RA1.a
+RA -> 3
+	RA.a = RA.ah
+B -> str BR
+	BR.ah = str.lex
+	B.a = BR.a
+BR ->  B  
+	BR.a = linea(BR.ah, B.a)
+BR ->  # 
+	BR.a = string(BR.ah)
+
+
+EJERCICIO 4
+
+(a)
+
+Agregar las nuevas palabras reservadas al lenguaje teniendo en cuenta que les da igual las mayusculas y las minusculas ejemplo
+
+ejem : (e | E)(j | J)(e | E)(m | M)
+
+Las nuevas palabras reservadas son: do, exitif, finally, endo
+
+(b)
+
+intruccion -> instruccion_do
+instruccion_dowhen -> do lIntrucciones exitif Expresion while Expresion finally lIntrucciones endo
+lIntrucciones -> lIntrucciones ; Instruccion
+lIntrucciones -> Instruccion ;
+
+(c)
+
+Primero abstraemos la gramatica para poder sacar sus constructores, es decir, eliminamos reglas puente y quitamos caracteres que no tengan carga semantica
+
+intruccion -> do lIntrucciones exitif Expresion while Expresion finally lIntrucciones endo
+lIntrucciones -> lIntrucciones ; Instruccion
+lIntrucciones -> Instruccion ;
+
+Generos:
+	intruccion -> Instr
+	Expreison -> Exp
+	lIntrucciones -> LInstr
+
+Constructores:
+intruccion -> do lIntrucciones exitif Expresion while Expresion finally lIntrucciones endo
+	inst_do : lInstr x Exp x Exp x LInstr -> Instr
+lIntrucciones -> lIntrucciones ; Instruccion
+	muchas_inst : LInstr x Instr -> LInstr
+lIntrucciones -> Instruccion ;
+	una_inst : Instr -> LInstr
+
+(d)
+
+intruccion -> instruccion_do
+	instruccion.a = instruccion_do.a
+instruccion_do -> do lIntrucciones exitif Expresion while Expresion finally lIntrucciones endo
+	instruccion_do.a = inst_do(lIntrucciones0.a, Expresion0.a, Expresion1.a, lIntrucciones1.a)
+lIntrucciones -> lIntrucciones ; Instruccion
+	lIntrucciones = muchas_inst(lIntrucciones.a, Insturccion.a)
+lIntrucciones -> Instruccion ;
+	lIntrucciones = una_inst(Insturccion.a)
+
+(e)
+
+Tenemos que eliminar la recursion a izquierdas de lInstrucciones
+
+lIntrucciones -> Instruccion ; Ir
+	Ir.ah = una_inst(Insturccion.a)
+	lIntrucciones.a = Ir.a 
+Ir -> ; Instruccion Ir
+	Ir1.ah = muchas_inst(Ir0.ah, Insturccion.a)
+	Ir0.a = Ir1.a
+Ir -> 3
+	Ir.a = Ir.ah
+
+Seria lo que habria que adaptar para poder hacer una implementacion descendente
+
+(f)
+
+vincula(inst_do(lInstr1, Exp1, Exp2, lInstr2)) : 
+	vincula(lInstr1)
+	vincula(Exp1)
+	vincula(Exp2)
+	vincula(lInstr2)
+vincula(muchas_inst(lIntr, Inst)) :
+	vincula(lInstr)
+	vincula(Inst)
+vincula(una_inst(Inst)) : 
+	vincula(Inst)
+
+(g)
+
+tipado(inst_do(lInstr1, Exp1, Exp2, lInstr2)) : 
+	tipado(lInstr1)
+	tipado(Exp1)
+	tipado(Exp2)
+	tipado(lInstr2)
+	if (exp!(Exp1.tipo) == tipo_bool && exp!(Exp2.tipo) == tipo_bool)
+		$.tipo = ambosOK(lInstr1, lInstr2)
+	else
+		if (exp!(Exp1.tipo) != tipo_bool)
+			aviso_error(Exp1)
+		endif
+		if (exp!(Exp2.tipo) != tipo_bool)
+			aviso_error(Exp2)
+		endif
+		$.tipo = error
+	endif
+tipado(muchas_inst(lIntr, Inst)) :
+	tipado(lInstr)
+	tipado(Inst)
+tipado(una_inst(Inst)) : 
+	tipado(Inst)
+
+(h)
+
+asig_espacio(inst_do(lInstr1, Exp1, Exp2, lInstr2)) : 
+	asig_espacio(lInstr1)
+	asig_espacio(lInstr2)
+asig_espacio(muchas_inst(lIntr, Inst)) :
+	asig_espacio(lInstr)
+	asig_espacio(Inst)
+asig_espacio(una_inst(Inst)) : 
+	asig_espacio(Inst)
+
+(i)
+
+etiquetado(inst_do(lInstr1, Exp1, Exp2, lInstr2)) : 
+	$.prim = etq
+	etiquetado(lInstr1)
+	etiquetado(Exp1)
+	etq++
+	etiquetado(Exp2)
+	etq++
+	etiquetado(lInstr2)
+	$.sig = etq
+etiquetado(muchas_inst(lIntr, Inst)) :
+	etiquetado(lInstr)
+	etiquetado(Inst)
+etiquetado(una_inst(Inst)) : 
+	etiquetado(Inst)
+
+(j)
+
+No hace falta modificar nada del repertorio de la maquina p
+
+(k)
+
+gen_cod(inst_do(lInstr1, Exp1, Exp2, lInstr2)) : 
+	gen_cod(lInstr1)
+	gen_cod(Exp1)
+	irv($.sig)
+	gen_cod(Exp2)
+	irv($.prim)
+	gen_cod(lInstr2)
+gen_cod(muchas_inst(lIntr, Inst)) :
+	gen_cod(lInstr)
+	gen_cod(Inst)
+gen_cod(una_inst(Inst)) : 
+	gen_cod(Inst)
